@@ -1,0 +1,16 @@
+# dependencies
+node_modules/
+
+# build output
+dist/
+
+# slidev / vite caches
+.vite/
+.slidev/
+
+# playwright browsers (installed locally per CLAUDE.md)
+.pw-browsers/
+
+# logs & os cruft
+*.log
+.DS_Store
