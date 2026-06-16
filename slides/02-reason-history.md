@@ -32,7 +32,9 @@ clicks: 5
 </div>
 
 <style>
-.tl-stage { gap: 1.6rem; justify-content: center; }
+/* Extra gap so the title clears the milestone cards that sit ABOVE the
+   axis (even markers reach ~20px below the timeline's top edge). */
+.tl-stage { gap: 4rem; justify-content: center; }
 </style>
 
 <!--

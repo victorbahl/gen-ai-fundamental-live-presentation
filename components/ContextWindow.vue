@@ -90,8 +90,8 @@ onSlideEnter(() => flash.value++)
 .cell {
   aspect-ratio: 1;
   border-radius: 4px;
-  border: 1px solid #1c212c;
-  background: #11151d;
+  border: 1px solid var(--sunken-border);
+  background: var(--sunken);
   transition: background 0.4s ease, border-color 0.4s ease, opacity 0.4s ease;
 }
 .cell.empty { opacity: 0.55; }

@@ -147,8 +147,8 @@ const roleColor = (r) =>
   line-height: 1.3;
   transition: opacity 0.35s ease;
 }
-.bubble.user { align-self: flex-end; background: #1e3a5f; color: #dbeafe; border-bottom-right-radius: 4px; }
-.bubble.asst { align-self: flex-start; background: #2a2118; color: #fde7cf; border-bottom-left-radius: 4px; }
+.bubble.user { align-self: flex-end; background: var(--bubble-user-bg); color: var(--bubble-user-ink); border-bottom-right-radius: 4px; }
+.bubble.asst { align-self: flex-start; background: var(--bubble-asst-bg); color: var(--bubble-asst-ink); border-bottom-left-radius: 4px; }
 
 .sr-foot {
   display: flex; justify-content: space-between; gap: 0.6rem;
@@ -184,7 +184,7 @@ const roleColor = (r) =>
 .msg {
   display: flex; gap: 0.6rem; align-items: baseline;
   font-size: 0.74rem; line-height: 1.25;
-  padding-bottom: 0.3rem; border-bottom: 1px dashed #20252f;
+  padding-bottom: 0.3rem; border-bottom: 1px dashed var(--hair);
   transition: opacity 0.35s ease;
 }
 .msg:last-child { border-bottom: none; }

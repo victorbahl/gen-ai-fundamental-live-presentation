@@ -62,7 +62,7 @@ layout: default
   position: absolute; bottom: 9px; left: 16px;
   font-family: var(--mono); font-size: 0.62rem; color: var(--ink-faint); opacity: 0.7;
 }
-.nbox.ml  { inset: 42px 34px 34px 34px; background: #1a2030; }
+.nbox.ml  { inset: 42px 34px 34px 34px; background: var(--nest-mid); }
 .nbox.gen {
   inset: 96px 196px 46px 196px;
   border-color: var(--warm); background: rgba(232,121,74,0.12);

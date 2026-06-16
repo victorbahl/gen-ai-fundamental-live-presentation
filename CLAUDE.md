@@ -16,22 +16,35 @@ Every rule the user gives is recorded here and must be respected on every slide.
 ## Deck structure (20 slides)
 
 Cover · Roadmap · **I** Part-opener / Timeline / "Prediction→reasoning" ·
-**II** Part-opener / NextTokenPredictor / ContextWindow / "remembers nothing" /
+**II** Part-opener / NextTokenPredictor / AttentionFlip / ContextWindow / "remembers nothing" /
 StatelessReplay (hero) / "no memory" payoff · **III** Part-opener / Tools flow /
 McpEnvelope / MCP Mermaid sequence · **IV** Part-opener / AgentLoop / Anatomy of an agent /
 A2A · Close.
 
 Components: `Hero.vue` (Archetype A), `Timeline.vue`, `NextTokenPredictor.vue`,
-`ContextWindow.vue`, `StatelessReplay.vue`, `McpEnvelope.vue`, `AgentLoop.vue`.
+`AttentionFlip.vue`, `ContextWindow.vue`, `StatelessReplay.vue`, `McpEnvelope.vue`,
+`AgentLoop.vue`.
 
 ## Status (as of session end, 2026-06-16)
 
 - All slides + components written; **production build compiles clean** (`slidev build`).
-- **Just fixed 3 rendering bugs** (see Lessons #1–3). **NOT yet visually verified** — next
-  session should confirm rendering (screenshot or user refresh) BEFORE claiming success.
-- Open / not done: visual QA pass; PDF/PPTX export (needs `playwright-chromium`, whose
-  browser download is sandbox-blocked — install to project `./.pw-browsers` with sandbox off);
-  polish pass (pacing, spacing, the timeline above/below-axis layout at real resolution).
+- **Part II reworked this session.** `NextTokenPredictor.vue` was rebuilt from scratch into the
+  "pipeline" design (FT-inspired — see ig.ft.com/generative-ai): prompt shown as an input field →
+  **tokenise** into sub-word chips → each token → a **column of numbers** → a **grid of weights**
+  (real signed values printed in cells, one-shot compute sweep) → **equalizer bars** for the
+  next-token distribution (unsorted, warm winner in the MIDDLE) → **loops** through "MuleSoft", ",",
+  "obviously" (7 clicks; sweep replays each pass; blinking caret throughout). Several alternative
+  explorations (mesh/map/grid/features/spectrum) were built to compare, then **deleted** once this
+  design was chosen — do not resurrect them. Running prompt is now "The best Salesforce acquisition
+  is" (shortened from the old 8-word version).
+- New `AttentionFlip.vue` slide added (FT "bank" idea: same word, two sentences, attention arcs
+  draw to the neighbours that fix its meaning). Marked optional in its speaker notes.
+- **NOT yet visually verified** — the pipeline is wide (1100-unit viewBox); next session should
+  confirm rendering (user refresh / screenshot) BEFORE claiming success, esp. the prompt line not
+  overflowing, the numbers grid spacing, and the right-edge bars not clipping.
+- Open / not done: visual QA pass; a planned "v2" polish of `NextTokenPredictor.vue`; PDF/PPTX
+  export (needs `playwright-chromium`, whose browser download is sandbox-blocked — install to
+  project `./.pw-browsers` with sandbox off); the timeline above/below-axis layout at real res.
 - The 7 hero backgrounds are gradient placeholders; drop real photos at `public/img/cover.jpg`,
   `part-1.jpg`, `part-2.jpg`, `part-2b.jpg`, `part-3.jpg`, `part-4.jpg`, `close.jpg`.
 - Before presenting: set `--photo-tag-display: none` in `styles/index.css` to hide photo tags.
@@ -71,6 +84,17 @@ Components: `Hero.vue` (Archetype A), `Timeline.vue`, `NextTokenPredictor.vue`,
    `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1` to install the package, and install the browser separately
    into a writable path (`PLAYWRIGHT_BROWSERS_PATH=./.pw-browsers`) with sandbox off.
 
+7. **Never put `v-if` and `v-for` on the SAME element (Vue 3).** Vue 3 evaluates `v-if` BEFORE
+   `v-for`, so the loop variable doesn't exist yet — `v-if="p.label"` throws
+   `Cannot read properties of undefined`. This crash is invisible to `slidev build` (it compiles)
+   but breaks the slide at runtime in the browser. Fix: precompute the filtered list in `<script>`
+   (`const labelled = items.filter(p => p.label)`) and `v-for` over that.
+
+8. **`Math.random()` / `Date.now()` are unavailable in some run contexts.** For decorative jitter
+   (cell values, animation delays) use a deterministic pseudo-random seeded by index:
+   `const rnd = (i) => { const x = Math.sin(i * 12.9898) * 43758.5453; return x - Math.floor(x) }`.
+   Bonus: deterministic = stable across re-renders (no flicker).
+
 ## Rules (newest at the bottom)
 
 1. **Language.** The user writes/comments in French. **All deliverables stay in English** —
@@ -96,3 +120,13 @@ Components: `Hero.vue` (Archetype A), `Timeline.vue`, `NextTokenPredictor.vue`,
 
 5. **No on-slide "API analogy" callout.** Drop the 🔌 emoji/badge linking concepts to APIs —
    it adds nothing on the slide. (Brief API parallels may stay in *speaker notes* only.)
+
+6. **Animations: beat-driven, eased, one-shot — not ambient loops.** Motion should explain, like
+   the FT explainer (ig.ft.com/generative-ai): each click triggers ONE eased, finite reveal — a
+   line draws in (`stroke-dashoffset`), a point fades to its slot, a bar grows, a value appears.
+   Use `cubic-bezier(0.22, 1, 0.36, 1)` ("settle into place") and stagger groups via
+   `transition-delay`. AVOID infinite `animation: … infinite` ambient flow/pulse — it reads as
+   decoration and distracts. (The blinking caret is the one allowed loop: it signals "generating".)
+   To REPLAY a one-shot CSS animation on a later beat, bump a `:key` on the element so Vue remounts
+   it (see the weight-sweep in `NextTokenPredictor.vue`). Still obeys Rule 4: things animate INTO
+   their own reserved slot; nothing reflows.

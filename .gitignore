@@ -11,6 +11,9 @@ dist/
 # playwright browsers (installed locally per CLAUDE.md)
 .pw-browsers/
 
+# background-photo candidates (scratch; pick one → public/img/)
+scripts/_candidates/
+
 # logs & os cruft
 *.log
 .DS_Store
