@@ -9,9 +9,6 @@ drawings:
   persist: false
 transition: fade
 mdc: true
-# Hash routing so the deck works under a GitHub Pages sub-path
-# (no server-side SPA rewrites there). URLs become /#/1, /#/2, …
-routerMode: hash
 fonts:
   provider: none
 ---
