@@ -61,7 +61,7 @@ tool the agent may call. "An agent carries its whole toolbox description on ever
 it does anything."
 
 [click] The goal goes in — green, set once: "sort out order #4471".
-[click] First loop: it thinks, calls get_order, and the API's JSON response is folded straight back
+[click] First loop: it thinks, calls get_order_status, and the API's JSON response is folded straight back
 into the window — the amber "tool data". Point out the scale jumped: each cell here is ~2k tokens.
 [click] Another loop, another Observe, another blob of data. Make the key point: it's tool OUTPUT,
 not your prose, that fills an agent's window — and it grows every single step. We're nearly full

@@ -3,7 +3,7 @@ import { computed } from 'vue'
 import { useSlideContext } from '@slidev/client'
 
 /*
-  AgentContextWindow (Part IV) — the SAME fixed-space grid as ContextWindow.vue,
+  AgentContextWindow (Part 3 — Agents) — the SAME fixed-space grid as ContextWindow.vue,
   but seen through an AGENT loop. Two new content types appear, and they're the
   whole point of this slide:
 
@@ -40,9 +40,9 @@ const beats = [
   { sys: 3, defs: 7, goal: 3, hist: 0,  data: 0,  mem: 0,
     caption: 'The user’s goal goes in: “sort out order #4471”. Set once — green.' },
   { sys: 3, defs: 7, goal: 3, hist: 4,  data: 14, mem: 0,
-    caption: 'One loop: the agent thinks, calls get_order — and the API’s response, a big JSON blob, is folded straight into the window.' },
+    caption: 'One loop: the agent thinks, calls get_order_status — and the API’s response, a big JSON blob, is folded straight into the window.' },
   { sys: 3, defs: 7, goal: 3, hist: 8,  data: 29, mem: 0,
-    caption: 'Another loop. Each Observe dumps more data. It’s tool OUTPUT — not your prose — that fills an agent’s window, fast.',
+    caption: 'Another loop. Each Observe dumps more data. It’s tool OUTPUT — not our prose — that fills an agent’s window, fast.',
     note: { text: 'Window almost full — after only a few loops', tone: 'warn' } },
   { sys: 3, defs: 7, goal: 3, hist: 6,  data: 8,  mem: 4,
     caption: 'So the agent offloads: it writes a compact note to EXTERNAL memory, drops the raw blobs, and pulls the note back only when it needs it.',

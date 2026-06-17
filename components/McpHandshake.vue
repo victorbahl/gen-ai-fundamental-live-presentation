@@ -80,7 +80,7 @@ const isOn = (i) => c.value >= i
 
     <div class="foot" :style="{ opacity: c >= 3 ? 1 : 0 }">
       One session, three standard calls — <strong>discover</strong> then <strong>call</strong>.
-      Same shape for every server, so any model talks to any tool.
+      Same shape for every server, so any AI app talks to any tool.
     </div>
   </div>
 </template>

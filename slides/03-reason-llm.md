@@ -21,7 +21,7 @@ layout: default
   accent="warm"
   num="02"
   headline="How the model actually works"
-  sub="tokens · attention · stateless · the context window" />
+  sub="tokens · attention · stateless · the window · its limits" />
 
 <!--
 Part two — LLMs. We just saw prediction at scale start to look like reasoning. Now we open the box
@@ -102,6 +102,17 @@ the same line as the original prompt, and one number column per token.
 append → feed the whole thing back. "Everything that feels like intelligence is this loop, run fast
 at enormous scale. Notice what's NOT here: no plan, and no memory — each pass starts cold from the
 text in front of it. Hold that thought; it's the key to the whole back half of the talk."
+
+HOW DOES IT STOP? (likely question) There's no "nothing" with a probability — stopping is just
+another ordinary token winning the distribution. The vocabulary includes a special END-OF-SEQUENCE
+token (EOS = End Of Sequence; written <eos> / <|endoftext|>, or for chat models an end-of-turn marker
+like <|eot_id|> / <|im_end|>). It sits in the vocab right next to "the" and "MuleSoft", and the model
+scores it on every pass. When the model has finished the thought, that EOS token is the tallest bar —
+it wins, we halt. So it's not the ABSENCE of a token; it's the PRESENCE of a learned "I'm done" token
+(real text in training ended, and those endings were marked with it). Footnote if pressed: the runtime
+can also force a stop independently of the model — a max_tokens cap (the "cut off mid-sentence" case)
+or a user-supplied stop sequence. "Finished naturally" = model emitted EOS; "cut off" = a limit hit
+first.
 -->
 
 ---
@@ -241,7 +252,10 @@ an agent's tools and their results fill this same space far faster.)
 layout: default
 ---
 
-<!-- WHAT CHANGED — Archetype A claim over the rocket-launch photo -->
+<!-- WHAT CHANGED — Archetype A claim over the rocket-launch photo.
+     Closes Part 2: having seen the mechanism end to end (tokens → attention →
+     stateless → window), we name the payoff — and bridge into Part 3, where
+     we get honest about the limits and start building around the model. -->
 
 <Hero bg="prediction-at-scale.jpg" kicker="What changed" align="center" size="sm">
   Prediction at scale started to look like <span class="grad-warm">reasoning.</span>
@@ -255,5 +269,75 @@ layout: default
 Here's the whole magic trick in one line, over a rocket at liftoff. Prediction at scale starts to
 look like reasoning. Train a model to predict the next word across the entire internet, and to get
 good at that it has to absorb grammar, facts, style, even reasoning patterns. "Predict the next word"
-becomes "answer the question." Which is exactly what we'll look at next.
+becomes "answer the question." That's the model at its best — and it's genuinely powerful. Next we
+get honest about where it falls short, and start building the scaffolding around it.
+-->
+
+---
+layout: default
+clicks: 2
+---
+
+<!-- HALLUCINATION — the flip side of "predict the next token". The model
+     emits the most PLAUSIBLE continuation over frozen weights; it never looked
+     anything up. So it can be fluent, confident, AND wrong. Pays off the
+     predictor ("a distribution, a ranked guess") + the frozen-weights beat.
+     NB: header comment AFTER the frontmatter (a comment before the first `---`
+     renders as a stray blank slide). -->
+
+<div class="demo-stage">
+  <div class="demo-head">
+    <div class="kicker">The flip side of prediction</div>
+    <h2>It predicts <span class="grad-warm">plausible</span> — not true</h2>
+  </div>
+  <Hallucination />
+</div>
+
+<!--
+The catch, and it's the one that matters most when we build on this. On arrival: a question — "where's
+my order #7788?" — and the model's answer, fluent and specific: "shipped Monday, arriving Wednesday,"
+with a confidence gauge sitting at 94%. Ask the room to take the answer at face value for a second.
+[click] Now the actual record from the Order API: status payment_failed, never shipped. The confident
+answer was simply wrong — and notice the model was no less fluent for it.
+[click] Why this happens is everything we just built: the model emitted the most PLAUSIBLE next tokens
+over its frozen weights. It never queried a system — there was no lookup. So fluent isn't correct, and
+confident isn't true. This is "hallucination," and it's not a bug we can patch out — it's what
+next-token prediction DOES. Which raises the obvious question: how do we make it trustworthy on OUR
+facts? That's the next slide.
+-->
+
+---
+layout: default
+clicks: 3
+---
+
+<!-- GROUNDING — the answer to hallucination + the on-ramp to tools (Part 3).
+     Two places knowledge can live → change one: the WEIGHTS (re-train / fine-
+     tune — costly, and fine-tune is for behaviour not facts) or the CONTEXT
+     (feed facts in at call time — RAG for static docs, tool calls for live
+     data). The live-data branch bridges straight into Part 3. -->
+
+<div class="demo-stage">
+  <div class="demo-head">
+    <div class="kicker">Make it accurate</div>
+    <h2>Grounding — put the right <span class="grad-warm">facts</span> in front of it</h2>
+  </div>
+  <Grounding />
+</div>
+
+<!--
+So how do we make it accurate on our facts? Frame it cleanly: a model's knowledge lives in exactly two
+places, so to fix what it knows we change one of them. On arrival, the two paths are on screen.
+[click] Path A — change the WEIGHTS, bake the knowledge in. Two ways. Re-train from scratch:
+astronomically expensive, nobody does this to add facts. Fine-tune: much cheaper — but here's the
+misconception to kill: fine-tuning teaches STYLE and BEHAVIOUR, not facts. It's unreliable for facts,
+it can't cite a source, and it goes stale the moment our data changes. Wrong tool for "know our data."
+[click] Path B — change the CONTEXT instead. Leave the weights frozen and hand the model the relevant
+facts at call time, in the window. Two flavours. RAG: retrieve text from a knowledge base — great for
+large, static, unstructured stuff like docs and policies. And tool calls: the model calls a live API
+for fresh, authoritative, structured data — like an order's real status. That second one is exactly
+what we build next.
+[click] Land it: grounding is just putting the right facts in the window. For live data, that's a tool
+call — and that's the whole next part. One honest caveat: grounding sharply cuts hallucination on the
+facts we supply; it never drives it fully to zero, because the model can still misread what we give it.
 -->

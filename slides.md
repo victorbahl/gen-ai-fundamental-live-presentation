@@ -22,8 +22,8 @@ fonts:
      without touching the same file. Edit section content THERE,
      not here. Keep this file to the cover + the include list. -->
 
-<Hero bg="cover.jpg" kicker="GenAI · a team refresher">
-  The GenAI refresher<br>you didn't <span class="grad-warm">ask for</span>
+<Hero bg="cover.jpg" kicker="Hackathon AI · SE French Team" :logos="['mulesoft.svg', 'informatica.svg']">
+  The GenAI refresher<br>you <span class="grad-warm">didn't ask for</span>
   <template #subtitle>
     ...but might enjoy anyway 😊
     

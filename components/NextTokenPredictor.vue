@@ -36,7 +36,7 @@ const bWeights = computed(() => r.value >= 3)   // numbers → weight grid + swe
 
 // generation beats: r=4 → step 0 (MuleSoft) … r=7 → step 3 (".")
 const steps = [
-  { token: 'MuleSoft',  cands: [['MuleSoft', 0.44], ['Slack', 0.38], ['Informatica', 0.38], ['Tableau', 0.18]] },
+  { token: 'MuleSoft',  cands: [['MuleSoft', 0.44], ['Slack', 0.21], ['Informatica', 0.16], ['Tableau', 0.09]] },
   { token: ',',         cands: [[',', 0.74], ['.', 0.15], ['and', 0.07], ['—', 0.04]] },
   { token: 'obviously', cands: [['obviously', 0.52], ['naturally', 0.27], ['clearly', 0.13], ['right?', 0.08]] },
   { token: '.',         cands: [['.', 0.63], ['too', 0.18], ['really', 0.12], ['!', 0.07]] },

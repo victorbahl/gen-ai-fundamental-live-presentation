@@ -32,11 +32,11 @@ const CELL_K = 0.5          // each cell ≈ 0.5k tokens (teaching scale)
 // segment order is FIXED: system → summary → history → current → free.
 const beats = [
   { sys: 3, sum: 0, hist: 0,  cur: 0,
-    caption: 'Before you type a word, the window already holds the system prompt — the rules, pinned to the front of every call.' },
+    caption: 'Before we type a word, the window already holds the system prompt — the rules, pinned to the front of every call.' },
   { sys: 3, sum: 0, hist: 0,  cur: 3,
-    caption: 'Your first question goes in — the live turn, a few hundred tokens.' },
+    caption: 'Our first question goes in — the live turn, a few hundred tokens.' },
   { sys: 3, sum: 0, hist: 14, cur: 3,
-    caption: 'The model answers and you reply. Each turn is appended to the history — the window fills.' },
+    caption: 'The model answers and we reply. Each turn is appended to the history — the window fills.' },
   { sys: 3, sum: 0, hist: 34, cur: 3,
     caption: 'More turns. History keeps stacking up; the free space shrinks.' },
   { sys: 3, sum: 0, hist: 54, cur: 3,

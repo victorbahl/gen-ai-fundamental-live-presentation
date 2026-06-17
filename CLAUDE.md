@@ -26,8 +26,9 @@ Cover · Humility · Roadmap (AI · LLMs · Agents) ·
 **1 — AI** (`02-reason-history.md`): PartOpener (AI, spine bar) / "GenAI is a small box" zoom (moved
 here from `01-intro.md`) / Timeline / "Prediction→reasoning" claim ·
 **2 — LLMs** (`03-reason-llm.md`): PartOpener (LLMs, spine bar) / NextTokenPredictor / AttentionFlip /
-StatelessReplayStack / StatelessReplayFilmstrip / ContextWindow (LAST — closes Part 2, bridges to
-agents) ·
+StatelessReplayStack / StatelessReplayFilmstrip / ContextWindow / "Prediction→reasoning" claim Hero /
+Hallucination / Grounding (Hallucination + Grounding are the LAST two — they get honest about the
+model's limits and bridge into Part 3's tools) ·
 **3 — Agents** (`04-act-tools.md` + `05-act-agents.md`, ONE part): PartOpener (Agents, spine bar) /
 Tools flow / McpEnvelope / McpHandshake / AgentLoop / AgentContextWindow / Anatomy of an agent / A2A ·
 Close.
@@ -58,7 +59,22 @@ files starting with `---`, never a leading comment.
 Components: `Hero.vue` (Archetype A), `PartOpener.vue` (part-opener hero w/ spine bar),
 `Timeline.vue`, `NextTokenPredictor.vue`, `AttentionFlip.vue`, `ContextWindow.vue`,
 `AgentContextWindow.vue`, `StatelessReplay.vue`, `McpEnvelope.vue`, `McpHandshake.vue`,
-`AgentLoop.vue`.
+`AgentLoop.vue`, `Hallucination.vue`, `Grounding.vue`.
+
+`Hallucination.vue` + `Grounding.vue` are the Part-2 closing PAIR (after the "Prediction→reasoning"
+claim). HALLUCINATION (clicks:2): two cards — the model's fluent answer + a 94% confidence gauge
+(left, warm) vs the actual Order-API record that DIFFERS (right, cool), a "≠" badge between, payoff
+band "no lookup happened · fluent ≠ correct · confident ≠ true". Uses order #7788 (a FRESH number, so
+it doesn't imply the earlier #4471 "shipped" answers were hallucinated). The teaching point: the model
+emits the most PLAUSIBLE tokens over frozen weights — hallucination is what next-token prediction DOES,
+not a patchable bug. GROUNDING (clicks:3): a decision diagram — "two places knowledge can live → change
+one". Path A = change the WEIGHTS (re-train = too costly; fine-tune = STYLE/BEHAVIOUR not facts, can't
+cite, goes stale — the misconception to kill). Path B = change the CONTEXT, weights frozen (RAG =
+retrieve static docs; Tool calls = live authoritative API, lit warm as "what we build next"). Payoff
+bridges into Part 3. HONEST CAVEAT baked in (user ask): grounding cuts hallucination on covered facts,
+never to zero. GROUNDING MODEL validated with user 2026-06-17: knowledge = weights OR context; fix one.
+Fine-tune≠facts and RAG-vs-tools-by-data-shape (static unstructured docs vs live structured API) are
+the two accuracy nuances that must stay.
 
 `McpEnvelope.vue` + `McpHandshake.vue` are the Part-3 (Agents) MCP pair. The envelope slide shows REST
 (left) vs MCP server (right) as TWO HTTP requests with the SAME Bearer auth and JSON content type —
@@ -92,7 +108,34 @@ session / offload). Segment order is FIXED (system → … → free) so cells on
 
 ## Status (as of session end, 2026-06-17)
 
-- **This session (2026-06-17, OPENER CLEANUP — newest): empties, box move, tags, more cuts.**
+- **This session (2026-06-17, ACCURACY/CONSISTENCY PASS — newest): fixed wrong info + inconsistencies.**
+  Full read-through of every slide + component for accuracy/consistency, then fixes (all per user
+  "fix everything"): (1) `NextTokenPredictor.vue` step-0 distribution summed to 138% (impossible) —
+  retuned to MuleSoft .44 / Slack .21 / Informatica .16 / Tableau .09 (clear winner, sums ≤ 1).
+  (2) `Timeline.vue` 1950s was mislabelled "Expert systems" (those are 70s–80s) → "Symbolic AI".
+  (3) "Prediction at scale → reasoning" claim Hero — its forward-ref ("look at next") used to dangle
+  toward Agents. CORRECTION (user, 2026-06-17): user wants it KEPT at the END of Part 2
+  (`03-reason-llm.md`, after ContextWindow) — it closes the LLM mechanism and bridges into Part 3.
+  (I briefly moved it to end of Part 1, then reverted per user preference.) Its note now reads
+  "next we get honest about where it falls short" — bridging into the planned hallucination/grounding
+  beats + the Agents scaffolding. Do NOT move it back to Part 1. (4) Close (`06-close.md`) called back to an
+  "opening question — can a machine think?" that the cover no longer asks → rewrote to call back the
+  "less magic, more system" promise. (5) `McpHandshake.vue` footer "any model talks to any tool" →
+  "any AI app" (matches the MCP-consumer-is-the-app accuracy rule). (6) Unified tool name `get_order`
+  → `get_order_status` (was split across `05-act-agents.md` + `AgentContextWindow.vue`). (7) Roadmap
+  LLMs sub-line `tokens · attention · memory` → `· stateless` (the part teaches NO memory). (8) Rule-9
+  "we" voice: fixed on-slide "you" leaks in `ContextWindow.vue` (2 captions), `AgentContextWindow.vue`
+  (1 caption), `06-close.md` subtitle. (9) Stale "(Part IV)" comment in `AgentContextWindow.vue` →
+  "(Part 3 — Agents)". Build compiles clean (`slidev build`, 533 modules).
+  Then (same session, user "do everything"): BUILT the two missing essentials as new slides at the
+  END of Part 2 (after the claim Hero, before the Agents opener) — `Hallucination.vue` (clicks:2) and
+  `Grounding.vue` (clicks:3), both auto-imported, both following Rule 4/8 + brand tokens; see Components
+  section for their design + the validated grounding model. Part-2 opener tag updated to "…the window ·
+  its limits". Prompt-injection was DEFERRED by the user — not built. Build compiles clean (545 modules).
+  **NOT yet visually verified — user should refresh; confirm the Hallucination cards + confidence gauge
+  read clearly, the Grounding two-path diagram doesn't clip the option cards / verdict pills at real
+  res, and the new Part-2 closing flow (claim → hallucination → grounding → Agents opener) lands.**
+- **This session (2026-06-17, OPENER CLEANUP): empties, box move, tags, more cuts.**
   Follow-up to the PART OPENERS pass, all per user: (1) Killed the 4 STRAY BLANK slides (5, 9, 16,
   21) — each `src:` include began with a header comment BEFORE its first `---`, which Slidev renders
   as an empty slide; moved every header comment AFTER the frontmatter. (2) Moved the "GenAI is a

@@ -17,12 +17,19 @@ const props = defineProps({
   kicker: { type: String, default: '' },
   align: { type: String, default: 'left' },  // 'left' | 'center'
   size: { type: String, default: 'lg' },     // 'lg' | 'sm'
+  logos: { type: Array, default: () => [] },  // filenames under public/img/, shown top-right
 })
 
 // Prepend Vite's BASE_URL (trailing-slash) so images resolve under a
 // deploy sub-path (e.g. GitHub Pages /repo/). Dev base is "/", so this
 // is a no-op locally.
-const bgUrl = `${import.meta.env.BASE_URL}img/${props.bg}`
+const base = import.meta.env.BASE_URL
+const bgUrl = `${base}img/${props.bg}`
+// keep the bare name (sans path/extension) so each logo can be sized via its own class
+const logoUrls = props.logos.map((f) => ({
+  src: `${base}img/${f}`,
+  name: f.split('/').pop().replace(/\.[^.]+$/, ''),
+}))
 </script>
 
 <template>
@@ -31,6 +38,16 @@ const bgUrl = `${import.meta.env.BASE_URL}img/${props.bg}`
     :class="[`al-${align}`]"
     :style="{ '--bg-url': `url('${bgUrl}')` }"
   >
+    <div v-if="logoUrls.length" class="hero-logos">
+      <img
+        v-for="(logo, i) in logoUrls"
+        :key="i"
+        :src="logo.src"
+        alt=""
+        class="hero-logo"
+        :class="`hero-logo--${logo.name}`"
+      />
+    </div>
     <div class="hero-inner">
       <div v-if="kicker" class="kicker">{{ kicker }}</div>
       <h1 class="display" :class="{ sm: size === 'sm' }"><slot /></h1>
@@ -55,6 +72,25 @@ const bgUrl = `${import.meta.env.BASE_URL}img/${props.bg}`
   background-position: center, center;
 }
 .al-center { align-items: center; text-align: center; }
+
+/* brand logos, pinned to the top-right corner — sit directly on the image */
+.hero-logos {
+  position: absolute;
+  top: 2.2rem;
+  right: 2.6rem;
+  display: flex;
+  align-items: center;
+  gap: 1.6rem;
+}
+.hero-logo {
+  height: 1.7rem;
+  width: auto;
+  opacity: 0.92;
+  /* keep white marks legible on light photo areas */
+  filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.55));
+}
+/* MuleSoft reads a touch larger than the others */
+.hero-logo--mulesoft { height: 2.1rem; }
 
 .hero-inner { max-width: 90%; }
 

@@ -41,7 +41,7 @@ clicks: 3
       <div class="rm-n">02</div>
       <div class="rm-word grad-warm">LLMs</div>
       <div class="rm-main">How the model actually works</div>
-      <div class="rm-sub">tokens · attention · memory</div>
+      <div class="rm-sub">tokens · attention · stateless</div>
     </div>
     <div class="rm-arrow" v-click="3">→</div>
     <div class="rm-item" v-click="3">

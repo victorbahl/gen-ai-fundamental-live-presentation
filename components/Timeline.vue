@@ -15,7 +15,7 @@ const { $clicks } = useSlideContext()
 const c = computed(() => $clicks.value)
 
 const items = [
-  { year: '1950s', title: 'Rules & logic', desc: 'Expert systems — hand-written if/then', tone: 'cool' },
+  { year: '1950s', title: 'Rules & logic', desc: 'Symbolic AI — hand-written if/then', tone: 'cool' },
   { year: '1990s', title: 'Machine learning', desc: 'Learn patterns from data, not rules', tone: 'cool' },
   { year: '2012', title: 'Deep learning', desc: 'Neural nets crack vision & speech', tone: 'cool' },
   { year: '2017', title: 'Transformers', desc: '"Attention is all you need"', tone: 'warm' },
