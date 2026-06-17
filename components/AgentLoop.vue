@@ -15,15 +15,16 @@ import { useSlideContext } from '@slidev/client'
 
 const { $clicks } = useSlideContext()
 const c = computed(() => $clicks.value)
-// 0 nodes appear, 1 think active, 2 act, 3 observe, 4 loop arrows, 5 done/exit
+// On arrival (c=0) the three nodes are shown with "Think" already active — no
+// dead first click. Then: 1 act, 2 observe, 3 loop arrows, 4 done/exit.
 const active = computed(() => {
-  if (c.value <= 1) return 0     // think
-  if (c.value === 2) return 1    // act
-  if (c.value === 3) return 2    // observe
+  if (c.value === 0) return 0    // think
+  if (c.value === 1) return 1    // act
+  if (c.value === 2) return 2    // observe
   return -1                      // loop running / done
 })
-const looping = computed(() => c.value >= 4)
-const done = computed(() => c.value >= 5)
+const looping = computed(() => c.value >= 3)
+const done = computed(() => c.value >= 4)
 </script>
 
 <template>
@@ -82,7 +83,7 @@ const done = computed(() => c.value >= 5)
 .node.observe { bottom: 6px; left: 0; }
 .node.lit { border-color: var(--cool); }
 .node.on {
-  border-color: var(--warm); box-shadow: 0 0 24px rgba(232,121,74,0.35);
+  border-color: var(--warm); box-shadow: 0 0 24px rgba(252,192,3,0.40);
   transform: scale(1.06);
 }
 .n-ic { font-size: 1.3rem; }

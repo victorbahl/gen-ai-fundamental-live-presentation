@@ -17,7 +17,7 @@ Watch.
 
 ---
 layout: default
-clicks: 7
+clicks: 8
 ---
 
 <!-- NEXT-TOKEN PREDICTOR — prompt → tokens → numbers → weights → predict → loop -->
@@ -32,7 +32,7 @@ clicks: 7
 
 <!--
 This one slide is the whole mechanism end to end: how the text you type becomes the next word, then
-the word after that. Seven beats — don't rush, each click is one idea. The caret keeps blinking to
+the word after that. Eight beats — don't rush, each click is one idea. The caret keeps blinking to
 signal "still generating".
 
 SET-UP (before any click): on screen is just the input field labelled "prompt" — "The best
@@ -40,12 +40,12 @@ Salesforce acquisition is" — with a blinking cursor, exactly what a user types
 "Here's our prompt. To us it's five English words. The model can't read words at all — so step one,
 it has to chop them up."
 
-[click 1 — TOKENISE] The prompt snaps apart into chips. KEY TEACHING POINT: these are *tokens*, not
-words. Tokens are sub-word fragments — notice "Salesforce" splits into "Sales" + "force", and
-"acquisition" into "acqui" + "sition" (the dashed chips are continuation pieces). Why: the model has
-a fixed vocabulary of ~100k common fragments and builds anything from those Lego bricks, so it's
-never stumped by a new or rare word. Rule of thumb for the room: ~4 characters per token, ~¾ of a
-word on average. This is also exactly what you're billed on — "tokens in, tokens out".
+[click 1 — TOKENISE] The input field splits IN PLACE — same line, same position — into token chips.
+KEY TEACHING POINT: these are *tokens*, not words. Tokens are sub-word fragments — notice "Salesforce"
+splits into "Sales" + "force", and "acquisition" into "acqui" + "sition". Why: the model has a fixed
+vocabulary of ~100k common fragments and builds anything from those Lego bricks, so it's never stumped
+by a new or rare word. Rule of thumb for the room: ~4 characters per token, ~¾ of a word on average.
+This is also exactly what you're billed on — "tokens in, tokens out".
 
 [click 2 — NUMBERS] Each token drops into its own COLUMN OF NUMBERS. This is the step that makes
 everything else possible: text becomes maths. Each token is turned into a fixed-length list of
@@ -67,17 +67,23 @@ showing the top four as a bar chart, height = likelihood. MuleSoft wins at 44%, 
 Two deliberate things: (1) it's not a fact, it's a distribution — a ranked guess; (2) I did NOT sort
 the bars tallest-first — the winner sits in the middle, because the model scores the whole vocabulary
 at once and "highest probability" has nothing to do with position. It commits the winner — "MuleSoft"
-appears after the prompt up top, in warm = generated text.
+joins the SAME token row, in warm = generated text, and a matching NEW number column slides into the
+grid: the longer text is now the input.
 
 [click 5 — LOOP (token 2)] Here's the engine. It takes the new, longer text — prompt + "MuleSoft" —
 and feeds the WHOLE thing back through the SAME pipeline. Watch the weight grid sweep again: that's a
-second forward pass. New distribution, new winner: a comma at 74%. It appends the ",".
+second forward pass; another number column appears. New distribution, new winner: a comma at 74%. It
+appends the ",".
 
-[click 6 — LOOP (token 3)] And again. Prompt + "MuleSoft" + "," goes back in, sweep replays, out comes
-"obviously" at 52%. Append. Make the point that nothing here is planned ahead — each word is chosen
-only once the previous one exists; the "sentence" emerges one token at a time.
+[click 6 — LOOP (token 3)] And again. Prompt + "MuleSoft" + "," goes back in, sweep replays, a column
+is added, out comes "obviously" at 52%. Append. Make the point that nothing here is planned ahead —
+each word is chosen only once the previous one exists; the "sentence" emerges one token at a time.
 
-[click 7 — THE LOOP, named] Land it: prompt → tokens → numbers → weights → a probability → pick →
+[click 7 — LOOP (token 4)] One more pass and the model decides it's done the thought: a period "."
+wins at 63%. Append. The row now reads "…is MuleSoft, obviously." — every generated token sitting in
+the same line as the original prompt, and one number column per token.
+
+[click 8 — THE LOOP, named] Land it: prompt → tokens → numbers → weights → a probability → pick →
 append → feed the whole thing back. "Everything that feels like intelligence is this loop, run fast
 at enormous scale. Notice what's NOT here: no plan, and no memory — each pass starts cold from the
 text in front of it. Hold that thought; it's the key to the whole back half of the talk."
@@ -88,7 +94,9 @@ layout: default
 clicks: 3
 ---
 
-<!-- ATTENTION BEAT — same word, two meanings (FT "bank" idea) -->
+<!-- ATTENTION BEAT — same word, two meanings (FT "bank" idea, reworked to "pipeline").
+     BOTH sentences + the highlighted "pipeline" are on screen from arrival; clicks
+     build the attention machinery on top (arcs A → arcs B → payoff). -->
 
 <div class="demo-stage">
   <div class="demo-head">
@@ -100,16 +108,21 @@ clicks: 3
 
 <!--
 The piece everyone names but few explain: ATTENTION. Borrowed from the FT — one word, two sentences.
-[click] "We sat on the river bank at dawn" — attention arcs draw from "bank" to "river"/"dawn" → river bank.
-[click] "She went to the bank to deposit cash" — arcs now draw to "deposit"/"cash" → money bank.
-[click] Same word; the model reads the WHOLE sentence at once and lets the neighbours fix the meaning.
+On screen already, BOTH sentences, same highlighted word: "The pipeline pumped oil for miles" and
+"Our Q4 pipeline looks healthy". Ask the room: same five letters — but you already read them two
+different ways. How? Watch what each sentence leans on.
+[click] Sentence one builds: attention arcs draw from "pipeline" to "pumped"/"oil" → here it means a
+steel pipe.
+[click] Sentence two builds: arcs draw to "Q4"/"healthy" → here it means future deals. Same letters,
+opposite meaning — and "pipeline" is a word this room lives in every day.
+[click] The model reads the WHOLE sentence at once and lets the neighbours fix the meaning.
 That simultaneous, whole-sentence reading is what the transformer unlocked — and why it beat the old
 word-by-word models. (Keep this beat only if you want one attention slide; otherwise it's optional.)
 -->
 
 ---
 layout: default
-clicks: 6
+clicks: 5
 ---
 
 <!-- CONTEXT WINDOW -->
@@ -117,19 +130,32 @@ clicks: 6
 <div class="demo-stage">
   <div class="demo-head">
     <div class="kicker">What the model can see</div>
-    <h2>The context window — a <span class="grad-warm">fixed</span> amount of attention</h2>
+    <h2>The context window — one <span class="grad-warm">fixed</span> space for everything</h2>
   </div>
   <ContextWindow />
 </div>
 
 <!--
 If it just predicts the next token from what it's seen — how much can it see? A fixed-size window.
-[click] First message — a little fills up.
-[click] [click] The conversation grows; the window fills.
-[click] Getting full — notice the colour shift. We're near capacity.
-[click] [click] Over the limit. The window can't grow, so the OLDEST tokens fall out of view.
-The model literally stops being able to see the start of the conversation. That "forgetting"
-isn't a bug — it's the window. Bigger windows help, but the limit never disappears.
+And it's not just "how much" — it matters WHAT is in it.
+
+SET-UP (before any click): the grid already shows a few BLUE cells — the system prompt. Make the
+point up front: "Even before you type, the window isn't empty. The rules — the system prompt — are
+sitting at the front, and they're pinned there for every single call." Point at the legend: each
+content type has a colour and a live token count.
+
+[click] Your first question goes in — GREEN, the current turn. Small, a few hundred tokens.
+[click] The model answers, you reply — each turn is appended to history (GOLD). The window fills.
+[click] More turns. History keeps stacking; watch the free (faint) space shrink.
+[click] Full. The window can't simply grow — there's no room left for the next turn. So what happens?
+[click] The app does something about it: it COMPRESSES the oldest turns into a short summary (the
+striped cells) — or starts a fresh session. Room reopens, the system prompt stays pinned, and the
+conversation continues. The model never sees the raw old turns again — only the summary.
+
+Land it: the window is ONE fixed space that system + history + your question all share. It doesn't
+silently forget — when it's full, YOU (or the framework) decide what to keep: summarise, or reset.
+Bigger windows push the limit out; they never remove it. (Hold this — in Part IV we'll watch tools
+and their results fill this same space far faster.)
 -->
 
 ---
@@ -150,26 +176,56 @@ layout: default
 clicks: 3
 ---
 
-<!-- STATELESS REPLAY (hero interactive) -->
+<!-- STATELESS REPLAY · take 1 — re-stack → forward pass → answer returns -->
 
 <div class="demo-stage">
   <div class="demo-head">
     <div class="kicker">The stateless truth</div>
     <h2>Every turn, you resend the <span class="grad-warm">entire</span> conversation</h2>
   </div>
-  <StatelessReplay />
+  <StatelessReplayStack />
 </div>
 
 <!--
-Left: what the human sees. Right: what the model actually receives on the API call.
-Turn one: a question, a payload. Looks like a session.
-[click] Turn two — watch the right panel. It didn't "remember" turn one; we resent it. The whole
-thing — Q1, A1, and Q2 — in one payload.
-[click] Turn three: same again. Re-sent top to bottom, every call. Watch the token counter climb —
-you pay for the whole history each turn.
-[click] Mental model for this room: no session on the server. The client carries all state in the
-request body, every call. You've built against stateless endpoints for years — same shape.
+The mechanics, end to end. Right side is two parts: the POST body on top, the LLM underneath.
+Turn one: the user asks. Watch the right — the request body is built (system + the question), the
+resend sweep runs over the WHOLE body, it drops into the LLM, the model generates, and ONLY THEN
+the answer travels back and appears on the LEFT. The answer is never sitting there in advance —
+it's produced by the model and returned.
+[click] Turn two. The previous answer is now back in the POST body as HISTORY — dimmed, because it
+was sent before. The only NEW line is the fresh question (highlighted). Sweep, forward pass,
+generate, answer returns. Token counter climbs.
+[click] Turn three: same again. Everything prior is re-sent, dimmed; one new line. You pay for the
+whole history each turn.
+[click] Mental model: no session on the server. The client carries all state in the request body,
+every call. You've built against stateless endpoints for years — same shape.
 -->
+
+---
+layout: default
+clicks: 3
+---
+
+<!-- STATELESS REPLAY · take 2 — filmstrip of envelopes (same idea, seen at a glance) -->
+
+<div class="demo-stage">
+  <div class="demo-head">
+    <div class="kicker">Seen another way</div>
+    <h2>Each call re-contains <span class="grad-warm">all</span> of the last one</h2>
+  </div>
+  <StatelessReplayFilmstrip />
+</div>
+
+<!--
+Same truth, shown all at once so the redundancy is undeniable. Three request envelopes side by side.
+Turn one: the first envelope is sent — system + one question.
+[click] Turn two: the second envelope re-contains everything from the first (dimmed = "sent before")
+plus exactly one new line (highlighted). The replayed block just got bigger.
+[click] Turn three: again — the grey replayed block grows, one new highlighted line, token bar climbs.
+The picture says it: every call ships all of the last one, plus a little more. That repeated grey
+block is what you pay for, every single turn.
+-->
+
 
 ---
 layout: default

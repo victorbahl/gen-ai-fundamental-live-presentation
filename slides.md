@@ -25,8 +25,9 @@ fonts:
 <Hero bg="cover.jpg" kicker="GenAI · a team refresher">
   The GenAI refresher<br>you didn't <span class="grad-warm">ask for</span>
   <template #subtitle>
-    …but might enjoy anyway. A 45-minute tour — from the history of AI
-    to autonomous agents — built up one idea at a time.
+    ...but might enjoy anyway 😊
+    
+    From the history of AI... to autonomous agents.
   </template>
 </Hero>
 

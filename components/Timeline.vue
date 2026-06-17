@@ -22,9 +22,10 @@ const items = [
   { year: '2022', title: 'The ChatGPT moment', desc: 'Prediction at scale goes mainstream', tone: 'warm' },
 ]
 
-// progress line width tracks how many milestones are revealed
+// progress line width tracks how many milestones are revealed.
+// The FIRST milestone is visible on arrival (c=0), so revealed count = c + 1.
 const progress = computed(() => {
-  const n = Math.min(c.value, items.length)
+  const n = Math.min(c.value + 1, items.length)
   if (n <= 1) return 0
   return ((n - 1) / (items.length - 1)) * 100
 })
@@ -38,7 +39,7 @@ const progress = computed(() => {
       <div class="marks">
         <div
           v-for="(it, i) in items" :key="i"
-          class="mark" :class="[it.tone, { on: c > i }]"
+          class="mark" :class="[it.tone, { on: c >= i }]"
         >
           <div class="dot" />
           <div class="card">

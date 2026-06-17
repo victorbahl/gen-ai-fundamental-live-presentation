@@ -1,7 +1,9 @@
 /* ============================================================
    GenAI Fundamentals — global theme
-   Editorial base: serif display, sans body, one cool accent
-   (blue) + one warm accent (terracotta/amber).
+   Editorial base: serif display, sans body, MuleSoft brand accents —
+   one cool accent (MuleSoft azure/cloud-blue) + one warm accent
+   (MuleSoft gold). Sourced from MuleSoft's own palette so the deck
+   reads as MuleSoft, not Anthropic.
    DAY/NIGHT: tokens below default to the LIGHT (day) scheme in
    :root; Slidev toggles `.dark` on <html> for the NIGHT scheme,
    which re-defines the same tokens. Everything downstream reads
@@ -24,14 +26,16 @@
   --ink-faint: #8a93a6;
   --hair: #dde2eb;
 
-  /* accents — kept identical across modes so brand stays constant;
-     day-mode shades nudged a touch darker for contrast on white */
-  --cool: #2563eb;       /* blue — the "API / integration" accent */
-  --cool-bright: #1d4ed8;
-  --warm: #d2592b;       /* terracotta — the "AI / model" accent */
-  --warm-bright: #c2680a;
-  --good: #0f9d6b;
-  --bad: #dc2626;
+  /* accents — MuleSoft brand. Cool = signature azure / cloud-blue (the
+     "API / integration" accent); warm = MuleSoft gold (the "AI / model"
+     accent). `-bright` is the stronger, AA-contrast shade for text/links
+     on the light canvas (so in day mode it reads DARKER than the base). */
+  --cool: #00a2df;       /* MuleSoft azure — signature accent (fills/strokes) */
+  --cool-bright: #0176d3; /* cloud blue — text/links on white */
+  --warm: #fcc003;       /* MuleSoft gold — the "AI / model" accent (fills) */
+  --warm-bright: #b26b00; /* deep amber-gold — text on white */
+  --good: #2e844a;
+  --bad: #ba0517;
 
   /* elevation: panels lift off the canvas with a soft shadow in day mode */
   --elev: 0 1px 2px rgba(16,24,40,0.06), 0 4px 12px rgba(16,24,40,0.06);
@@ -67,11 +71,11 @@ html.dark {
   --ink-faint: #6b7589;
   --hair: #262c3a;
 
-  /* accents */
-  --cool: #3b82f6;
-  --cool-bright: #60a5fa;
-  --warm: #e8794a;
-  --warm-bright: #f59e0b;
+  /* accents — MuleSoft brand, lifted for contrast on the dark canvas */
+  --cool: #1b96ff;       /* MuleSoft bright blue — fills/strokes on dark */
+  --cool-bright: #57c2ff; /* lighter azure — text/links on dark */
+  --warm: #fcc003;       /* MuleSoft gold — fills on dark */
+  --warm-bright: #ffd45e; /* lifted gold — text on dark */
   --good: #34d399;
   --bad: #f87171;
 

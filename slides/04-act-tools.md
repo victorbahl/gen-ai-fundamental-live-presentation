@@ -12,41 +12,42 @@ layout: default
 
 <!--
 So we have a brilliant reasoner that sees a window of text and forgets everything between calls.
-Notice what it still can't do: anything. It can't read your database, check an order, send an email.
+Notice what it still can't do: anything. It can't read our database, check an order, send an email.
 It only emits text. To be useful, it needs hands.
 -->
 
 ---
 layout: default
+clicks: 4
 ---
 
-<!-- TOOLS — build-up on fixed stage -->
+<!-- TOOLS — build-up on fixed stage. Title is on screen from arrival; clicks add the flow. -->
 
 <div class="stage tools-stage">
-  <div class="title-row" v-click>
+  <div class="title-row">
     <div class="kicker">The idea behind tools</div>
-    <h2>Let the model <span class="grad-warm">ask</span> — your code does the work</h2>
+    <h2>Let the model <span class="grad-warm">ask</span> — our code does the work</h2>
   </div>
 
   <div class="flow">
-    <div class="fnode" v-click="2">
+    <div class="fnode" v-click="1">
       <div class="fn-t">1 · Model asks</div>
       <div class="fn-d">"call get_order_status(4471)"</div>
     </div>
-    <div class="farrow" v-click="3">→</div>
-    <div class="fnode" v-click="3">
-      <div class="fn-t">2 · Your code runs</div>
+    <div class="farrow" v-click="2">→</div>
+    <div class="fnode" v-click="2">
+      <div class="fn-t">2 · Our code runs</div>
       <div class="fn-d">hits the real Order API</div>
     </div>
-    <div class="farrow" v-click="4">→</div>
-    <div class="fnode" v-click="4">
+    <div class="farrow" v-click="3">→</div>
+    <div class="fnode" v-click="3">
       <div class="fn-t">3 · Result goes back</div>
       <div class="fn-d">folded into the next payload</div>
     </div>
   </div>
 
-  <div class="stage-foot" v-click="5">
-    The model never touches your systems. It only <strong>requests</strong>; you stay in control of execution.
+  <div class="stage-foot" v-click="4">
+    The model never touches our systems. It only <strong>requests</strong>; we stay in control of execution.
   </div>
 </div>
 
@@ -63,13 +64,13 @@ layout: default
 </style>
 
 <!--
-The mechanism is simple and it puts you in control.
-[click] You hand the model a menu of tools it's allowed to ask for.
+The mechanism is simple and it puts us in control. We hand the model a menu of tools it's
+allowed to ask for.
 [click] It doesn't run anything — it emits a request: "please call get_order_status with 4471".
-[click] YOUR code receives that, calls the real API — with your auth, your governance.
+[click] OUR code receives that, calls the real API — with our auth, our governance.
 [click] The result is fed back into the model's next payload, and now it can answer.
-[click] Key point for this audience: the model never touches your systems directly. It requests;
-you execute. That's a security and governance story, not just a feature.
+[click] Key point for this audience: the model never touches our systems directly. It requests;
+we execute. That's a security and governance story, not just a feature.
 -->
 
 ---
@@ -77,76 +78,57 @@ layout: default
 clicks: 3
 ---
 
-<!-- MCP ENVELOPE -->
+<!-- MCP ENVELOPE — same HTTP, same auth, only the body differs -->
 
 <div class="demo-stage">
   <div class="demo-head">
     <div class="kicker">What MCP actually is</div>
-    <h2>An API with a <span class="grad-warm">standard envelope</span></h2>
+    <h2>A standard API <span class="grad-warm">any AI app can consume</span></h2>
   </div>
   <McpEnvelope />
-  <div class="mcp-foot" v-click="3">
-    MCP just standardises how a model discovers and calls tools — so any model talks to any tool,
-    without a custom integration each time.
-  </div>
 </div>
 
-<style>
-.mcp-foot {
-  text-align: center; color: var(--ink-soft); font-size: 0.95rem;
-  max-width: 64ch; margin: 0 auto;
-}
-</style>
-
 <!--
-MCP — Model Context Protocol — sounds like a new world. It isn't.
-On the left, an HTTP call you've shipped a thousand times. On the right, the same intent as an
-MCP tool call.
-[click] Look at the MCP side: a method, a tool name, JSON arguments, a JSON result.
-[click] They line up one-to-one. Endpoint ≈ tool name. Body ≈ arguments. Header ≈ transport.
-JSON response ≈ JSON result.
-[click] All MCP adds is a standard envelope for discovery and calling — so any model can talk to any
-tool without a bespoke integration each time. It's not that different from an HTTP API with a few
-agreed constraints. You already know this.
+MCP — Model Context Protocol — sounds like a new world. It isn't. It's a standard way to expose an
+API so ANY AI app can consume it. And note who "consumes" it: not the model — the model only emits
+text deciding which tool it wants. It's our app — the MCP client inside the host — that actually
+makes the call. On the left, a REST call we've shipped a thousand times.
+[click] On the right, the same request our app sends to an MCP server. Same method over HTTP, same
+Host, same Bearer token in the same Authorization header. It's a normal HTTPS POST.
+[click] Line them up: the whole HTTP envelope is identical — host, auth, JSON content type. The
+ONLY thing that differs is the body. REST puts intent in the URL; MCP carries a small JSON-RPC
+object — jsonrpc, an id, a method, params. That's the entire difference.
+[click] And here's the part this room cares about: because it's just HTTP, every policy we run
+today wraps it unchanged — OAuth, rate limiting, audit logging, WAF. MCP doesn't bypass our
+gateway; it sits behind it like any other API.
 -->
 
 ---
 layout: default
+clicks: 3
 ---
 
-<!-- MCP SEQUENCE — Mermaid (static diagram, no build-up needed) -->
+<!-- MCP HANDSHAKE — the three standard calls (initialize → list → call) -->
 
-<div class="stage seq-stage">
-  <div class="title-row">
+<div class="demo-stage">
+  <div class="demo-head">
     <div class="kicker">MCP in motion</div>
-    <h2>It reads like any integration flow</h2>
+    <h2>Three <span class="grad-warm">standard calls</span> — every time</h2>
   </div>
-
-```mermaid {scale: 0.74}
-sequenceDiagram
-  autonumber
-  actor U as User
-  participant M as Model
-  participant S as MCP Server
-  participant API as Order API
-  U->>M: "Where is order 4471?"
-  M->>S: tools/call get_order_status
-  S->>API: GET /orders/4471/status
-  API-->>S: { shipped, eta }
-  S-->>M: result (folded into context)
-  M-->>U: "It shipped — arriving Thursday."
-```
-
+  <McpHandshake />
 </div>
 
-<style>
-.seq-stage { gap: 1.2rem; justify-content: center; }
-.seq-stage :deep(.mermaid) { display: flex; justify-content: center; }
-</style>
-
 <!--
-End to end. User asks. The model decides it needs a tool and emits an MCP call. The MCP server
-translates that into a real call against your Order API. The result comes back, gets folded into the
-context — remember, into the payload — and the model phrases the human answer.
-Squint and this is a System API behind a Process API. The model is just one more consumer in the flow.
+Every MCP session is the same three calls — and to be precise, it's our MCP client (inside the
+host app) making them, not the model. The model only decides; the client speaks the protocol.
+First, initialize: the client and the server agree on a protocol version and exchange capabilities.
+A normal POST /mcp with our Bearer token.
+[click] Then tools/list — this is the one that matters. The server returns its MENU: the tools it
+offers, their names and JSON schemas. The client fetches it and hands it to the model, so the model
+"discovers" what it can do — with zero bespoke integration. New tool on the server? It just shows up here.
+[click] Finally tools/call — the model picks one, the client issues the call, the server runs it
+against the real Order API, and the result comes back as JSON, folded into the model's context.
+[click] Discover, then call — same shape for every server. That's the whole point: any AI app can
+talk to any tool. Squint and it's a System API behind a Process API; our app is just one more
+governed consumer in the flow.
 -->

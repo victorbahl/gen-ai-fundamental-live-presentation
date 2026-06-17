@@ -17,11 +17,12 @@ We go from machines we program with rules, to machines that learn, to machines t
 
 ---
 layout: default
-clicks: 5
+clicks: 4
 ---
 
-<!-- TIMELINE — build-up on fixed axis. clicks:5 drives the 5 reveals
-     that live inside <Timeline/> (it reads $clicks). -->
+<!-- TIMELINE — build-up on fixed axis. The first milestone (1950s) is on
+     screen from arrival; clicks:4 drives the remaining 4 reveals inside
+     <Timeline/> (it reads $clicks). -->
 
 <div class="stage tl-stage">
   <div class="title-row">
@@ -38,7 +39,7 @@ clicks: 5
 </style>
 
 <!--
-[click] Start in the 50s: rules and logic — we hand-write every if/then. Brittle.
+On screen already — the 50s: rules and logic, we hand-write every if/then. Brittle.
 [click] 90s: machine learning — stop writing rules, learn patterns from data.
 [click] 2012: deep learning — neural nets crack vision and speech.
 [click] 2017: the hinge. The Transformer — "attention is all you need". Architecture behind every modern LLM.
@@ -53,7 +54,7 @@ layout: default
 <!-- WHAT CHANGED — statement-ish, fixed stage -->
 
 <div class="stage">
-  <div class="big-claim" v-click>
+  <div class="big-claim">
     Prediction at scale started to look like <span class="grad-warm">reasoning.</span>
   </div>
   <div class="claim-sub" v-click>
