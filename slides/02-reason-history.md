@@ -1,18 +1,96 @@
-<!-- ============================================================
-     PART I — From Computing to Reasoning
-     ============================================================ -->
-
 ---
 layout: default
 ---
 
-<Hero bg="part-1.jpg" kicker="Part I · From computing to reasoning">
-  Seventy years<br>in <span class="grad-cool">one breath.</span>
-</Hero>
+<!-- ============================================================
+     PART 1 — A quick intro to AI
+     ============================================================
+     Opens with the AI part-opener hero (PartOpener.vue) — the spine bar
+     with "AI" lit, reusing the roadmap copy. Then the "GenAI is a small
+     box" zoom (moved here from 01-intro.md — it belongs in Part 1), the
+     timeline (the one historical shift), and the bridge claim that hands
+     off into Part 2.
+     NB: the header comment sits AFTER this frontmatter on purpose — a
+     comment BEFORE the first `---` renders as a stray blank slide. -->
+
+<PartOpener
+  bg="part-1.jpg"
+  :active="1"
+  accent="cool"
+  num="01"
+  headline="A quick map of the field"
+  sub="where GenAI fits · a short history" />
 
 <!--
-Quick history — not for trivia, but so we can see the one shift that changed everything.
-We go from machines we program with rules, to machines that learn, to machines that predict.
+Part one — AI. Before we touch a single model, a quick map of the whole field: seventy years of it,
+in a couple of minutes, just so we can place GenAI on the map and see how small the box we actually
+care about is. Then we zoom all the way in.
+-->
+
+---
+layout: default
+clicks: 3
+---
+
+<!-- ONE SMALL BOX — zoom-in: GenAI is a small box inside AI.
+     Fixed canvas; title is on screen from arrival; nested boxes reveal by opacity only. -->
+
+<div class="stage boxes-stage">
+  <div class="title-row">
+    <div class="kicker">First, a myth to kill</div>
+    <h2>GenAI is one small box inside <span class="grad-cool">AI</span></h2>
+  </div>
+
+  <div class="nest-canvas">
+    <div class="nbox ai" v-click="1">
+      <div class="nlabel">Artificial Intelligence</div>
+      <div class="nhint">rules · search · planning · robotics · vision …</div>
+    </div>
+    <div class="nbox ml" v-click="2">
+      <div class="nlabel">Machine Learning</div>
+    </div>
+    <div class="nbox gen" v-click="3">
+      <div class="nlabel">Generative AI</div>
+      <div class="gen-sub">LLMs · agents</div>
+    </div>
+  </div>
+</div>
+
+<style>
+.boxes-stage { gap: 2.2rem; justify-content: center; }
+
+.nest-canvas { position: relative; width: 640px; height: 256px; margin: 0 auto; }
+.nbox {
+  position: absolute; border: 1px solid var(--hair); border-radius: 16px;
+  background: var(--bg-panel);
+  transition: opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.nbox .nlabel {
+  position: absolute; top: 10px; left: 16px;
+  font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--ink-faint);
+}
+.nbox.ai  { inset: 0; }
+.nbox.ai .nhint {
+  position: absolute; bottom: 9px; left: 16px;
+  font-family: var(--mono); font-size: 0.62rem; color: var(--ink-faint); opacity: 0.7;
+}
+.nbox.ml  { inset: 42px 34px 34px 34px; background: var(--nest-mid); }
+.nbox.gen {
+  inset: 96px 196px 46px 196px;
+  border-color: var(--warm); background: rgba(252,192,3,0.14);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.15rem;
+}
+.nbox.gen .nlabel { position: static; color: var(--warm-bright); }
+.gen-sub { font-family: var(--serif); font-weight: 600; font-size: 1rem; color: var(--ink); }
+</style>
+
+<!--
+One myth to kill before the history.
+[click] Everyone says "AI". AI is huge: seventy years of rules, search, planning, robotics, vision.
+[click] Machine learning is one slice of that — systems that learn from data instead of hand-written rules.
+[click] And generative AI — the LLMs and agents this whole talk is about — is a small box inside THAT.
+When people say "AI" today, they almost always mean this little gold box.
 -->
 
 ---
@@ -47,33 +125,3 @@ On screen already — the 50s: rules and logic, we hand-write every if/then. Bri
 The pattern: we stopped telling machines the rules, and started letting them predict.
 -->
 
----
-layout: default
----
-
-<!-- WHAT CHANGED — statement-ish, fixed stage -->
-
-<div class="stage">
-  <div class="big-claim">
-    Prediction at scale started to look like <span class="grad-warm">reasoning.</span>
-  </div>
-  <div class="claim-sub" v-click>
-    Train one model to predict the next word over the whole internet,
-    and "predict the next word" quietly becomes "answer the question."
-  </div>
-</div>
-
-<style>
-.big-claim {
-  font-family: var(--serif); font-weight: 600; font-size: 3rem; line-height: 1.1;
-  text-align: center; max-width: 18ch; text-wrap: balance;
-}
-.claim-sub { color: var(--ink-soft); font-size: 1.1rem; max-width: 52ch; text-align: center; }
-</style>
-
-<!--
-[click] Here's the whole magic trick in one line. Prediction at scale starts to look like reasoning.
-[click] Train a model to predict the next word across the entire internet, and to get good at that
-it has to absorb grammar, facts, style, even reasoning patterns. "Predict the next word" becomes
-"answer the question." Which is exactly what we'll look at next.
--->

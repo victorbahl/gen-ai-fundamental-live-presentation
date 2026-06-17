@@ -14,10 +14,17 @@ import { useSlideContext, onSlideEnter } from '@slidev/client'
   finally sees it). So the order is: ask → resend everything → model runs →
   answer appears on the left. The answer is never pre-shown anywhere.
 
-  Each call: the new user line lands in the POST body, a resend sweep runs
-  over the WHOLE stack (all of it ships again), a forward pass drops into the
-  LLM, it generates, and the answer pops on the left. The previous answer
-  re-enters the POST body as HISTORY on the next call (assistant i at turn i+2).
+  CLICK MAP (turn 1 is built up step-by-step; later turns are one full cycle):
+    c0  LEFT only — the human's first question. RIGHT is blank.
+    c1  + the POST body (system + question) re-stacked & sent.
+    c2  + the LLM (forward pass · generating…).
+    c3  + the answer returns → lands on the left (turn 1 complete).
+    c4  turn 2 — one full animated cycle (sweep · forward · generate · answer).
+    c5  turn 3 — one full animated cycle.
+    c6  takeaway.
+
+  The previous answer re-enters the POST body as HISTORY on the next call
+  (assistant i appears at turn i+2 — never on the call that produced it).
 
   PHYSICAL-PAGE RULE: every bubble and every row owns a fixed slot and is
   always rendered. Clicks toggle opacity + replay one-shot animations keyed
@@ -33,20 +40,30 @@ const script = [
   { u: 'And the order from last week?',   a: 'Order #4392 was delivered Monday, 14:20.' },
 ]
 
-// arrival (c0) = turn 1 ; c1 = turn 2 ; c2 = turn 3 ; c3 = takeaway
-const turn = computed(() => Math.min($clicks.value + 1, script.length))
-const summary = computed(() => $clicks.value >= script.length)
+// turn 1 spans c0..c3; turn 2 = c4; turn 3 = c5; takeaway = c6
+const turn = computed(() => Math.min($clicks.value <= 3 ? 1 : $clicks.value - 2, script.length))
+const summary = computed(() => $clicks.value >= 6)
 const answer = computed(() => script[turn.value - 1].a)
 
-// LEFT — the human conversation. The answer bubble reveals on the same turn
-// as its question, but a CSS transition-delay makes it land only AFTER the
-// model has "generated" it (it's never on screen in advance).
+// turn-1 build-up gates. Monotonic in clicks → also true for every later turn,
+// so the right-hand panels simply stay on screen once revealed.
+const showPost = computed(() => $clicks.value >= 1)
+const showLLM = computed(() => $clicks.value >= 2)
+const showAns = computed(() => $clicks.value >= 3)
+// first turn = discrete click-driven reveals (no timed cascade); later turns animate
+const stepped = computed(() => turn.value === 1)
+
+// LEFT — the human conversation. On turn 1 the answer bubble waits for the
+// explicit click (showAns); on later turns it rides the cascade (delayed
+// transition) so it lands only AFTER the model has "generated" it.
 const bubbles = computed(() =>
   script.flatMap((x, i) => ([
     { role: 'user', text: x.u, at: i + 1, answer: false },
     { role: 'asst', text: x.a, at: i + 1, answer: true },
   ]))
 )
+const bubbleVisible = (b) =>
+  (b.answer && b.at === 1) ? showAns.value : turn.value >= b.at
 
 // RIGHT — the POST body. assistant i only appears at turn i+2 (i.e. as HISTORY
 // on the NEXT call) — never on the call that produced it.
@@ -76,7 +93,7 @@ const roleColor = (r) =>
 </script>
 
 <template>
-  <div class="srA">
+  <div class="srA" :class="{ stepped }">
     <!-- LEFT: what the human sees -->
     <div class="human">
       <div class="head"><span class="dot" /> What the human sees</div>
@@ -84,8 +101,8 @@ const roleColor = (r) =>
         <div class="recv" :key="'r' + beat" />
         <div
           v-for="(b, i) in bubbles" :key="i"
-          class="bubble" :class="[b.role, { ans: b.answer }]"
-          :style="{ opacity: turn >= b.at ? 1 : 0 }"
+          class="bubble" :class="[b.role, { ans: b.answer, instant: b.answer && b.at === 1 }]"
+          :style="{ opacity: bubbleVisible(b) ? 1 : 0 }"
         >{{ b.text }}</div>
       </div>
       <div class="foot"><span>Turn {{ turn }} of {{ script.length }}</span></div>
@@ -93,20 +110,20 @@ const roleColor = (r) =>
 
     <!-- CONNECTOR: send out (top) / answer back (bottom) -->
     <div class="wire">
-      <div class="send" :key="'s' + beat">SEND ⟶</div>
-      <div class="wire-line" />
-      <div class="back" :key="'b' + beat">⟵ answer</div>
+      <div class="send" :key="'s' + beat" :style="{ opacity: showPost ? 1 : 0 }">SEND ⟶</div>
+      <div class="wire-line" :style="{ opacity: showPost ? 1 : 0 }" />
+      <div class="back" :key="'b' + beat" :style="stepped ? { opacity: showAns ? 1 : 0 } : null">⟵ answer</div>
     </div>
 
     <!-- RIGHT: POST body (top) → LLM (bottom) -->
     <div class="api">
-      <div class="head warm">
+      <div class="head warm" :style="{ opacity: showPost ? 1 : 0 }">
         <span class="dot warm" /> POST /v1/messages — request body
         <span class="call">call {{ turn }}</span>
       </div>
 
       <!-- 1 · the request body, re-stacked & re-sent every call -->
-      <div class="stack">
+      <div class="stack" :style="{ opacity: showPost ? 1 : 0 }">
         <div class="sweep" :key="'w' + beat" />
         <div
           v-for="(m, i) in rows" :key="i"
@@ -117,23 +134,23 @@ const roleColor = (r) =>
           <span class="text">{{ m.text }}</span>
         </div>
       </div>
-      <div class="post-foot">
+      <div class="post-foot" :style="{ opacity: showPost ? 1 : 0 }">
         <span class="resend">⟳ entire transcript re-sent</span>
         <span class="tok">{{ tokens }} tokens</span>
       </div>
 
       <!-- forward pass into the model -->
-      <div class="flow" :key="'f' + beat">
+      <div class="flow" :key="'f' + beat" :style="{ opacity: showLLM ? 1 : 0 }">
         <span class="flow-dot" />
         <span class="flow-lbl">forward pass ↓</span>
       </div>
 
       <!-- 2 · the model: a stateless function that generates the answer -->
-      <div class="llm" :key="'l' + beat">
+      <div class="llm" :key="'l' + beat" :style="{ opacity: showLLM ? 1 : 0 }">
         <div class="llm-head">LLM · stateless function</div>
         <div class="llm-stage">
-          <div class="llm-think">generating…</div>
-          <div class="llm-ans">{{ answer }}</div>
+          <div class="llm-think" :style="stepped ? { opacity: (showLLM && !showAns) ? 1 : 0 } : null">generating…</div>
+          <div class="llm-ans" :style="stepped ? { opacity: showAns ? 1 : 0 } : null">{{ answer }}</div>
         </div>
       </div>
     </div>
@@ -158,7 +175,7 @@ const roleColor = (r) =>
   font-size: 0.76rem; font-weight: 600; letter-spacing: 0.03em;
   color: var(--cool-bright); margin-bottom: 0.5rem;
 }
-.head.warm { color: var(--warm-bright); }
+.head.warm { color: var(--warm-bright); transition: opacity 0.4s ease; }
 .call { margin-left: auto; font-family: var(--mono); font-size: 0.62rem; color: var(--ink-faint); }
 .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--cool); }
 .dot.warm { background: var(--warm); }
@@ -175,7 +192,7 @@ const roleColor = (r) =>
 .recv {
   position: absolute; inset: 0; border-radius: 14px; pointer-events: none; z-index: 4;
   border: 2px solid transparent;
-  animation: recvFlash 0.9s ease 1.95s both;
+  animation: recvFlash 0.9s ease 2s both;
 }
 @keyframes recvFlash {
   0%   { border-color: transparent; box-shadow: 0 0 0 0 rgba(252,192,3,0); }
@@ -187,7 +204,8 @@ const roleColor = (r) =>
   max-width: 88%; padding: 0.45rem 0.7rem; border-radius: 12px;
   font-size: 0.8rem; line-height: 1.3; transition: opacity 0.4s ease;
 }
-.bubble.ans { transition-delay: 1.95s; }
+.bubble.ans { transition-delay: 2s; }
+.bubble.ans.instant { transition-delay: 0s; }     /* turn-1 answer lands on its own click */
 .bubble.user { align-self: flex-end; background: var(--bubble-user-bg); color: var(--bubble-user-ink); border-bottom-right-radius: 4px; }
 .bubble.asst { align-self: flex-start; background: var(--bubble-asst-bg); color: var(--bubble-asst-ink); border-bottom-left-radius: 4px; }
 .foot {
@@ -204,6 +222,7 @@ const roleColor = (r) =>
   font-family: var(--mono); font-size: 0.66rem; font-weight: 700; letter-spacing: 0.06em;
   color: var(--warm-bright); padding: 0.3rem 0.55rem; border-radius: 8px;
   border: 1px solid var(--warm); background: rgba(252,192,3,0.10);
+  transition: opacity 0.4s ease;
   animation: pulse 0.7s cubic-bezier(0.22,1,0.36,1) 0.25s both;
 }
 @keyframes pulse {
@@ -211,11 +230,11 @@ const roleColor = (r) =>
   40%  { transform: scale(1.08); box-shadow: 0 0 22px 2px rgba(252,192,3,0.45); }
   100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(252,192,3,0); }
 }
-.wire-line { width: 2px; height: 40px; background: linear-gradient(var(--warm), transparent); }
+.wire-line { width: 2px; height: 40px; background: linear-gradient(var(--warm), transparent); transition: opacity 0.4s ease; }
 .back {
   font-family: var(--mono); font-size: 0.62rem; font-weight: 600; letter-spacing: 0.04em;
   color: var(--ink-faint);
-  animation: backIn 0.6s cubic-bezier(0.22,1,0.36,1) 1.7s both;
+  animation: backIn 0.6s cubic-bezier(0.22,1,0.36,1) 1.85s both;
 }
 @keyframes backIn {
   0%   { opacity: 0; transform: translateX(8px); }
@@ -228,6 +247,7 @@ const roleColor = (r) =>
   position: relative; height: 212px; border-radius: 14px 14px 0 0; padding: 0.6rem;
   background: var(--bg-soft); border: 1px solid var(--hair); border-bottom: none;
   display: flex; flex-direction: column; gap: 0.32rem; overflow: hidden;
+  transition: opacity 0.4s ease;
 }
 .sweep { position: absolute; inset: 0; pointer-events: none; z-index: 3; }
 .sweep::after {
@@ -261,6 +281,7 @@ const roleColor = (r) =>
   padding: 0.32rem 0.6rem; font-size: 0.66rem; height: 1.5rem;
   background: var(--bg-soft); border: 1px solid var(--hair); border-top: 1px dashed var(--hair);
   border-radius: 0 0 14px 14px;
+  transition: opacity 0.4s ease;
 }
 .resend { color: var(--warm-bright); font-weight: 600; }
 .tok {
@@ -271,6 +292,7 @@ const roleColor = (r) =>
 .flow {
   display: flex; align-items: center; justify-content: center; gap: 0.5rem;
   height: 32px; position: relative;
+  transition: opacity 0.4s ease;
 }
 .flow-lbl { font-family: var(--mono); font-size: 0.6rem; color: var(--ink-faint); letter-spacing: 0.04em; }
 .flow-dot {
@@ -287,6 +309,7 @@ const roleColor = (r) =>
   border-radius: 14px; padding: 0.55rem 0.7rem; height: 110px;
   background: var(--bg-panel); border: 1px solid var(--hair);
   display: flex; flex-direction: column; gap: 0.4rem;
+  transition: opacity 0.4s ease;
   animation: llmGlow 1.4s ease 0.85s both;
 }
 @keyframes llmGlow {
@@ -301,23 +324,36 @@ const roleColor = (r) =>
 .llm-stage { position: relative; flex: 1; display: flex; align-items: center; }
 .llm-think {
   font-family: var(--mono); font-size: 0.74rem; color: var(--ink-faint);
-  animation: thinkInOut 1.55s ease 0.7s both;
+  animation: thinkInOut 1.25s ease 0.7s both;
 }
 @keyframes thinkInOut {
   0%   { opacity: 0; }
-  18%  { opacity: 1; }
-  80%  { opacity: 1; }
+  15%  { opacity: 1; }
+  78%  { opacity: 1; }
   100% { opacity: 0; }
 }
 .llm-ans {
   position: absolute; inset: 0; display: flex; align-items: center;
   font-size: 0.82rem; line-height: 1.3; color: var(--warm-bright); font-weight: 600;
-  animation: ansIn 0.5s cubic-bezier(0.22,1,0.36,1) 1.55s both;
+  animation: ansIn 0.5s cubic-bezier(0.22,1,0.36,1) 2s both;
 }
 @keyframes ansIn {
   0%   { opacity: 0; transform: translateY(6px); }
   100% { opacity: 1; transform: translateY(0); }
 }
+
+/* ---- TURN-1 build-up: discrete, click-driven reveals (no timed cascade) ---- */
+.srA.stepped .sweep::after,
+.srA.stepped .send,
+.srA.stepped .back,
+.srA.stepped .flow-dot,
+.srA.stepped .llm,
+.srA.stepped .recv,
+.srA.stepped .llm-think,
+.srA.stepped .llm-ans { animation: none; }
+.srA.stepped .llm-think { transition: opacity 0.3s ease; }
+.srA.stepped .llm-ans { transition: opacity 0.4s ease 0.25s; }   /* hand off after "generating…" clears */
+.srA.stepped .back { transition: opacity 0.4s ease; }
 
 .note {
   position: absolute; left: 0; right: 0; bottom: 0; text-align: center;

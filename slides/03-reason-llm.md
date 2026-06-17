@@ -1,18 +1,33 @@
-<!-- ============================================================
-     PART II — Inside the reasoning machine
-     ============================================================ -->
-
 ---
 layout: default
 ---
 
-<Hero bg="part-2.jpg" kicker="Part II · Inside the reasoning machine" size="sm">
-  It predicts the next word.<br>That's <span class="grad-warm">it.</span>
-</Hero>
+<!-- ============================================================
+     PART 2 — How an LLM actually works
+     ============================================================
+     Opens with the LLMs part-opener hero (PartOpener.vue) — the spine
+     bar with "LLMs" lit, reusing the roadmap copy. Part 2 order:
+     opener → predictor → attention → stateless (stack + filmstrip) →
+     context window (which closes the part and bridges into agents).
+     The two retired slides ("the most important slide" remembers-nothing
+     hero, and the "It has no memory" payoff statement) were CUT here per
+     user — do not resurrect them.
+     NB: this header comment sits AFTER the frontmatter on purpose — a
+     comment BEFORE the first `---` renders as a stray blank slide. -->
+
+<PartOpener
+  bg="part-2.jpg"
+  :active="2"
+  accent="warm"
+  num="02"
+  headline="How the model actually works"
+  sub="tokens · attention · stateless · the context window" />
 
 <!--
-Let's open the box. The thing everyone calls intelligence is, mechanically, a next-word predictor.
-Watch.
+Part two — LLMs. We just saw prediction at scale start to look like reasoning. Now we open the box
+and look at the one model doing it: how a prompt becomes tokens, how attention fixes meaning from
+context, and why — between two calls — it carries nothing over. This is the part that makes the
+whole back half of the talk click.
 -->
 
 ---
@@ -122,58 +137,7 @@ word-by-word models. (Keep this beat only if you want one attention slide; other
 
 ---
 layout: default
-clicks: 5
----
-
-<!-- CONTEXT WINDOW -->
-
-<div class="demo-stage">
-  <div class="demo-head">
-    <div class="kicker">What the model can see</div>
-    <h2>The context window — one <span class="grad-warm">fixed</span> space for everything</h2>
-  </div>
-  <ContextWindow />
-</div>
-
-<!--
-If it just predicts the next token from what it's seen — how much can it see? A fixed-size window.
-And it's not just "how much" — it matters WHAT is in it.
-
-SET-UP (before any click): the grid already shows a few BLUE cells — the system prompt. Make the
-point up front: "Even before you type, the window isn't empty. The rules — the system prompt — are
-sitting at the front, and they're pinned there for every single call." Point at the legend: each
-content type has a colour and a live token count.
-
-[click] Your first question goes in — GREEN, the current turn. Small, a few hundred tokens.
-[click] The model answers, you reply — each turn is appended to history (GOLD). The window fills.
-[click] More turns. History keeps stacking; watch the free (faint) space shrink.
-[click] Full. The window can't simply grow — there's no room left for the next turn. So what happens?
-[click] The app does something about it: it COMPRESSES the oldest turns into a short summary (the
-striped cells) — or starts a fresh session. Room reopens, the system prompt stays pinned, and the
-conversation continues. The model never sees the raw old turns again — only the summary.
-
-Land it: the window is ONE fixed space that system + history + your question all share. It doesn't
-silently forget — when it's full, YOU (or the framework) decide what to keep: summarise, or reset.
-Bigger windows push the limit out; they never remove it. (Hold this — in Part IV we'll watch tools
-and their results fill this same space far faster.)
--->
-
----
-layout: default
----
-
-<Hero bg="part-2b.jpg" kicker="The most important slide" size="sm">
-  And between two calls,<br>it remembers <span class="grad-warm">nothing.</span>
-</Hero>
-
-<!--
-One more property, and it's the big one. The window explains what it sees in a single call.
-But across calls? Nothing carries over. Let me show you exactly what the API receives.
--->
-
----
-layout: default
-clicks: 3
+clicks: 6
 ---
 
 <!-- STATELESS REPLAY · take 1 — re-stack → forward pass → answer returns -->
@@ -181,24 +145,26 @@ clicks: 3
 <div class="demo-stage">
   <div class="demo-head">
     <div class="kicker">The stateless truth</div>
-    <h2>Every turn, you resend the <span class="grad-warm">entire</span> conversation</h2>
+    <h2>Every turn, we resend the <span class="grad-warm">entire</span> conversation</h2>
   </div>
   <StatelessReplayStack />
 </div>
 
 <!--
-The mechanics, end to end. Right side is two parts: the POST body on top, the LLM underneath.
-Turn one: the user asks. Watch the right — the request body is built (system + the question), the
-resend sweep runs over the WHOLE body, it drops into the LLM, the model generates, and ONLY THEN
-the answer travels back and appears on the LEFT. The answer is never sitting there in advance —
-it's produced by the model and returned.
-[click] Turn two. The previous answer is now back in the POST body as HISTORY — dimmed, because it
-was sent before. The only NEW line is the fresh question (highlighted). Sweep, forward pass,
-generate, answer returns. Token counter climbs.
-[click] Turn three: same again. Everything prior is re-sent, dimmed; one new line. You pay for the
+The mechanics, end to end. We build turn one up piece by piece. On arrival there's just the LEFT
+side: the human asks "Where is my order?" — nothing on the right yet.
+[click] The POST body appears: the request our API actually receives — system + the question — and
+the resend sweep runs over the whole thing.
+[click] It drops into the LLM — a stateless function — which starts generating.
+[click] And only NOW the answer comes back: it lands on the left. The answer was never sitting there
+in advance — the model produced it and returned it. Turn one complete.
+[click] Turn two, now as one full cycle. The previous answer is back in the POST body as HISTORY —
+dimmed, because it was sent before. The only NEW line is the fresh question (highlighted). Sweep,
+forward pass, generate, answer returns. Token counter climbs.
+[click] Turn three: same again. Everything prior is re-sent, dimmed; one new line. We pay for the
 whole history each turn.
 [click] Mental model: no session on the server. The client carries all state in the request body,
-every call. You've built against stateless endpoints for years — same shape.
+every call. We've built against stateless endpoints for years — same shape.
 -->
 
 ---
@@ -218,30 +184,76 @@ clicks: 3
 
 <!--
 Same truth, shown all at once so the redundancy is undeniable. Three request envelopes side by side.
-Turn one: the first envelope is sent — system + one question.
-[click] Turn two: the second envelope re-contains everything from the first (dimmed = "sent before")
-plus exactly one new line (highlighted). The replayed block just got bigger.
+Turn one: the first envelope is sent — system + one question. Note the body stops there: the answer
+isn't in it, because the model hasn't produced it yet.
+[click] Turn two: the second envelope re-contains everything from the first — the prior question AND
+its answer, now dimmed because they were sent before — plus exactly one new line (highlighted): the
+fresh question. The replayed block just got bigger.
 [click] Turn three: again — the grey replayed block grows, one new highlighted line, token bar climbs.
-The picture says it: every call ships all of the last one, plus a little more. That repeated grey
-block is what you pay for, every single turn.
+The picture says it: every call ships all of the last one, plus a little more.
 -->
 
 
 ---
 layout: default
+clicks: 5
 ---
 
-<!-- PAYOFF — statement -->
+<!-- CONTEXT WINDOW — closes Part 2 and bridges into agents.
+     Follows the stateless cluster: we resend everything every call,
+     so how much fits in ONE call? A fixed window — and when it's full,
+     the app compresses or offloads. (The AgentContextWindow slide in
+     Part 3 reuses these exact mechanics with tool output.) -->
 
-<div class="statement">
-  <div>
-    <div class="big">It has no memory.<br>Every call <span class="grad-warm">starts from zero.</span></div>
-    <div class="sub">Memory, history, "context" — that's <em>your</em> job, not the model's.</div>
+<div class="demo-stage">
+  <div class="demo-head">
+    <div class="kicker">What fits in one call</div>
+    <h2>The context window — one <span class="grad-warm">fixed</span> space for everything</h2>
   </div>
+  <ContextWindow />
 </div>
 
 <!--
-Let it land. The model is a pure function: text in, text out. No hidden state carried over.
-Everything we build from here exists to feed the right things into that payload. This is the key
-to the entire back half of the talk.
+We just saw it: no memory, so we resend the whole conversation every single call. Which raises the
+question — how big can that payload get? There's a hard limit: the context window. One fixed-size
+space. And it's not just "how much" — it matters WHAT is in it.
+
+SET-UP (before any click): the grid already shows a few BLUE cells — the system prompt. Make the
+point up front: "Even before we type, the window isn't empty. The rules — the system prompt — are
+sitting at the front, and they're pinned there for every single call." Point at the legend: each
+content type has a colour and a live token count.
+
+[click] Our first question goes in — GREEN, the current turn. Small, a few hundred tokens.
+[click] The model answers, we reply — each turn is appended to history (GOLD). The window fills.
+[click] More turns. History keeps stacking; watch the free (faint) space shrink.
+[click] Full. The window can't simply grow — there's no room left for the next turn. So what happens?
+[click] The app does something about it: it COMPRESSES the oldest turns into a short summary (the
+striped cells) — or starts a fresh session. Room reopens, the system prompt stays pinned, and the
+conversation continues. The model never sees the raw old turns again — only the summary.
+
+Land it: the window is ONE fixed space that system + history + our question all share. It doesn't
+silently forget — when it's full, WE (or the framework) decide what to keep: summarise, or reset.
+Bigger windows push the limit out; they never remove it. (Hold this — in the next part we'll watch
+an agent's tools and their results fill this same space far faster.)
+-->
+
+---
+layout: default
+---
+
+<!-- WHAT CHANGED — Archetype A claim over the rocket-launch photo -->
+
+<Hero bg="prediction-at-scale.jpg" kicker="What changed" align="center" size="sm">
+  Prediction at scale started to look like <span class="grad-warm">reasoning.</span>
+  <template #subtitle>
+    Train one model to predict the next word over the whole internet,
+    and "predict the next word" quietly becomes "answer the question."
+  </template>
+</Hero>
+
+<!--
+Here's the whole magic trick in one line, over a rocket at liftoff. Prediction at scale starts to
+look like reasoning. Train a model to predict the next word across the entire internet, and to get
+good at that it has to absorb grammar, facts, style, even reasoning patterns. "Predict the next word"
+becomes "answer the question." Which is exactly what we'll look at next.
 -->

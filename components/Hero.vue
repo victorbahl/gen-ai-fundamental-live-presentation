@@ -7,7 +7,6 @@
      gradient, so a missing file simply falls through to the gradient.
    - NO block/scrim/panel behind the text — text sits directly on the
      image and stays legible via text-shadow only.
-   - A faint corner tag names the file the user should drop in.
   Usage:
     <Hero bg="cover.jpg" kicker="GenAI · from first principles">
       Can a machine actually <span class="grad-warm">think?</span>
@@ -37,7 +36,6 @@ const bgUrl = `${import.meta.env.BASE_URL}img/${props.bg}`
       <h1 class="display" :class="{ sm: size === 'sm' }"><slot /></h1>
       <div v-if="$slots.subtitle" class="subtitle"><slot name="subtitle" /></div>
     </div>
-    <div class="photo-tag">📷 drop photo → public/img/{{ bg }}</div>
   </div>
 </template>
 
@@ -77,21 +75,4 @@ const bgUrl = `${import.meta.env.BASE_URL}img/${props.bg}`
   text-shadow: 0 1px 10px rgba(0,0,0,0.7);
 }
 .al-center .subtitle { margin-inline: auto; }
-
-/* faint corner tag — tells the user where the photo goes.
-   Hide globally by setting --photo-tag-display: none in styles/index.css */
-.photo-tag {
-  display: var(--photo-tag-display, block);
-  position: absolute;
-  right: 14px;
-  bottom: 12px;
-  font-family: var(--mono);
-  font-size: 0.62rem;
-  letter-spacing: 0.02em;
-  color: rgba(255,255,255,0.45);
-  background: rgba(0,0,0,0.28);
-  border: 1px dashed rgba(255,255,255,0.18);
-  border-radius: 7px;
-  padding: 2px 8px;
-}
 </style>

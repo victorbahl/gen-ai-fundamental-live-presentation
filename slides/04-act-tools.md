@@ -1,19 +1,33 @@
-<!-- ============================================================
-     PART III — Giving it hands (tools / MCP)
-     ============================================================ -->
-
 ---
 layout: default
 ---
 
-<Hero bg="part-3.jpg" kicker="Part III · Giving it hands">
-  A mind with<br><span class="grad-warm">no hands.</span>
-</Hero>
+<!-- ============================================================
+     PART 3 — Agents: from answers to actions
+     ============================================================
+     This is the final part of the new AI → LLMs → Agents spine. It
+     spans tools + MCP (this file) AND the agent loop / anatomy / A2A
+     (05-act-agents.md) — they're ONE part now, not two. This file
+     carries the part-opener hero (PartOpener.vue, spine bar with
+     "Agents" lit). The old thematic openers — "A mind with no hands."
+     (here) and "When the model drives." (05) — were REPLACED/REMOVED
+     per user; do not resurrect them.
+     NB: this header comment sits AFTER the frontmatter on purpose — a
+     comment BEFORE the first `---` renders as a stray blank slide. -->
+
+<PartOpener
+  bg="part-3.jpg"
+  :active="3"
+  accent="warm"
+  num="03"
+  headline="From answers to actions"
+  sub="tools · MCP · the agent loop · A2A" />
 
 <!--
-So we have a brilliant reasoner that sees a window of text and forgets everything between calls.
-Notice what it still can't do: anything. It can't read our database, check an order, send an email.
-It only emits text. To be useful, it needs hands.
+Part three — Agents. So far we have a brilliant reasoner that sees a window of text and forgets
+everything between calls. Notice what it still can't do: anything. It can't read our database, check
+an order, send an email — it only emits text. This part is about giving it hands and then handing it
+the wheel: tools, MCP, and the agent loop. This is where most of our work actually lives.
 -->
 
 ---

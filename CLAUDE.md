@@ -5,27 +5,62 @@ Every rule the user gives is recorded here and must be respected on every slide.
 
 ## Project
 
-- Slidev deck: "Compute → Reason → Act" — a visual, interactive intro to Generative AI.
+- Slidev deck: "AI → LLMs → Agents" — a visual, interactive intro to Generative AI.
   Audience: technical MuleSoft Solution Engineers (API management, integration, AI gateway).
-  Fil rouge: Compute → Reason → Act (history → LLM → agents). ~45 min, English. Neutral/unbranded.
+  Fil rouge: **AI → LLMs → Agents** (quick map of the field → how one model works → what we build
+  that acts). ~45 min, English. Neutral/unbranded.
   Running example for demos: "order status across systems".
+  SPINE HISTORY (user, 2026-06-17): the original "Compute → Reason → Act" four-part triad was
+  retired. The two dead part-opener heroes ("Seventy years in one breath", "It predicts the next
+  word. That's it.") were CUT — do not resurrect them. Tools/MCP + agents are now ONE part (Part 3
+  "Agents"), not two. Within Part 2, STATELESS now comes BEFORE the context window (the no-memory
+  truth motivates "so how much fits in one call?" → the window, which then closes Part 2 and bridges
+  into agents).
 - Entry point: `slides.md`. Custom components in `components/` (auto-imported).
 - Global theme/tokens in `styles/index.css`.
 - Run: `npm run dev` (the dev server must run outside the sandbox — it binds a port).
 
-## Deck structure (20 slides)
+## Deck structure (3 parts)
 
-Cover · Roadmap · **I** Part-opener / Timeline / "Prediction→reasoning" ·
-**II** Part-opener / NextTokenPredictor / AttentionFlip / ContextWindow / "remembers nothing" /
-StatelessReplay (hero) / "no memory" payoff · **III** Part-opener / Tools flow /
-McpEnvelope / MCP Mermaid sequence · **IV** Part-opener / AgentLoop / AgentContextWindow /
-Anatomy of an agent / A2A · Close.
+Cover · Humility · Roadmap (AI · LLMs · Agents) ·
+**1 — AI** (`02-reason-history.md`): PartOpener (AI, spine bar) / "GenAI is a small box" zoom (moved
+here from `01-intro.md`) / Timeline / "Prediction→reasoning" claim ·
+**2 — LLMs** (`03-reason-llm.md`): PartOpener (LLMs, spine bar) / NextTokenPredictor / AttentionFlip /
+StatelessReplayStack / StatelessReplayFilmstrip / ContextWindow (LAST — closes Part 2, bridges to
+agents) ·
+**3 — Agents** (`04-act-tools.md` + `05-act-agents.md`, ONE part): PartOpener (Agents, spine bar) /
+Tools flow / McpEnvelope / McpHandshake / AgentLoop / AgentContextWindow / Anatomy of an agent / A2A ·
+Close.
 
-Components: `Hero.vue` (Archetype A), `Timeline.vue`, `NextTokenPredictor.vue`,
-`AttentionFlip.vue`, `ContextWindow.vue`, `AgentContextWindow.vue`, `StatelessReplay.vue`,
-`McpEnvelope.vue`, `McpHandshake.vue`, `AgentLoop.vue`.
+PART OPENERS (user, 2026-06-17): each of the three parts opens with a `PartOpener.vue` hero (NEW
+component) showing a SPINE PROGRESS bar — the full "AI › LLMs › Agents" spine with the current part
+lit (accent underline) and the others dimmed — over a background photo, then the part number + a
+headline + a sub line of TAGS. The tags map to what that part actually contains (user, 2026-06-17):
+Part 1 = "where GenAI fits · a short history · prediction at scale"; Part 2 = "tokens · attention ·
+stateless · the context window"; Part 3 = "tools · MCP · the agent loop · A2A". Part 1 uses the
+cool/azure accent (`accent="cool"`, `bg="part-1.jpg"`); Parts 2 & 3 use warm/gold (`bg="part-2.jpg"`,
+`part-3.jpg`). Same placeholder/text-shadow rules as `Hero.vue` (Rules 2/3) and token-driven accents
+(Rule 7).
 
-`McpEnvelope.vue` + `McpHandshake.vue` are the Part-III MCP pair. The envelope slide shows REST
+CUT SLIDES (user, 2026-06-17) — do NOT resurrect: (a) Part-2 "the most important slide" remembers-
+nothing hero (`part-2b.jpg`) and the "It has no memory" payoff statement; (b) Part-3 thematic opener
+"A mind with no hands." (REPLACED by the Agents PartOpener) and the "When the model drives." in-part
+pivot hero (`part-4.jpg`) — its tools→agents handoff is now folded into the AgentLoop speaker notes;
+(c) the close hero line "From calculators to colleagues." (now "Less magic. More system."). The
+`part-2b.jpg` and `part-4.jpg` placeholders are no longer referenced.
+
+EMPTY-SLIDE GOTCHA (user, 2026-06-17): a `src:`-included file whose FIRST line is an HTML `<!-- … -->`
+comment (before the first `---` frontmatter) renders that comment as a STRAY BLANK slide. This had
+produced 4 empties (then slides 5, 9, 16, 21). Fix applied to all includes: the header comment now
+sits AFTER the first `---` frontmatter (the pattern `06-close.md` always used). Keep new include
+files starting with `---`, never a leading comment.
+
+Components: `Hero.vue` (Archetype A), `PartOpener.vue` (part-opener hero w/ spine bar),
+`Timeline.vue`, `NextTokenPredictor.vue`, `AttentionFlip.vue`, `ContextWindow.vue`,
+`AgentContextWindow.vue`, `StatelessReplay.vue`, `McpEnvelope.vue`, `McpHandshake.vue`,
+`AgentLoop.vue`.
+
+`McpEnvelope.vue` + `McpHandshake.vue` are the Part-3 (Agents) MCP pair. The envelope slide shows REST
 (left) vs MCP server (right) as TWO HTTP requests with the SAME Bearer auth and JSON content type —
 the only difference is the body (REST = intent in URL; MCP = a JSON-RPC `tools/call` object). Beat 3
 drops the payoff band: "it's just HTTP, so our gateway policies (OAuth / rate-limit / audit / WAF)
@@ -40,21 +75,79 @@ client, not the model. Built per the user's brief: MCP ≈ standard REST/HTTP, c
 sides, "what you ship today" removed, simple-first then add detail.
 
 `ContextWindow.vue` and `AgentContextWindow.vue` are a deliberate PAIR: the same fixed-space,
-colour-coded grid shown twice. The lean Part-II one (system · history · current · summary · free)
-teaches "the window is one fixed space different things share, and when it's full the APP acts —
+colour-coded grid shown twice. The lean Part-2 (LLMs) one (system · history · current · summary ·
+free) teaches "the window is one fixed space different things share, and when it's full the APP acts —
 it compresses the oldest turns into a summary (striped cells) or starts a fresh session; the system
-prompt stays pinned." The Part-IV one reuses the identical mechanics and adds **tool defs** + **tool
-data** (the runaway space-hog — tool OUTPUT, not your prose, is what fills an agent's window); when
-full, the agent **offloads to external memory** (striped azure cells, kept OUTSIDE the window) —
-motivating the "Memory" piece on the Anatomy slide that immediately follows. NB (user feedback
+prompt stays pinned." It now sits LAST in Part 2 (right after the stateless cluster), so the running
+order is "no memory → we resend everything → so how much fits in one call? → the window." The Part-3
+(Agents) one reuses the identical mechanics and adds **tool defs** + **tool data** (the runaway
+space-hog — tool OUTPUT, not your prose, is what fills an agent's window); when full, the agent
+**offloads to external memory** (striped azure cells, kept OUTSIDE the window) — motivating the
+"Memory" piece on the Anatomy slide that immediately follows. NB (user feedback
 2026-06-17): do NOT frame this as money/"budget"/"rent" — it's about space and what fills it; and
 do NOT show tokens just "falling out of the window" — show the real resolution (compress / new
 session / offload). Segment order is FIXED (system → … → free) so cells only change colour in place
-— never reflow (Rule 4). Token scale differs on purpose: 0.5k/cell in Part II, 2k/cell in Part IV
-(agent tool output is big).
+— never reflow (Rule 4). Token scale differs on purpose: 0.5k/cell in the Part-2 (LLMs) window,
+2k/cell in the Part-3 (Agents) one (agent tool output is big).
 
 ## Status (as of session end, 2026-06-17)
 
+- **This session (2026-06-17, OPENER CLEANUP — newest): empties, box move, tags, more cuts.**
+  Follow-up to the PART OPENERS pass, all per user: (1) Killed the 4 STRAY BLANK slides (5, 9, 16,
+  21) — each `src:` include began with a header comment BEFORE its first `---`, which Slidev renders
+  as an empty slide; moved every header comment AFTER the frontmatter. (2) Moved the "GenAI is a
+  small box" zoom OUT of `01-intro.md` and INTO Part 1 (`02-reason-history.md`), right after the AI
+  opener — it's a Part-1 idea. (3) Rewrote the three opener sub-lines as TAGS matching each part's
+  real contents (see Deck structure). (4) REMOVED the "When the model drives." pivot hero (`05`,
+  `part-4.jpg`) — folded its tools→agents handoff into the AgentLoop notes. (5) Changed the close
+  hero from "From calculators to colleagues." to "Less magic. More system." (kicker → "AI · LLMs ·
+  Agents", notes updated). Build compiles clean (`slidev build`, 534 modules). **NOT yet visually
+  verified — user should refresh; confirm the 4 empties are gone, the box reads in Part 1, and the
+  opener tag lines don't clip.**
+- **This session (2026-06-17, PART OPENERS): added 3 part-opener heroes; cut 2 slides.**
+  Per user: (1) NEW `PartOpener.vue` — a part-opener hero with a SPINE PROGRESS bar ("AI › LLMs ›
+  Agents", current part lit + accent underline, others dimmed) over a bg photo, then the part number
+  + the agenda's main/sub line (reused from the roadmap). One opens each part: Part 1 (`02`,
+  `bg="part-1.jpg"`, cool accent, "A quick map of the field"), Part 2 (`03`, `part-2.jpg`, warm,
+  "How the model actually works"), Part 3 (`04`, `part-3.jpg`, warm, "From answers to actions").
+  (2) CUT the "the most important slide" remembers-nothing `Hero` (was `part-2b.jpg` — now
+  unreferenced) and the "It has no memory" payoff `statement` slide, both in Part 2. (3) REPLACED
+  the Part-3 thematic opener "A mind with no hands." with the Agents PartOpener (its
+  no-hands/needs-hands beat folded into the opener's speaker notes). Speaker notes written for all
+  three openers. Build compiles clean (`slidev build`). **NOT yet visually verified — user should
+  refresh; supply real `part-1/2/3.jpg` photos and check the spine bar + headline don't clip and the
+  active-word underline reads clearly over the image.**
+- **This session (2026-06-17, FLOW REWORK): retired the Compute→Reason→Act spine.**
+  Big-picture restructure only (no component internals touched). (1) New spine **AI → LLMs →
+  Agents** — relabelled the cover `info`, the roadmap cards/title (`01-intro.md`), and all spine
+  notes. (2) CUT both dead part-opener heroes: "Seventy years in one breath" (`02`) and "It predicts
+  the next word. That's it." (`03`) — the Timeline and NextTokenPredictor own their own titles now.
+  (3) Collapsed old Part III (tools/MCP) + Part IV (agents) into ONE **Part 3 — Agents**: only
+  `04-act-tools.md` carries the part-opener hero ("A mind with no hands"); the "When the model
+  drives" hero in `05` is now an IN-PART pivot (kicker "Same part · now the model drives"), not
+  "Part IV". (4) Moved STATELESS before the context window inside Part 2: predictor → attention →
+  "remembers nothing" hero → StatelessStack → Filmstrip → no-memory payoff → ContextWindow (now
+  LAST, closing Part 2 and bridging to agents). Fixed the resulting forward-references in notes (the
+  "remembers nothing" hero no longer points at the window; the window opener now bridges from "we
+  resend everything → how much fits in one call?"; "Callback to Part II" → "from Part 2"). Aligned
+  the stateless stack title to "we resend" (Rule 9). Build compiles clean (`slidev build`). **NOT
+  yet visually verified — user should refresh and click through the new Part-2 order.**
+- **This session (2026-06-17, newest): reworked the two "stateless truth" slides per user.**
+  `StatelessReplayStack.vue` now builds TURN ONE up by clicks instead of running it as a timed
+  cascade on arrival: c0 = LEFT only (the human's first question; right side blank), c1 = + POST
+  body (system + question, sweep), c2 = + LLM (forward pass · generating…), c3 = + answer returns
+  to the left (turn 1 done). Turns 2 and 3 stay as ONE full animated cycle each (c4, c5); takeaway
+  at c6. Slide `clicks: 3 → 6`. Added a `.stepped` class (true only on turn 1) that kills the timed
+  CSS animations and drives the LLM "generating…"→answer purely off click gates (`showLLM`/`showAns`)
+  with a clean fade handoff (think fades out, answer fades in 0.25s later — fixes the user's "answer
+  overlays generating" complaint). For the later animated turns the cascade timing was retightened
+  (think fades by ~1.95s, ansIn at 2.0s) so the answer no longer overlaps "generating…".
+  `StatelessReplayFilmstrip.vue`: per the user, the CURRENT turn's ANSWER is no longer in the POST
+  body (it hasn't been produced when the call is sent) — each envelope is now system + prior turns
+  (user+answer, replayed/dimmed) + ONE new line = the current question only. Removed the "↗ … you
+  pay to resend it all" legend line (and its `summary`/`.grow` dead code). Speaker notes for both
+  slides rewritten to match (and to "we" voice). Build compiles clean. **NOT yet visually verified —
+  user should refresh; check turn-1 steps land cleanly and no answer/generating overlap.**
 - **This session (2026-06-17, latest): reworked Part III MCP per user brief, then iterated.** Goal:
   make MCP accurate + beautiful, lean on "MCP ≈ standard REST/HTTP". Envelope title is now "A
   standard API any model can consume" (the accurate framing the user asked for — was "HTTP you
@@ -117,7 +210,8 @@ session / offload). Segment order is FIXED (system → … → free) so cells on
   project `./.pw-browsers` with sandbox off); the timeline above/below-axis layout at real res.
 - The 7 hero backgrounds are gradient placeholders; drop real photos at `public/img/cover.jpg`,
   `part-1.jpg`, `part-2.jpg`, `part-2b.jpg`, `part-3.jpg`, `part-4.jpg`, `close.jpg`.
-- Before presenting: set `--photo-tag-display: none` in `styles/index.css` to hide photo tags.
+- The on-slide photo-placeholder corner tags were removed (user, 2026-06-17). `Hero.vue` no longer
+  renders a `.photo-tag`, and the `--photo-tag-display` flag is gone from `styles/index.css`.
 
 ## Engineering lessons (do NOT repeat these)
 

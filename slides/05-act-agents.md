@@ -1,26 +1,18 @@
-<!-- ============================================================
-     PART IV — Machines that act (agents + A2A)
-     ============================================================ -->
-
----
-layout: default
----
-
-<Hero bg="part-4.jpg" kicker="Part IV · Machines that act">
-  When the model<br><span class="grad-warm">drives.</span>
-</Hero>
-
-<!--
-So far the model answers one turn at a time, and we orchestrate. The agentic shift is simple but
-profound: we let the MODEL decide the next step, in a loop, until a goal is met.
--->
-
 ---
 layout: default
 clicks: 4
 ---
 
-<!-- AGENT LOOP — Think is active on arrival (no dead first click);
+<!-- ============================================================
+     PART 3 (continued) — agents + A2A
+     ============================================================
+     Same part as 04-act-tools.md (agent loop / context window / anatomy
+     / A2A). The "When the model drives." pivot hero was REMOVED per user;
+     the tools → agents handoff is folded into the agent-loop notes below.
+     NB: this header comment sits AFTER the frontmatter on purpose — a
+     comment BEFORE the first `---` renders as a stray blank slide.
+
+     AGENT LOOP — Think is active on arrival (no dead first click);
      clicks walk Act → Observe → loop → done. -->
 
 <div class="demo-stage">
@@ -32,7 +24,10 @@ clicks: 4
 </div>
 
 <!--
-An agent is mostly one idea: a loop. On screen already: the three nodes, with THINK active —
+We've given the model hands — tools, MCP. So far, though, it answers one turn at a time and WE
+orchestrate every step. The agentic shift is simple but profound: we hand it the wheel — let the
+MODEL decide the next step, in a loop, until a goal is met.
+An agent is mostly one idea: that loop. On screen already: the three nodes, with THINK active —
 given the goal and what it knows, the model decides the next step.
 [click] Act — call a tool. That's MCP, exactly what we just saw.
 [click] Observe — read the result back into context.
@@ -58,7 +53,7 @@ clicks: 4
 </div>
 
 <!--
-Callback to Part II — the context window — but now through the agent loop. Same fixed space; watch
+Callback to the context window from Part 2 — but now through the agent loop. Same fixed space; watch
 how fast it fills.
 
 SET-UP (before any click): the grid already shows BLUE — the system prompt PLUS the schema of every

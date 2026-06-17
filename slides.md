@@ -2,7 +2,7 @@
 theme: default
 title: 'GenAI, from first principles'
 info: |
-  Compute → Reason → Act — a visual, interactive intro to Generative AI
+  AI → LLMs → Agents — a visual, interactive intro to Generative AI
   for integration-minded engineers.
 class: text-left
 drawings:
@@ -35,8 +35,9 @@ fonts:
 Welcome. One promise for the next 45 minutes: by the end, this "AI revolution" should feel
 less like magic and more like a system you could have designed.
 
-Through-line: three words — Compute, Reason, Act. Machines that calculate, then reason,
-then act. The big question on screen is the hook; I'll return to it at the very end.
+Three moves: AI, then LLMs, then Agents. First a quick map of the field, then how a single
+model actually works, then what we build on top of it that can act. The title on screen is
+the hook; I'll come back to it at the very end.
 -->
 
 ---

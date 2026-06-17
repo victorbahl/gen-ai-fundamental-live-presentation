@@ -53,10 +53,6 @@
   --serif: 'Fraunces', 'Iowan Old Style', Georgia, serif;
   --sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
   --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
-
-  /* PRESENT-MODE FLAG: set to `none` to hide all photo-placeholder tags
-     across the whole deck before presenting. One line, global. */
-  --photo-tag-display: block;
 }
 
 /* ---- NIGHT scheme — Slidev adds .dark on <html> via the day/night toggle.
