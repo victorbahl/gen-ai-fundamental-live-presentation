@@ -20,7 +20,10 @@ const props = defineProps({
   size: { type: String, default: 'lg' },     // 'lg' | 'sm'
 })
 
-const bgUrl = `/img/${props.bg}`
+// Prepend Vite's BASE_URL (trailing-slash) so images resolve under a
+// deploy sub-path (e.g. GitHub Pages /repo/). Dev base is "/", so this
+// is a no-op locally.
+const bgUrl = `${import.meta.env.BASE_URL}img/${props.bg}`
 </script>
 
 <template>
