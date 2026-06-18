@@ -38,7 +38,7 @@ const beats = [
   { sys: 3, defs: 7, goal: 0, hist: 0,  data: 0,  mem: 0,
     caption: 'Before the agent runs one step, it already carries the system prompt AND the schema of every tool it may call — on every single call.' },
   { sys: 3, defs: 7, goal: 3, hist: 0,  data: 0,  mem: 0,
-    caption: 'The user’s goal goes in: “sort out order #4471”. Set once — green.' },
+    caption: 'The user’s goal goes in: “when will order #7788 arrive?”. Set once — green.' },
   { sys: 3, defs: 7, goal: 3, hist: 4,  data: 14, mem: 0,
     caption: 'One loop: the agent thinks, calls get_order_status — and the API’s response, a big JSON blob, is folded straight into the window.' },
   { sys: 3, defs: 7, goal: 3, hist: 8,  data: 29, mem: 0,

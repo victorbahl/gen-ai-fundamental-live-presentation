@@ -5,13 +5,16 @@ layout: default
 <!-- ============================================================
      PART 3 — Agents: from answers to actions
      ============================================================
-     This is the final part of the new AI → LLMs → Agents spine. It
-     spans tools + MCP (this file) AND the agent loop / anatomy / A2A
-     (05-act-agents.md) — they're ONE part now, not two. This file
-     carries the part-opener hero (PartOpener.vue, spine bar with
-     "Agents" lit). The old thematic openers — "A mind with no hands."
-     (here) and "When the model drives." (05) — were REPLACED/REMOVED
-     per user; do not resurrect them.
+     Final part of the AI → LLMs → Agents spine. It spans the agent
+     runtime / tools / MCP (this file) AND skills / the loop / context /
+     A2A (05-act-agents.md) — ONE part. This file carries the part-opener
+     hero (PartOpener.vue, spine bar with "Agents" lit).
+
+     ORDER (reworked 2026-06-18, user): TOP-DOWN now. Define "what is an
+     agent" UP FRONT (AgentRuntime.vue) — the old end-of-part "Anatomy"
+     recap was folded into it — then unpack each piece: tools, MCP, then
+     skills + the running loop in 05. The dead thematic openers
+     ("A mind with no hands.", "When the model drives.") stay CUT.
      NB: this header comment sits AFTER the frontmatter on purpose — a
      comment BEFORE the first `---` renders as a stray blank slide. -->
 
@@ -21,13 +24,15 @@ layout: default
   accent="warm"
   num="03"
   headline="From answers to actions"
-  sub="tools · MCP · the agent loop · A2A" />
+  sub="what an agent is · tools · MCP · skills · the loop · A2A" />
 
 <!--
 Part three — Agents. So far we have a brilliant reasoner that sees a window of text and forgets
 everything between calls. Notice what it still can't do: anything. It can't read our database, check
-an order, send an email — it only emits text. This part is about giving it hands and then handing it
-the wheel: tools, MCP, and the agent loop. This is where most of our work actually lives.
+an order, send an email — it only emits text. This part gives it hands and then hands it the wheel.
+And we'll do it top-down: first I'll show you exactly what an agent IS — it's nothing exotic — then
+we'll unpack each piece: tools, MCP, skills, and the loop actually running. This is where most of
+our work lives.
 -->
 
 ---
@@ -35,56 +40,54 @@ layout: default
 clicks: 4
 ---
 
-<!-- TOOLS — build-up on fixed stage. Title is on screen from arrival; clicks add the flow. -->
+<!-- WHAT IS AN AGENT — the runtime, defined up front (replaces the old
+     end-of-part "Anatomy" recap). Title on arrival; clicks dock each piece. -->
 
-<div class="stage tools-stage">
-  <div class="title-row">
+<div class="demo-stage">
+  <div class="demo-head">
+    <div class="kicker">Start with the whole picture</div>
+    <h2>An agent is the <span class="grad-warm">LLM</span> — wrapped so it can act</h2>
+  </div>
+  <AgentRuntime />
+</div>
+
+<!--
+Before any detail, let's de-mystify the word "agent". It is NOT a new kind of model. It's the exact
+LLM we just spent Part 2 on — on its own it only reasons and emits text.
+[click] We make it an agent by wrapping it: we give it a GOAL and put it in a LOOP, so instead of
+answering once, it decides its OWN next step, over and over, until the goal is met.
+[click] We wire it to TOOLS — so each step can actually act on the real world, not just talk.
+[click] And we give it MEMORY — somewhere to carry the state the model itself forgets between calls.
+[click] That's the whole thing: an LLM, a loop with a goal, tools, and memory. Nothing here is new —
+the rest of this part is just unpacking each piece. Let's start with tools.
+-->
+
+---
+layout: default
+clicks: 3
+---
+
+<!-- TOOLS — the round-trip across the trust boundary, with real artefacts.
+     Replaces the old 3-box flow. Title on arrival; clicks walk the round-trip. -->
+
+<div class="demo-stage">
+  <div class="demo-head">
     <div class="kicker">The idea behind tools</div>
     <h2>Let the model <span class="grad-warm">ask</span> — our code does the work</h2>
   </div>
-
-  <div class="flow">
-    <div class="fnode" v-click="1">
-      <div class="fn-t">1 · Model asks</div>
-      <div class="fn-d">"call get_order_status(4471)"</div>
-    </div>
-    <div class="farrow" v-click="2">→</div>
-    <div class="fnode" v-click="2">
-      <div class="fn-t">2 · Our code runs</div>
-      <div class="fn-d">hits the real Order API</div>
-    </div>
-    <div class="farrow" v-click="3">→</div>
-    <div class="fnode" v-click="3">
-      <div class="fn-t">3 · Result goes back</div>
-      <div class="fn-d">folded into the next payload</div>
-    </div>
-  </div>
-
-  <div class="stage-foot" v-click="4">
-    The model never touches our systems. It only <strong>requests</strong>; we stay in control of execution.
-  </div>
+  <ToolRoundtrip />
 </div>
 
-<style>
-.tools-stage { gap: 2rem; }
-.flow { display: flex; align-items: stretch; justify-content: center; gap: 1rem; }
-.fnode {
-  background: var(--bg-panel); border: 1px solid var(--hair); border-radius: 14px;
-  padding: 1.1rem 1.2rem; width: 230px;
-}
-.fn-t { font-family: var(--serif); font-weight: 600; font-size: 1.05rem; }
-.fn-d { font-family: var(--mono); font-size: 0.72rem; color: var(--ink-soft); margin-top: 0.4rem; }
-.farrow { display: flex; align-items: center; font-size: 1.6rem; color: var(--ink-faint); }
-</style>
-
 <!--
-The mechanism is simple and it puts us in control. We hand the model a menu of tools it's
-allowed to ask for.
-[click] It doesn't run anything — it emits a request: "please call get_order_status with 4471".
-[click] OUR code receives that, calls the real API — with our auth, our governance.
-[click] The result is fed back into the model's next payload, and now it can answer.
-[click] Key point for this audience: the model never touches our systems directly. It requests;
-we execute. That's a security and governance story, not just a feature.
+The first piece: tools. The mechanism is simple, and it puts US in control. We hand the model a menu
+of tools it's allowed to ask for. On screen, it does the only thing it can — it emits TEXT: a
+structured request, "call get_order_status with id 7788". Notice the dashed line: the model lives on
+the left and never crosses it.
+[click] That request crosses to OUR side. Our code runs the real Order API call — with our auth, our
+governance. The model never holds the credential.
+[click] The JSON result is folded back into the model's next payload — and only now can it answer.
+[click] The point this room cares about: the model never touches our systems. It requests; we
+execute. That's a security and governance story, not just a feature.
 -->
 
 ---
@@ -103,10 +106,11 @@ clicks: 3
 </div>
 
 <!--
-MCP — Model Context Protocol — sounds like a new world. It isn't. It's a standard way to expose an
-API so ANY AI app can consume it. And note who "consumes" it: not the model — the model only emits
-text deciding which tool it wants. It's our app — the MCP client inside the host — that actually
-makes the call. On the left, a REST call we've shipped a thousand times.
+We just saw OUR code call a tool. MCP — Model Context Protocol — is simply the STANDARD way to expose
+that tool so ANY AI app can consume it, with zero bespoke integration. It sounds like a new world; it
+isn't. And note who "consumes" it: not the model — the model only emits text deciding which tool it
+wants. It's our app — the MCP client inside the host — that actually makes the call. On the left, a
+REST call we've shipped a thousand times.
 [click] On the right, the same request our app sends to an MCP server. Same method over HTTP, same
 Host, same Bearer token in the same Authorization header. It's a normal HTTPS POST.
 [click] Line them up: the whole HTTP envelope is identical — host, auth, JSON content type. The

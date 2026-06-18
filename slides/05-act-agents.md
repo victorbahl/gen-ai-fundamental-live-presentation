@@ -1,40 +1,74 @@
 ---
 layout: default
-clicks: 4
+clicks: 3
 ---
 
 <!-- ============================================================
-     PART 3 (continued) — agents + A2A
+     PART 3 (continued) — skills · the loop · context · A2A
      ============================================================
-     Same part as 04-act-tools.md (agent loop / context window / anatomy
-     / A2A). The "When the model drives." pivot hero was REMOVED per user;
-     the tools → agents handoff is folded into the agent-loop notes below.
+     Same part as 04-act-tools.md. ORDER (reworked 2026-06-18, user):
+       Tools vs Skills (after tools+MCP) → the loop RUNNING (live trace)
+       → agent context window → A2A (protocol-technical, Agent Cards).
+     The old "Anatomy of an agent" recap slide was REMOVED — its job is
+     done up front by AgentRuntime.vue ("what is an agent"). The dead
+     "When the model drives." pivot hero stays CUT.
      NB: this header comment sits AFTER the frontmatter on purpose — a
      comment BEFORE the first `---` renders as a stray blank slide.
 
-     AGENT LOOP — Think is active on arrival (no dead first click);
-     clicks walk Act → Observe → loop → done. -->
+     TOOLS vs SKILLS — names the skill concept, AFTER tools+MCP (user's
+     ordering). Title on arrival; clicks reveal skill, link, bridge. -->
+
+<div class="demo-stage">
+  <div class="demo-head">
+    <div class="kicker">Two words people mix up</div>
+    <h2>A tool is one <span class="grad-warm">action</span> — a skill is a <span class="grad-warm">playbook</span></h2>
+  </div>
+  <ToolsVsSkills />
+</div>
+
+<!--
+Quick but important distinction, now that we know what a tool is. On the left, the tool — a single
+callable action. get_order_status(id) returns JSON. It's a verb the model invokes; it's what the
+agent CAN do.
+[click] On the right, a skill. A skill isn't one call — it's a packaged PLAYBOOK for a whole job:
+instructions plus the resources to do it well. "Handle a refund" ships as a SKILL.md of steps, the
+policy that governs it, maybe a script — and the agent loads it ON DEMAND, only when the task
+matches, so we don't bloat every prompt with everything.
+[click] And a skill USES tools — it orchestrates several tool calls plus the know-how to sequence
+them toward an outcome.
+[click] So: tools are what an agent can do; skills are HOW to do something well. But notice — both
+are just context we hand the model. It still only decides; we still execute. Same trust boundary.
+-->
+
+---
+layout: default
+clicks: 5
+---
+
+<!-- THE LOOP, RUNNING — live worked trace (rebuilt; replaces the static ring).
+     Title on arrival; clicks accumulate the transcript turn by turn. -->
 
 <div class="demo-stage">
   <div class="demo-head">
     <div class="kicker">The agent loop</div>
-    <h2>Think → Act → Observe → <span class="grad-warm">repeat</span></h2>
+    <h2>Think → Act → Observe, until the <span class="grad-warm">goal is met</span></h2>
   </div>
   <AgentLoop />
 </div>
 
 <!--
-We've given the model hands — tools, MCP. So far, though, it answers one turn at a time and WE
-orchestrate every step. The agentic shift is simple but profound: we hand it the wheel — let the
-MODEL decide the next step, in a loop, until a goal is met.
-An agent is mostly one idea: that loop. On screen already: the three nodes, with THINK active —
-given the goal and what it knows, the model decides the next step.
-[click] Act — call a tool. That's MCP, exactly what we just saw.
-[click] Observe — read the result back into context.
-[click] Then loop: think again with the new information, act again. The model itself decides whether
-it's done.
-[click] When the goal is met, it exits and answers. No human stepping through each turn — the model
-drives the orchestration.
+Now the loop — not as a diagram, but actually running. We've given the model a goal: "when will
+order #7788 arrive?" Watch it work. Step one, it THINKS: I need the status first.
+[click] It ACTS — calls get_order_status — and OBSERVES the result: shipped, but the ETA is null…
+and there's a tracking number. Hold that thought.
+[click] Step two, it THINKS again — and here's the whole point. WE did not script this. The model
+chose its next move FROM what it just observed: no ETA, but a tracking number, so go follow it.
+That self-directed next step is what makes it an agent.
+[click] It ACTS on its own decision — get_tracking — and OBSERVES the ETA: June 20th.
+[click] Step three: it has the ETA, the goal is met, so it STOPS and answers. The model decided when
+it was done — no human stepping through the turns.
+[click] That's the agentic loop: we orchestrated nothing between steps. Think, act, observe, repeat —
+the model drives, and it knows when to quit. Now — what does running this loop do to the window?
 -->
 
 ---
@@ -42,7 +76,7 @@ layout: default
 clicks: 4
 ---
 
-<!-- AGENT CONTEXT WINDOW — the loop fills the same fixed budget, fast, with tool OUTPUT. -->
+<!-- AGENT CONTEXT WINDOW — the loop fills the same fixed space, fast, with tool OUTPUT. -->
 
 <div class="demo-stage">
   <div class="demo-head">
@@ -53,14 +87,14 @@ clicks: 4
 </div>
 
 <!--
-Callback to the context window from Part 2 — but now through the agent loop. Same fixed space; watch
-how fast it fills.
+Callback to the context window from Part 2 — but now through the agent loop we just watched. Same
+fixed space; watch how fast it fills.
 
 SET-UP (before any click): the grid already shows BLUE — the system prompt PLUS the schema of every
 tool the agent may call. "An agent carries its whole toolbox description on every single call, before
 it does anything."
 
-[click] The goal goes in — green, set once: "sort out order #4471".
+[click] The goal goes in — green, set once: the order question we just ran.
 [click] First loop: it thinks, calls get_order_status, and the API's JSON response is folded straight back
 into the window — the amber "tool data". Point out the scale jumped: each cell here is ~2k tokens.
 [click] Another loop, another Observe, another blob of data. Make the key point: it's tool OUTPUT,
@@ -70,68 +104,9 @@ after just a few loops.
 kept OUTSIDE the window), drops the raw JSON blobs, and pulls the note back only when it needs it.
 Room reopens; the loop continues without losing the thread.
 
-Land it: this is WHY an agent needs MEMORY. The model keeps no state and the window fills in a few
-loops — so the agent has to decide what to summarise, what to offload, and what to drop. That deciding
-IS the memory piece — which is exactly the next slide.
--->
-
----
-layout: default
-clicks: 5
----
-
-<!-- ANATOMY OF AN AGENT — build-up, fixed stage.
-     Title is on screen from arrival; clicks assemble the parts. -->
-
-<div class="stage anat-stage">
-  <div class="title-row">
-    <div class="kicker">Nothing new — just assembled</div>
-    <h2>Anatomy of an <span class="grad-warm">agent</span></h2>
-  </div>
-
-  <div class="parts">
-    <div class="part" v-click="1">
-      <div class="p-ic">🧠</div><div class="p-t">Reason</div><div class="p-d">the LLM</div>
-    </div>
-    <div class="pplus" v-click="2">+</div>
-    <div class="part" v-click="2">
-      <div class="p-ic">🔧</div><div class="p-t">Tools</div><div class="p-d">via MCP</div>
-    </div>
-    <div class="pplus" v-click="3">+</div>
-    <div class="part" v-click="3">
-      <div class="p-ic">📒</div><div class="p-t">Memory</div><div class="p-d">state you carry</div>
-    </div>
-    <div class="pplus" v-click="4">+</div>
-    <div class="part" v-click="4">
-      <div class="p-ic">🎯</div><div class="p-t">Goal</div><div class="p-d">+ the loop</div>
-    </div>
-  </div>
-
-  <div class="stage-foot" v-click="5">
-    Every piece is something we already built in this talk.
-  </div>
-</div>
-
-<style>
-.anat-stage { gap: 2rem; }
-.parts { display: flex; align-items: center; justify-content: center; gap: 1rem; }
-.part {
-  background: var(--bg-panel); border: 1px solid var(--hair); border-radius: 14px;
-  padding: 1.1rem 1.3rem; width: 150px; text-align: center;
-}
-.p-ic { font-size: 1.5rem; }
-.p-t { font-family: var(--serif); font-weight: 600; font-size: 1.1rem; margin-top: 0.2rem; }
-.p-d { font-size: 0.72rem; color: var(--ink-soft); margin-top: 0.15rem; }
-.pplus { font-size: 1.5rem; color: var(--ink-faint); }
-</style>
-
-<!--
-Let's de-mystify "agent". It's an assembly of parts you now know.
-[click] Reason — the LLM.
-[click] Tools — via MCP.
-[click] Memory — the state you carry between calls, because the model won't.
-[click] A goal, plus the loop from the last slide.
-[click] That's it. Nothing here is new. An agent is these four things wired together.
+Land it: this is the MEMORY piece from the runtime slide, made concrete. The model keeps no state
+and the window fills in a few loops — so the agent has to decide what to summarise, what to offload,
+and what to drop. That deciding IS memory.
 -->
 
 ---
@@ -139,55 +114,28 @@ layout: default
 clicks: 3
 ---
 
-<!-- A2A — build-up, fixed stage.
-     Title is on screen from arrival; clicks add orchestrator → workers → foot. -->
+<!-- A2A — protocol-technical: Agent Card discovery + task delegation.
+     Mirrors the MCP pair. Title on arrival; clicks walk discover → delegate → return. -->
 
-<div class="stage a2a-stage">
-  <div class="title-row">
+<div class="demo-stage">
+  <div class="demo-head">
     <div class="kicker">When one agent isn't enough</div>
     <h2>Agents calling <span class="grad-warm">agents</span> — A2A</h2>
   </div>
-
-  <div class="a2a">
-    <div class="agent orchestrator" v-click="1">
-      <div class="a-ic">🧭</div><div class="a-t">Orchestrator</div>
-    </div>
-    <div class="a2a-lines" v-click="2">
-      <div class="ln" /><div class="ln" /><div class="ln" />
-    </div>
-    <div class="a2a-row">
-      <div class="agent" v-click="2"><div class="a-ic">📦</div><div class="a-t">Orders agent</div></div>
-      <div class="agent" v-click="2"><div class="a-ic">💳</div><div class="a-t">Billing agent</div></div>
-      <div class="agent" v-click="2"><div class="a-ic">🚚</div><div class="a-t">Logistics agent</div></div>
-    </div>
-  </div>
-
-  <div class="stage-foot" v-click="3">
-    A2A is service-to-service — for agents. Specialised workers, one coordinator, a shared protocol.
-  </div>
+  <A2A />
 </div>
 
-<style>
-.a2a-stage { gap: 1.6rem; }
-.a2a { display: flex; flex-direction: column; align-items: center; gap: 0.4rem; }
-.agent {
-  background: var(--bg-panel); border: 1px solid var(--hair); border-radius: 14px;
-  padding: 0.8rem 1rem; width: 150px; text-align: center;
-}
-.agent.orchestrator { border-color: var(--warm); }
-.a-ic { font-size: 1.4rem; }
-.a-t { font-family: var(--serif); font-weight: 600; font-size: 0.95rem; margin-top: 0.15rem; }
-.a2a-lines { display: flex; gap: 5.5rem; height: 26px; }
-.a2a-lines .ln { width: 2px; background: var(--hair); }
-.a2a-row { display: flex; gap: 1rem; }
-</style>
-
 <!--
-Last piece. One agent is powerful; a team is more.
-[click] An orchestrator agent owns the goal.
-[click] It delegates to specialists — an orders agent, a billing agent, a logistics agent — each with
-its own tools and scope.
-[click] A2A — agent-to-agent — is just the protocol for that delegation. Service-to-service, for agents.
-If you run an integration platform, this is your world: composition, routing, contracts — applied to a
-new kind of consumer.
+Last piece. One agent is powerful; a team is more — an orchestrator that owns the goal, delegating to
+specialists. A2A — agent-to-agent — is just the protocol for that, and notice it's the SAME shape as
+MCP, one level up. On arrival: step one, DISCOVER. The orchestrator does a GET on the specialist's
+/.well-known/agent.json and gets back its Agent Card — who it is, what skills it offers, where to
+reach it. That's the A2A version of tools/list.
+[click] Step two, DELEGATE: it POSTs a Task — "get status for order #7788". The specialist agent
+then runs its OWN loop, with its own tools — exactly the loop we just watched.
+[click] Step three, RETURN: the specialist replies with a Task in state "completed" and the result,
+folded back to the orchestrator.
+[click] Discover the agent, then delegate the task — same Bearer-over-HTTP envelope as MCP, so the
+same gateway policies apply. If you run an integration platform, this is your world: discovery,
+contracts, routing, governance — applied to a new kind of consumer.
 -->

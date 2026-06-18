@@ -29,9 +29,12 @@ here from `01-intro.md`) / Timeline / "Prediction→reasoning" claim ·
 StatelessReplayStack / StatelessReplayFilmstrip / ContextWindow / "…reasoning…" claim Hero / "But…" turn
 Hero (`but-limits.jpg`) / Hallucination ("the limits") / Grounding (the closing run: celebrate → deflate
 → name the limits → show the fix → bridge into Part 3's tools) ·
-**3 — Agents** (`04-act-tools.md` + `05-act-agents.md`, ONE part): PartOpener (Agents, spine bar) /
-Tools flow / McpEnvelope / McpHandshake / AgentLoop / AgentContextWindow / Anatomy of an agent / A2A ·
-Close.
+**3 — Agents** (`04-act-tools.md` + `05-act-agents.md`, ONE part) — REORDERED TOP-DOWN
+(user, 2026-06-18): PartOpener (Agents, spine bar) / **AgentRuntime ("what is an agent" — UP FRONT)** /
+ToolRoundtrip (tools) / McpEnvelope / McpHandshake / **ToolsVsSkills (skills — after tools+MCP)** /
+AgentLoop (now a LIVE worked trace) / AgentContextWindow / **A2A (protocol-technical, Agent Cards)** ·
+Close (hackathon CTA). The old end-of-part "Anatomy of an agent" recap slide was REMOVED — its job is
+done up front by AgentRuntime. See the 2026-06-18 PART-3 REWORK status entry for the full rationale.
 
 PART OPENERS (user, 2026-06-17): each of the three parts opens with a `PartOpener.vue` hero (NEW
 component) showing a SPINE PROGRESS bar — the full "AI › LLMs › Agents" spine with the current part
@@ -59,7 +62,8 @@ files starting with `---`, never a leading comment.
 Components: `Hero.vue` (Archetype A), `PartOpener.vue` (part-opener hero w/ spine bar),
 `Timeline.vue`, `NextTokenPredictor.vue`, `AttentionFlip.vue`,
 `ContextWindow.vue`, `AgentContextWindow.vue`, `StatelessReplay.vue`, `McpEnvelope.vue`,
-`McpHandshake.vue`, `AgentLoop.vue`, `Hallucination.vue`, `Grounding.vue`.
+`McpHandshake.vue`, `AgentRuntime.vue`, `ToolRoundtrip.vue`, `ToolsVsSkills.vue`, `AgentLoop.vue`,
+`A2A.vue`, `Hallucination.vue`, `Grounding.vue`.
 
 PART-1 HISTORY (user, 2026-06-18): I built two alternates — `FieldMapV2.vue` (4-ring nested map) and
 `TimelineV2.vue` (3-era / hinge / scale-surge timeline) — as second slides for live comparison. User
@@ -127,6 +131,48 @@ TRIMMED 2026-06-18 (user): the payoff band was REMOVED entirely ("For facts that
 zero") — the presenter says the weights=skills/context=facts line + the tools bridge ORALLY. Slide is now
 `clicks:3→2` (only the two path reveals); the `.band`/`.b-lead`/`.b-foot` CSS is gone.
 
+PART-3 REWORK (user, 2026-06-18) — the four NEW/REWORKED Agents components:
+
+`AgentRuntime.vue` (`clicks:4`) — "WHAT IS AN AGENT", defined UP FRONT (the deck is now top-down; this
+REPLACES the old end-of-part "Anatomy of an agent" recap slide, which was DELETED). An engine+attachments
+diagram on a fixed 780×300 px stage (SVG wire layer 1:1 to px, AgentLoop-style; HTML nodes on top, Rule 4).
+Beats: c0 bare LLM core ("on its own it only reasons"); c1 + GOAL in + LOOP arc + dashed AGENT boundary
+("decides its own next step"); c2 + TOOLS docked; c3 + MEMORY docked; c4 + ANSWER out + payoff band
+("an agent is the LLM, wrapped to act: a loop + goal + tools + memory — nothing new"). Colours per Rule 7:
+core/loop/memory = warm, tools = cool, goal/answer = good. Example matches the loop slide: goal "When will
+order #7788 arrive?" → "Shipped — arriving Jun 20."
+
+`ToolRoundtrip.vue` (`clicks:3`) — TOOLS, the request→execute→return round-trip across a TRUST BOUNDARY
+(REPLACES the old thin 3-box flow). A dashed centre line splits "the model · text only" (left, warm) from
+"our side · executes" (right, cool); real artefacts (a `tool_use` JSON request → our `GET …/orders/7788`
+with Bearer → the `{status,eta}` result). Beats: c0 model's request; c1 crosses boundary, our code runs it;
+c2 result folded back; c3 payoff ("the model never touches our systems — it requests, we execute").
+
+`ToolsVsSkills.vue` (`clicks:3`) — names the SKILL concept (the missing piece), placed AFTER tools+MCP
+(user's ordering). Two cards: TOOL = one callable action (cool — `get_order_status(id)→JSON`, "a verb the
+model invokes, what it CAN do"); SKILL = a packaged playbook (warm — a `handle-a-refund/` folder with
+`SKILL.md` + policy + script, "loaded on demand", "a procedure the agent follows, HOW to do it well").
+Beats: c0 tool; c1 skill; c2 link pill ("a skill orchestrates several tool calls"); c3 bridge ("tools=CAN,
+skills=HOW; both are just context — it still only decides, we still execute").
+
+`A2A.vue` (`clicks:3`) — REBUILT protocol-technical (REPLACES the decorative emoji-boxes version), a
+deliberate MIRROR of the MCP pair: "discover the agent, then delegate a task" = MCP's "discover the menu,
+then call". Two agents (Orchestrator warm / Orders specialist cool) + three exchange rows like the handshake:
+① DISCOVER `GET /.well-known/agent.json` → the Agent Card {name, skills, url}; ② DELEGATE `POST message/send`
+→ a Task; ③ RETURN a `Task {state:"completed", result}`. Beats c0–c2 walk the rows; c3 payoff ("same
+Bearer-over-HTTP envelope as MCP → same gateway policies"). A2A spec shape kept light but accurate (Agent
+Card at /.well-known/agent.json; Task lifecycle submitted→working→completed).
+
+`AgentLoop.vue` — REBUILT 2026-06-18 from the static think→act→observe ring into a LIVE WORKED TRACE
+(`clicks:3→5`). The loop ACTUALLY RUNS on a concrete goal ("When will order #7788 arrive?"), accumulating
+like an agent transcript: ① THINK→ACT `get_order_status(7788)`→OBS `{status:"shipped", eta:null,
+tracking:"1Z…"}`; ② THINK (the KEY beat — the model CHOOSES its next step FROM the observation: "no ETA but
+a tracking number, follow it" — highlighted, "↑ chosen from what it just saw")→ACT `get_tracking`→OBS ETA;
+③ goal met → DONE. A right-side legend shows the one think→act→observe loop. THE POINT (in the payoff band +
+notes): we orchestrated nothing between steps — the model picked step ② itself and decided when to stop;
+THAT is the agentic loop. Beats: c0 goal+① THINK; c1 ① ACT+OBS; c2 ② THINK (causal link lit); c3 ② ACT+OBS;
+c4 ③ done; c5 payoff.
+
 `McpEnvelope.vue` + `McpHandshake.vue` are the Part-3 (Agents) MCP pair. The envelope slide shows REST
 (left) vs MCP server (right) as TWO HTTP requests with the SAME Bearer auth and JSON content type —
 the only difference is the body (REST = intent in URL; MCP = a JSON-RPC `tools/call` object). Beat 3
@@ -149,8 +195,9 @@ prompt stays pinned." It now sits LAST in Part 2 (right after the stateless clus
 order is "no memory → we resend everything → so how much fits in one call? → the window." The Part-3
 (Agents) one reuses the identical mechanics and adds **tool defs** + **tool data** (the runaway
 space-hog — tool OUTPUT, not your prose, is what fills an agent's window); when full, the agent
-**offloads to external memory** (striped azure cells, kept OUTSIDE the window) — motivating the
-"Memory" piece on the Anatomy slide that immediately follows. NB (user feedback
+**offloads to external memory** (striped azure cells, kept OUTSIDE the window) — making concrete the
+"Memory" piece introduced up front on the `AgentRuntime` ("what is an agent") slide. Its goal-beat
+caption was updated 2026-06-18 to the loop's example ("when will order #7788 arrive?"). NB (user feedback
 2026-06-17): do NOT frame this as money/"budget"/"rent" — it's about space and what fills it; and
 do NOT show tokens just "falling out of the window" — show the real resolution (compress / new
 session / offload). Segment order is FIXED (system → … → free) so cells only change colour in place
@@ -159,7 +206,33 @@ session / offload). Segment order is FIXED (system → … → free) so cells on
 
 ## Status (as of session end, 2026-06-18)
 
-- **This session (2026-06-18, GROUNDING REWORK + photo — newest): even-handed grounding; real but-limits photo.**
+- **This session (2026-06-18, PART-3 (AGENTS) DRASTIC REWORK — newest): top-down reorder + 4 new/rebuilt
+  components + hackathon CTA close.** User: "improve drastically the last part — visual and beautiful;
+  analyse and propose options." After an AskUserQuestion round (with visual previews), the agreed direction:
+  (1) ORDER — go TOP-DOWN: define "what is an agent" UP FRONT, but keep Skills AFTER tools/MCP (user's
+  explicit note). New flow: PartOpener → **AgentRuntime (what is an agent)** → **ToolRoundtrip (tools)** →
+  McpEnvelope → McpHandshake → **ToolsVsSkills** → **AgentLoop (live trace)** → AgentContextWindow → **A2A** →
+  **Close (CTA)**. The old end-of-part "Anatomy of an agent" recap slide was DELETED (its job is now done up
+  front by AgentRuntime). (2) NEW `AgentRuntime.vue` — engine+attachments diagram, the agent = LLM wrapped
+  with a goal/loop/tools/memory. (3) NEW `ToolRoundtrip.vue` — replaced the thin 3-box tools flow with a
+  trust-boundary round-trip showing real `tool_use`/REST/result JSON. (4) NEW `ToolsVsSkills.vue` — names the
+  missing SKILL concept (tool = one action; skill = a packaged playbook loaded on demand). (5) REBUILT
+  `AgentLoop.vue` from the static ring into a LIVE WORKED TRACE — the loop runs on "when will order #7788
+  arrive?", and the KEY beat is the model CHOOSING step ② (`get_tracking`) from what it observed in step ①
+  (no ETA but a tracking number); `clicks:3→5`. The example was chosen with the user — the earlier "sort out
+  order #4471" framing confused them, so the goal is now a concrete question with a visible self-directed
+  second step. (6) REBUILT `A2A.vue` protocol-technical — Agent Card discovery (`/.well-known/agent.json`) +
+  task delegation, a deliberate mirror of the MCP pair. (7) `06-close.md` is now a hackathon CALL TO ACTION
+  ("Enough slides. Go build something.") keeping the `close.jpg` bg — direct, simple, fun, per user. See the
+  PART-3 REWORK block in the components section for each component's beats. `AgentContextWindow` goal caption
+  retargeted to the #7788 question. Build compiles clean (`slidev build`, 558 modules). VERIFIED via headless
+  Chrome screenshots: `AgentRuntime` reads beautifully; the others render correctly. **KNOWN MINOR (user said
+  fix later, do NOT block): `ToolRoundtrip`'s right-hand column (two stacked cards) sits a touch tall and its
+  lower card slightly kisses the payoff band at real canvas res (980×551) — stage height was mid-adjustment
+  (currently 330px) when we stopped. Also do a click-by-click pass on `AgentLoop`/`A2A`/`ToolsVsSkills` at
+  real res to confirm no row/band overlap.** The `public/img/to-use/` photo-staging folder is intentionally
+  left untracked (user's candidate photos).
+- **This session (2026-06-18, GROUNDING REWORK + photo): even-handed grounding; real but-limits photo.**
   Per user: (1) dropped the user-supplied photo into `public/img/but-limits.jpg` (a dark foggy forest
   path — strong fit for the "But…" turn; copied from `public/img/to-use/pexels-szafran-31218341.jpg`).
   (2) REWORKED `Grounding.vue` — the prior version was too one-sidedly pro-context and provocative about

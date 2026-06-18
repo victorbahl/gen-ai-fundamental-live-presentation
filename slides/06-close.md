@@ -2,22 +2,27 @@
 layout: default
 ---
 
-<!-- CLOSE — Archetype A callback -->
+<!-- CLOSE — hackathon CALL TO ACTION (reworked 2026-06-18, user).
+     Keep the close.jpg background; text is now a direct, fun CTA: you only
+     really get this by BUILDING — that's what the hackathon is for. The old
+     "Less magic. More system." recap line was replaced. -->
 
-<Hero bg="close.jpg" kicker="AI · LLMs · Agents" align="center" size="sm">
-  Less magic.<br>More <span class="grad-warm">system.</span>
+<Hero bg="close.jpg" kicker="Now your turn" align="center" size="sm">
+  Enough slides.<br><span class="grad-warm">Go build something.</span>
   <template #subtitle>
-    Stateless calls · a context window · a standard envelope · a loop with a goal.
-    We already know this stack.
+    You won't really get any of this by watching — only by breaking it.
+    That's the whole point of this hackathon. Pick an idea, wire up a tool, let it loop.
+    Have fun. 🚀
   </template>
 </Hero>
 
 <!--
-Back to the promise from the start — that by the end this would feel less like magic and more like a
-system we could have designed. Here's the whole thing, mechanically: it predicts the next token, over
-a fixed window, with no memory between calls. Everything else — tools, MCP, memory, agents, A2A — is
-scaffolding we build around that, and all of it rhymes with what we already do: stateless calls,
-payloads, envelopes, orchestration.
-That was the whole arc: AI, then a single LLM, then agents built on top of it. Less magic, more
-system — a stack you could have designed. Thank you — questions?
+That's the mechanism, end to end: it predicts the next token, over a fixed window, with no memory —
+and everything else, tools, MCP, skills, the loop, A2A, is scaffolding we build around it, all of it
+rhyming with what we already do.
+But here's the honest truth: you will NOT actually understand any of it from these slides. Nobody
+does. You get it by building — by wiring up a tool, watching the loop do something dumb, and fixing
+it. That is exactly what the next hours are for. So close the laptop on this deck, open a blank one,
+pick the smallest idea that excites you, and make it act. Break things. Ask questions. Have fun.
+Go build. Thank you!
 -->
