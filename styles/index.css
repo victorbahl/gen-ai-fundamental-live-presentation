@@ -151,6 +151,14 @@ html.dark {
 .grad-cool { color: var(--cool-bright); }
 .grad-warm { color: var(--warm-bright); }
 
+/* On a hero (always over a DARK photo) the day-theme amber --warm-bright
+   (#b26b00) is illegible. Use the bright MuleSoft gold instead, with a shadow
+   so it reads on any image. Applies to every Hero/PartOpener accent word. */
+.hero .grad-warm,
+.part-opener .grad-warm { color: var(--warm); text-shadow: 0 2px 22px rgba(0,0,0,0.6); }
+.hero .grad-cool,
+.part-opener .grad-cool { color: var(--cool-bright); text-shadow: 0 2px 22px rgba(0,0,0,0.6); }
+
 /* ===========================================================
    ARCHETYPE A — Hero / Question
    Implemented by components/Hero.vue (placeholder background +

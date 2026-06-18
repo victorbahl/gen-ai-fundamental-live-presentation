@@ -77,12 +77,12 @@ clicks: 3
 }
 .nbox.ml  { inset: 42px 34px 34px 34px; background: var(--nest-mid); }
 .nbox.gen {
-  inset: 96px 196px 46px 196px;
+  inset: 120px 236px 54px 236px;
   border-color: var(--warm); background: rgba(252,192,3,0.14);
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.15rem;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.1rem;
 }
-.nbox.gen .nlabel { position: static; color: var(--warm-bright); }
-.gen-sub { font-family: var(--serif); font-weight: 600; font-size: 1rem; color: var(--ink); }
+.nbox.gen .nlabel { position: static; color: var(--warm-bright); font-size: 0.6rem; }
+.gen-sub { font-family: var(--serif); font-weight: 600; font-size: 0.85rem; color: var(--ink); }
 </style>
 
 <!--
@@ -124,4 +124,3 @@ On screen already — the 50s: rules and logic, we hand-write every if/then. Bri
 [click] 2022: the ChatGPT moment. Nothing new in principle — but scale made it feel like a step change.
 The pattern: we stopped telling machines the rules, and started letting them predict.
 -->
-

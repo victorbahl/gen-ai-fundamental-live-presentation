@@ -1,181 +1,138 @@
 <script setup>
-import { computed, ref, onMounted } from 'vue'
+import { computed } from 'vue'
 import { useSlideContext } from '@slidev/client'
 
 /*
-  Hallucination — "it predicts plausible, not true".
-  Pays off the predictor + stateless beats: the model emits the most LIKELY
-  continuation over FROZEN weights — it never looked anything up. So it can be
-  fluent, confident, AND wrong.
+  THE LIMITS — "it sounds certain, and can't know our facts".
+  Pays off the predictor + stateless beats and the "…but it only guesses" hero.
 
-  Two cards, same grammar as McpEnvelope (so it reads as part of the deck):
-    LEFT  (warm)  — the model's fluent answer + a near-full CONFIDENCE gauge.
-    RIGHT (cool)  — the ACTUAL record from the system of truth — it differs.
-  A "≠" badge between them; a payoff band underneath.
+  REBUILT 2026-06-18 (user): the old order-status demo (#7788 vs the Order API
+  record, ≠ badge, confidence gauge) was REMOVED — the user didn't want it. The
+  slide is now generic: the THREE structural limits as the centrepiece, each one
+  a card, converging on ONE root cause that bridges into grounding.
 
-  Running example: order status (a fresh number, #7788, so it doesn't imply the
-  earlier #4471 "shipped" answers were themselves hallucinated).
+  Three blind-spots (generic — NOT tied to the order example):
+    🔒 Only public knowledge — learned the public internet; never saw OUR data.
+    🧊 Frozen in the past     — weights fixed at a cutoff; no fresh / live state.
+    🎲 Guesses, never checks  — fills any gap with plausible tokens = hallucination.
 
-  PHYSICAL-PAGE RULE (4): both cards, the mid badge and the band own fixed slots
-  from the start; clicks only toggle opacity / highlight — nothing reflows.
-  Rule 8: lands on arrival with the prompt + model card + gauge already showing.
+  Root cause band: one cause behind all three — a frozen, public model that can
+  only predict text, it can't go and look. So don't change the model; feed it the
+  facts. (→ the can't-act / grounding bridge into Part 3.)
 
-  Beats (clicks: 2):
-    c=0  prompt + model answer + confidence gauge (94%)
-    c=1  actual record fades in + the ≠ mismatch badge
-    c=2  payoff band — no lookup; plausible ≠ true
+  PHYSICAL-PAGE RULE (4): the three cards + the root band own fixed slots from the
+  start; clicks only toggle opacity / lit-state — nothing reflows.
+  Rule 8: lands on arrival with the title + the first card already showing.
+
+  Beats (clicks: 3):
+    c=0  card 1 (only public) lit; cards 2/3 + band reserved, hidden
+    c=1  card 2 (frozen) lit
+    c=2  card 3 (guesses) lit
+    c=3  root-cause band — one cause → feed it the facts
 */
 
 const { $clicks } = useSlideContext()
 const c = computed(() => $clicks.value)
 
-// gauge fills once on mount so the "94% confident" lands on arrival (Rule 8)
-const mounted = ref(false)
-onMounted(() => requestAnimationFrame(() => { mounted.value = true }))
-const CONF = 94
+const limits = [
+  {
+    ic: '🔒',
+    t: 'Only public knowledge',
+    d: 'It learned from the public internet. It never saw our systems, our docs, our customers.',
+    so: 'blind to our data',
+  },
+  {
+    ic: '🧊',
+    t: 'Frozen in the past',
+    d: 'Its weights were fixed at a training cutoff. Nothing since exists for it — no today, no live state.',
+    so: 'no fresh data',
+  },
+  {
+    ic: '🎲',
+    t: 'Guesses — never checks',
+    d: 'When it doesn’t know, it answers anyway: the most plausible-sounding tokens. Fluent ≠ true.',
+    so: 'hallucination',
+  },
+]
 </script>
 
 <template>
-  <div class="hl">
-    <!-- the user's question -->
-    <div class="ask">
-      <span class="ask-tag">prompt</span>
-      <span class="ask-text">“Where’s my order #7788?”</span>
-    </div>
-
-    <div class="grid">
-      <!-- LEFT: model output -->
-      <div class="card warm">
-        <div class="chip"><span class="ic">🤖</span> Model output</div>
-        <div class="body">
-          <div class="answer">“Shipped Monday — arriving Wednesday.”</div>
-          <div class="gauge">
-            <div class="gauge-track">
-              <div class="gauge-fill" :style="{ width: (mounted ? CONF : 0) + '%' }" />
-            </div>
-            <div class="gauge-lbl">
-              <span class="pct">{{ CONF }}%</span> confident
-              <span class="wrong" :style="{ opacity: c >= 1 ? 1 : 0 }">— and wrong</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- MIDDLE: mismatch -->
-      <div class="mid">
-        <div class="neq" :style="{ opacity: c >= 1 ? 1 : 0 }">
-          <span class="neq-sign">≠</span>
-          <span class="neq-sub">doesn’t match</span>
-        </div>
-      </div>
-
-      <!-- RIGHT: actual record -->
-      <div class="card cool" :style="{ opacity: c >= 1 ? 1 : 0 }">
-        <div class="chip"><span class="ic">📦</span> Actual record · Order API</div>
-        <div class="body">
-          <pre class="record">{ <span class="key">"order"</span>: <span class="s">"7788"</span>,
-  <span class="key">"status"</span>: <span class="bad">"payment_failed"</span>,
-  <span class="key">"shipped"</span>: <span class="bad">false</span> }</pre>
-          <div class="src">system of record · never queried</div>
-        </div>
+  <div class="lim">
+    <!-- three structural limits -->
+    <div class="cards">
+      <div
+        v-for="(l, i) in limits"
+        :key="i"
+        class="card"
+        :class="{ lit: c >= i }"
+      >
+        <div class="badge">{{ l.ic }}</div>
+        <div class="t">{{ l.t }}</div>
+        <div class="d">{{ l.d }}</div>
+        <div class="so"><span class="arr">→</span> {{ l.so }}</div>
       </div>
     </div>
 
-    <!-- payoff band -->
-    <div class="band" :style="{ opacity: c >= 2 ? 1 : 0 }">
-      <span class="b-lead">No lookup happened.</span>
-      It predicted the most <em>plausible</em> tokens over frozen weights — so
-      <strong>fluent ≠ correct</strong>, and <strong>confident ≠ true</strong>.
+    <!-- root-cause band — bridges into grounding -->
+    <div class="band" :style="{ opacity: c >= 3 ? 1 : 0 }">
+      <span class="b-lead">One cause behind all three:</span>
+      a frozen, public model that can only <em>predict text</em> — it can’t go and check.
+      So we don’t change the model. <strong>We feed it the facts.</strong>
     </div>
   </div>
 </template>
 
 <style scoped>
-.hl {
-  display: flex; flex-direction: column; align-items: center; gap: 1.1rem;
-  width: 100%; max-width: 980px; margin: 0 auto;
-  --card-h: 210px;
+.lim {
+  display: flex; flex-direction: column; align-items: center; gap: 1.4rem;
+  width: 100%; max-width: 1000px; margin: 0 auto;
 }
 
-/* the asked question */
-.ask {
-  display: inline-flex; align-items: baseline; gap: 0.6rem;
-  padding: 0.4rem 0.9rem; border-radius: 10px;
-  background: var(--bg-soft); border: 1px solid var(--hair);
-}
-.ask-tag {
-  font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.2em;
-  text-transform: uppercase; color: var(--ink-faint);
-}
-.ask-text { font-family: var(--mono); font-size: 0.95rem; color: var(--ink); }
-
-/* two cards + middle badge */
-.grid {
-  display: grid; grid-template-columns: 1fr 120px 1fr;
-  gap: 0.9rem; align-items: stretch; width: 100%;
-}
+/* three limit cards */
+.cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.1rem; width: 100%; }
 .card {
-  height: var(--card-h);
-  background: var(--bg-panel); border: 1px solid var(--hair); border-radius: 14px;
-  box-shadow: var(--elev); overflow: hidden; border-top-width: 3px;
-  display: flex; flex-direction: column; transition: opacity 0.45s ease;
+  position: relative;
+  display: flex; flex-direction: column; align-items: flex-start; gap: 0.5rem;
+  min-height: 232px;
+  padding: 1.2rem 1.1rem 1rem;
+  border-radius: 16px;
+  background: var(--bg-panel);
+  border: 1px solid var(--hair); border-top: 3px solid var(--hair);
+  box-shadow: var(--elev);
+  opacity: 0.28;
+  transition: opacity 0.45s ease, border-top-color 0.45s ease, box-shadow 0.45s ease;
 }
-.card.warm { border-top-color: var(--warm); }
-.card.cool { border-top-color: var(--cool); }
-
-.chip {
-  display: flex; align-items: center; gap: 0.45rem;
-  padding: 0 0.9rem; height: 2.3rem; font-size: 0.74rem; font-weight: 700;
-  letter-spacing: 0.03em; border-bottom: 1px solid var(--hair);
+.card.lit {
+  opacity: 1;
+  border-top-color: var(--warm);
+  box-shadow: 0 0 26px rgba(252,192,3,0.14);
 }
-.card.warm .chip { color: var(--warm-bright); background: rgba(252,192,3,0.12); }
-.card.cool .chip { color: var(--cool-bright); background: rgba(1,118,211,0.07); }
-.ic { font-size: 0.95rem; }
 
-.body { flex: 1; padding: 0.9rem; display: flex; flex-direction: column; justify-content: center; gap: 0.9rem; }
-.answer { font-family: var(--serif); font-size: 1.18rem; font-weight: 600; line-height: 1.25; color: var(--ink); }
-
-/* confidence gauge — deliberately near-full + warm, the irony is the point */
-.gauge { display: flex; flex-direction: column; gap: 0.35rem; }
-.gauge-track {
-  height: 12px; border-radius: 6px; overflow: hidden;
-  background: var(--bg-soft); border: 1px solid var(--hair);
+.badge {
+  display: flex; align-items: center; justify-content: center;
+  width: 48px; height: 48px; border-radius: 12px; font-size: 1.5rem;
+  background: rgba(252,192,3,0.12); border: 1px solid rgba(252,192,3,0.28);
 }
-.gauge-fill {
-  height: 100%; border-radius: 6px;
-  background: linear-gradient(90deg, var(--warm), var(--warm-bright));
-  transition: width 0.9s cubic-bezier(0.22, 1, 0.36, 1);
-}
-.gauge-lbl { font-family: var(--mono); font-size: 0.74rem; color: var(--ink-soft); }
-.gauge-lbl .pct { color: var(--warm-bright); font-weight: 700; }
-.gauge-lbl .wrong { color: var(--bad); font-weight: 700; transition: opacity 0.4s ease; }
+.t { font-family: var(--serif); font-weight: 700; font-size: 1.18rem; color: var(--ink); line-height: 1.2; }
+.d { font-size: 0.86rem; color: var(--ink-soft); line-height: 1.45; flex: 1; }
 
-/* record */
-.record { margin: 0; font-family: var(--mono); font-size: 0.82rem; line-height: 1.5; color: var(--ink-soft); }
-.record .key { color: var(--cool-bright); }
-.record .s { color: var(--ink); }
-.record .bad { color: var(--bad); font-weight: 700; }
-.src { font-family: var(--mono); font-size: 0.66rem; color: var(--ink-faint); letter-spacing: 0.02em; }
-
-/* middle mismatch badge */
-.mid { display: flex; align-items: center; justify-content: center; }
-.neq {
-  display: flex; flex-direction: column; align-items: center; gap: 0.2rem;
-  transition: opacity 0.45s ease;
-}
-.neq-sign {
-  font-family: var(--serif); font-size: 2.4rem; font-weight: 700; line-height: 1;
+/* the "so..." consequence pill, pinned to the bottom */
+.so {
+  font-family: var(--mono); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.01em;
   color: var(--bad);
+  padding: 0.3rem 0.6rem; border-radius: 999px;
+  background: rgba(186,5,23,0.09); border: 1px solid rgba(186,5,23,0.16);
 }
-.neq-sub { font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.06em; color: var(--ink-faint); }
+.so .arr { opacity: 0.7; margin-right: 0.15rem; }
 
-/* payoff band */
+/* root-cause band */
 .band {
-  width: 100%; text-align: center; font-size: 0.95rem; color: var(--ink-soft);
-  line-height: 1.45; padding: 0.8rem 1.2rem; border-radius: 12px;
+  width: 100%; text-align: center; font-size: 1rem; color: var(--ink-soft);
+  line-height: 1.5; padding: 0.9rem 1.4rem; border-radius: 12px;
   background: var(--sunken); border: 1px solid var(--sunken-border);
   transition: opacity 0.45s ease;
 }
-.band .b-lead { color: var(--bad); font-weight: 700; }
-.band strong { color: var(--ink); }
+.band .b-lead { color: var(--warm-bright); font-weight: 700; }
+.band em { font-style: italic; color: var(--ink); }
+.band strong { color: var(--ink); font-weight: 700; }
 </style>

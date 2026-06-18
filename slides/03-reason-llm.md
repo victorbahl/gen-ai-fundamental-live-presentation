@@ -258,52 +258,72 @@ layout: default
      we get honest about the limits and start building around the model. -->
 
 <Hero bg="prediction-at-scale.jpg" kicker="What changed" align="center" size="sm">
-  Prediction at scale started to look like <span class="grad-warm">reasoning.</span>
-  <template #subtitle>
-    Train one model to predict the next word over the whole internet,
-    and "predict the next word" quietly becomes "answer the question."
-  </template>
+  Prediction at scale started to look like <span class="grad-warm">reasoning…</span>
 </Hero>
 
 <!--
 Here's the whole magic trick in one line, over a rocket at liftoff. Prediction at scale starts to
 look like reasoning. Train a model to predict the next word across the entire internet, and to get
 good at that it has to absorb grammar, facts, style, even reasoning patterns. "Predict the next word"
-becomes "answer the question." That's the model at its best — and it's genuinely powerful. Next we
-get honest about where it falls short, and start building the scaffolding around it.
+quietly becomes "answer the question." That's the model at its best — and it's genuinely powerful.
+Let the ellipsis hang — because there's a "but" coming.
 -->
 
 ---
 layout: default
-clicks: 2
 ---
 
-<!-- HALLUCINATION — the flip side of "predict the next token". The model
-     emits the most PLAUSIBLE continuation over frozen weights; it never looked
-     anything up. So it can be fluent, confident, AND wrong. Pays off the
-     predictor ("a distribution, a ranked guess") + the frozen-weights beat.
+<!-- THE "BUT" — the turn. Pairs with the "…reasoning…" hero just before (its
+     ellipsis hangs; this one answers it). One sentence, no subtitle. Deflates
+     the hype and sets up the limits slide that follows. Over a heavier/darker
+     photo than the rocket (the mood shifts from liftoff to "look closer"). -->
+
+<Hero bg="but-limits.jpg" kicker="…but look closer" align="center" size="sm">
+  But it only ever <span class="grad-warm">guesses</span> — over what it saw months ago.
+</Hero>
+
+<!--
+The turn. The ellipsis from the last slide hangs; this is the "but." For all that power, strip it
+back to the mechanism and it never stopped doing one thing: guessing the next token — and guessing
+over a snapshot of the public internet, frozen months before we ever typed. It can sound like it
+reasons; it cannot know anything we didn't put in front of it. Hold that — the next slide makes it
+concrete, three ways at once.
+-->
+
+---
+layout: default
+clicks: 3
+---
+
+<!-- THE LIMITS — the flip side of "predict the next token", made GENERIC (no
+     order-status demo). Three structural limits as cards — only public · frozen
+     in the past · guesses, never checks — converging on ONE root cause that
+     bridges into grounding. Pays off the predictor + the frozen-weights beat and
+     the "…but it only guesses" hero just before. See Hallucination.vue.
      NB: header comment AFTER the frontmatter (a comment before the first `---`
      renders as a stray blank slide). -->
 
 <div class="demo-stage">
   <div class="demo-head">
     <div class="kicker">The flip side of prediction</div>
-    <h2>It predicts <span class="grad-warm">plausible</span> — not true</h2>
+    <h2>It sounds certain — and can’t know <span class="grad-warm">our</span> facts</h2>
   </div>
   <Hallucination />
 </div>
 
 <!--
-The catch, and it's the one that matters most when we build on this. On arrival: a question — "where's
-my order #7788?" — and the model's answer, fluent and specific: "shipped Monday, arriving Wednesday,"
-with a confidence gauge sitting at 94%. Ask the room to take the answer at face value for a second.
-[click] Now the actual record from the Order API: status payment_failed, never shipped. The confident
-answer was simply wrong — and notice the model was no less fluent for it.
-[click] Why this happens is everything we just built: the model emitted the most PLAUSIBLE next tokens
-over its frozen weights. It never queried a system — there was no lookup. So fluent isn't correct, and
-confident isn't true. This is "hallucination," and it's not a bug we can patch out — it's what
-next-token prediction DOES. Which raises the obvious question: how do we make it trustworthy on OUR
-facts? That's the next slide.
+Now we get honest, three ways at once. Everything that makes the model powerful comes from the same
+mechanism — and that mechanism has three structural blind spots. On arrival the first is up.
+First: it knows only PUBLIC knowledge. It learned from the public internet; it has never seen our
+systems, our docs, our customers. Blind to our data by construction.
+[click] Second: it's FROZEN in the past. The weights were fixed at a training cutoff — nothing since
+exists for it. No "today," no live state, no order that changed this morning.
+[click] Third — the one people name: it GUESSES, it never checks. When it doesn't know, it doesn't stop;
+it emits the most plausible-sounding tokens anyway. That's hallucination, and it's not a bug we patch
+out — it's what next-token prediction DOES.
+[click] Here's the thread: these aren't three problems, they're one. A frozen, public model that can
+only predict text — it can't go and look anything up. So the fix is never "change the model." It's "feed
+it the facts." That's the next slide.
 -->
 
 ---
@@ -326,18 +346,20 @@ clicks: 3
 </div>
 
 <!--
-So how do we make it accurate on our facts? Frame it cleanly: a model's knowledge lives in exactly two
-places, so to fix what it knows we change one of them. On arrival, the two paths are on screen.
-[click] Path A — change the WEIGHTS, bake the knowledge in. Two ways. Re-train from scratch:
-astronomically expensive, nobody does this to add facts. Fine-tune: much cheaper — but here's the
-misconception to kill: fine-tuning teaches STYLE and BEHAVIOUR, not facts. It's unreliable for facts,
-it can't cite a source, and it goes stale the moment our data changes. Wrong tool for "know our data."
-[click] Path B — change the CONTEXT instead. Leave the weights frozen and hand the model the relevant
-facts at call time, in the window. Two flavours. RAG: retrieve text from a knowledge base — great for
-large, static, unstructured stuff like docs and policies. And tool calls: the model calls a live API
-for fresh, authoritative, structured data — like an order's real status. That second one is exactly
-what we build next.
-[click] Land it: grounding is just putting the right facts in the window. For live data, that's a tool
-call — and that's the whole next part. One honest caveat: grounding sharply cuts hallucination on the
-facts we supply; it never drives it fully to zero, because the model can still misread what we give it.
+We just named the root cause: a frozen, public model. So to make it accurate we change what it knows —
+and its knowledge lives in exactly two places. Both are legitimate; they just solve different jobs. On
+arrival, the two paths are on screen.
+[click] Path A — change the WEIGHTS, teach the model itself. Re-train: build or adapt the model on our
+data. It's costly and infrequent, but it's the right call when we genuinely need a specialised model with
+deep domain skill. Fine-tune: cheaper — keep training on our examples to lock in tone, format, the way it
+does a task. It's excellent for HOW the model responds; it's weak for FACTS, because it can't cite a
+source and it goes stale the moment our data changes. So weights are the lever for skills and behaviour.
+[click] Path B — change the CONTEXT. Leave the weights frozen and hand the model the relevant facts at
+call time, in the window. RAG: retrieve our private docs and policies and paste them in — great for
+large, static, unstructured knowledge. Tool calls: the model asks our code to call a live API for fresh,
+authoritative data. This is the lever for facts — especially facts that change.
+[click] Land it: weights teach skills, context carries the facts. For the limits we just saw — our data,
+today's state — the facts change, so the lever is context. And for live data that's a tool call: the
+whole next part. One honest caveat: grounding sharply cuts hallucination on the facts we supply; it never
+drives it fully to zero, because the model can still misread what we give it.
 -->

@@ -3,26 +3,37 @@ import { computed } from 'vue'
 import { useSlideContext } from '@slidev/client'
 
 /*
-  Grounding — "how do we make it accurate?". The answer to the hallucination
-  beat, and the on-ramp to Part 3 (tools).
+  GROUNDING — "how do we make it accurate?". The answer to the limits beat and
+  the on-ramp to Part 3 (tools).
 
   Mental model (validated with the user): a model's knowledge lives in exactly
-  two places, so to fix what it knows we change ONE of them:
+  two places, so to make it accurate we can change EITHER — and BOTH are
+  legitimate, they just solve different jobs:
 
-    A · CHANGE THE WEIGHTS  (bake it in) — the hard way
-        · Re-train      — astronomically costly; nobody does this for grounding
-        · Fine-tune     — cheaper, but it's for STYLE / BEHAVIOUR, not facts:
-                          unreliable for facts, can't cite, goes stale on every
-                          data change. (Common misconception to correct.)
+    A · CHANGE THE WEIGHTS  (teach the model itself)
+        · Re-train   — build/adapt the model on our data → deep domain skill at
+                       scale. Costly + infrequent, but the right call for a
+                       genuinely specialised base model.
+        · Fine-tune  — keep training on our examples → locks in tone, format,
+                       task behaviour. Great for HOW it responds; weak for facts
+                       (can't cite, goes stale on every data change).
 
     B · CHANGE THE CONTEXT  (feed facts in at call time) — weights stay FROZEN
-        · RAG           — retrieve text from a knowledge base (docs, policies):
-                          large, static, unstructured.
-        · Tools         — call a live API for fresh / structured / authoritative
-                          data (e.g. order status). ← this is what Part 3 builds.
+        · RAG        — retrieve our private docs / policies, paste them in.
+        · Tools      — call a live API for fresh / structured / authoritative
+                       data. ← this is what Part 3 builds.
 
-  Honest footnote: grounding REDUCES hallucination on covered topics; it doesn't
-  eliminate it (the model can still misread supplied context).
+  THE DISTINCTION (the non-provocative reframe, user 2026-06-18):
+    weights teach SKILLS & BEHAVIOUR · context carries the FACTS.
+  So for facts that CHANGE (our data, today's state — the limits we just named)
+  the lever is context — not because weights are "wrong", but because volatile
+  facts belong in context. Re-train / fine-tune keep their valid place.
+
+  REWORKED 2026-06-18 (user: "remove 'don't change the model' — changing weights
+  IS a solution; re-train & fine-tune make sense in certain cases; the slide is
+  too one-sidedly about context; be less provocative — no 'wrong instinct'").
+  Both paths now read as legitimate; verdicts say what each is FOR (use-case),
+  not pass/fail.
 
   PHYSICAL-PAGE RULE (4): root + both columns + all four cards own fixed slots
   from the start; clicks only toggle opacity / lit-state — nothing reflows.
@@ -30,9 +41,9 @@ import { useSlideContext } from '@slidev/client'
 
   Beats (clicks: 3):
     c=0  root + the two path headers (weights | context), cards dimmed
-    c=1  Path A cards (weights) — the costly / wrong-for-facts way
-    c=2  Path B cards (context) — RAG + Tools, lit warm (the practical way)
-    c=3  payoff band — bridges into Part 3 (tools)
+    c=1  Path A cards (weights) — teach the model itself
+    c=2  Path B cards (context) — RAG + Tools (the lever for facts)
+    c=3  payoff band — weights=skills, context=facts → bridges into Part 3
 */
 
 const { $clicks } = useSlideContext()
@@ -43,8 +54,8 @@ const c = computed(() => $clicks.value)
   <div class="gr">
     <!-- ROOT -->
     <div class="root">
-      <span class="r-q">Make it know <em>our</em> facts</span>
-      <span class="r-hint">two places knowledge can live → change one</span>
+      <span class="r-q">Two places its knowledge can live</span>
+      <span class="r-hint">make it accurate on our facts</span>
     </div>
 
     <div class="forks">
@@ -53,17 +64,21 @@ const c = computed(() => $clicks.value)
         <div class="p-head">
           <span class="p-n">A</span>
           <span class="p-t">Change the <strong>weights</strong></span>
-          <span class="p-tag cool">bake it in · the hard way</span>
+          <span class="p-tag cool">teach the model itself</span>
         </div>
         <div class="opt" :style="{ opacity: c >= 1 ? 1 : 0.18 }">
-          <div class="o-t">Re-train</div>
-          <div class="o-d">from scratch — astronomically costly</div>
-          <span class="verdict no">✗ not for this</span>
+          <div class="o-row">
+            <div class="o-t">Re-train</div>
+            <span class="use cool">for deep domain skill</span>
+          </div>
+          <div class="o-d">build the model on our data — powerful, costly, done rarely</div>
         </div>
         <div class="opt" :style="{ opacity: c >= 1 ? 1 : 0.18 }">
-          <div class="o-t">Fine-tune</div>
-          <div class="o-d">cheaper — but teaches <em>style</em>, not facts; can’t cite, goes stale</div>
-          <span class="verdict meh">△ behaviour, not facts</span>
+          <div class="o-row">
+            <div class="o-t">Fine-tune</div>
+            <span class="use cool">for tone &amp; behaviour</span>
+          </div>
+          <div class="o-d">keep training on our examples — shapes how it responds</div>
         </div>
       </div>
 
@@ -72,26 +87,29 @@ const c = computed(() => $clicks.value)
         <div class="p-head">
           <span class="p-n warm">B</span>
           <span class="p-t">Change the <strong>context</strong></span>
-          <span class="p-tag warm">feed facts in at call time · weights stay frozen</span>
+          <span class="p-tag warm">feed facts in at call time · weights frozen</span>
         </div>
         <div class="opt" :style="{ opacity: c >= 2 ? 1 : 0.18 }">
-          <div class="o-t">RAG</div>
-          <div class="o-d">retrieve text from a knowledge base — docs, policies <span class="dim">(static)</span></div>
-          <span class="verdict yes">✓ grounded</span>
+          <div class="o-row">
+            <div class="o-t">RAG</div>
+            <span class="use warm">for our private docs</span>
+          </div>
+          <div class="o-d">retrieve our docs &amp; policies, paste them in <span class="dim">(static)</span></div>
         </div>
         <div class="opt hot" :style="{ opacity: c >= 2 ? 1 : 0.18 }">
-          <div class="o-t">Tool calls</div>
-          <div class="o-d">call a live API for fresh, authoritative data <span class="dim">(order status)</span></div>
-          <span class="verdict yes">✓ grounded · live</span>
+          <div class="o-row">
+            <div class="o-t">Tool calls</div>
+            <span class="use warm">for live facts</span>
+          </div>
+          <div class="o-d">call a live API for fresh, authoritative data <span class="dim">(real-time)</span></div>
         </div>
       </div>
     </div>
 
     <!-- payoff band -->
     <div class="band" :style="{ opacity: c >= 3 ? 1 : 0 }">
-      <span class="b-lead">Grounding = put the right facts in the window.</span>
-      For live data that’s a <strong>tool call</strong> — which is exactly the next part.
-      <span class="b-foot">(It cuts hallucination on covered facts — never to zero.)</span>
+      <span class="b-lead">For facts that change, the lever is context</span> — and for live data that’s a <strong>tool call</strong>, the next part.
+      <span class="b-foot">(Grounding cuts hallucination on the facts we supply — never fully to zero.)</span>
     </div>
   </div>
 </template>
@@ -112,7 +130,7 @@ const c = computed(() => $clicks.value)
 .r-q em { font-style: italic; color: var(--warm-bright); }
 .r-hint { font-family: var(--mono); font-size: 0.64rem; letter-spacing: 0.04em; color: var(--ink-faint); }
 
-/* two columns */
+/* two columns — both legitimate, equal weight */
 .forks { display: grid; grid-template-columns: 1fr 1fr; gap: 1.1rem; width: 100%; }
 .path {
   display: flex; flex-direction: column; gap: 0.55rem;
@@ -121,7 +139,7 @@ const c = computed(() => $clicks.value)
   transition: border-color 0.45s ease, box-shadow 0.45s ease, background 0.45s ease;
 }
 .path.weights.lit { border-color: var(--cool); }
-.path.context.lit { border-color: var(--warm); box-shadow: 0 0 26px rgba(252,192,3,0.16); }
+.path.context.lit { border-color: var(--warm); box-shadow: 0 0 22px rgba(252,192,3,0.14); }
 
 .p-head { display: grid; grid-template-columns: auto 1fr; grid-row-gap: 0.15rem; align-items: center; column-gap: 0.6rem; }
 .p-n {
@@ -137,26 +155,26 @@ const c = computed(() => $clicks.value)
 .p-tag.cool { color: var(--cool-bright); }
 .p-tag.warm { color: var(--warm-bright); }
 
-/* option cards */
+/* option cards — title + use-case on one row, description below */
 .opt {
-  position: relative; padding: 0.55rem 0.7rem; border-radius: 10px;
+  padding: 0.55rem 0.7rem 0.6rem; border-radius: 10px;
   background: var(--bg-panel); border: 1px solid var(--hair);
   transition: opacity 0.45s ease;
 }
 .opt.hot { border-color: var(--warm); background: rgba(252,192,3,0.06); }
-.o-t { font-family: var(--sans); font-weight: 700; font-size: 0.9rem; color: var(--ink); }
-.o-d { font-size: 0.76rem; color: var(--ink-soft); line-height: 1.35; margin-top: 0.1rem; padding-right: 5.5rem; }
+.o-row { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+.o-t { font-family: var(--sans); font-weight: 700; font-size: 0.92rem; color: var(--ink); }
+.o-d { font-size: 0.76rem; color: var(--ink-soft); line-height: 1.35; margin-top: 0.18rem; }
 .o-d em { font-style: italic; color: var(--ink); }
 .o-d .dim { color: var(--ink-faint); }
 
-.verdict {
-  position: absolute; top: 0.55rem; right: 0.7rem;
+/* use-case pill — neutral (what it's FOR), tinted to its column */
+.use {
   font-family: var(--mono); font-size: 0.6rem; font-weight: 700; letter-spacing: 0.02em;
-  padding: 0.12rem 0.45rem; border-radius: 999px; white-space: nowrap;
+  padding: 0.14rem 0.5rem; border-radius: 999px; white-space: nowrap;
 }
-.verdict.no  { color: var(--bad); background: rgba(186,5,23,0.10); }
-.verdict.meh { color: var(--ink-soft); background: var(--sunken); }
-.verdict.yes { color: var(--good); background: rgba(46,132,74,0.12); }
+.use.cool { color: var(--cool-bright); background: rgba(1,118,211,0.10); }
+.use.warm { color: var(--warm-bright); background: rgba(252,192,3,0.14); }
 
 /* payoff band */
 .band {

@@ -26,9 +26,9 @@ Cover · Humility · Roadmap (AI · LLMs · Agents) ·
 **1 — AI** (`02-reason-history.md`): PartOpener (AI, spine bar) / "GenAI is a small box" zoom (moved
 here from `01-intro.md`) / Timeline / "Prediction→reasoning" claim ·
 **2 — LLMs** (`03-reason-llm.md`): PartOpener (LLMs, spine bar) / NextTokenPredictor / AttentionFlip /
-StatelessReplayStack / StatelessReplayFilmstrip / ContextWindow / "Prediction→reasoning" claim Hero /
-Hallucination / Grounding (Hallucination + Grounding are the LAST two — they get honest about the
-model's limits and bridge into Part 3's tools) ·
+StatelessReplayStack / StatelessReplayFilmstrip / ContextWindow / "…reasoning…" claim Hero / "But…" turn
+Hero (`but-limits.jpg`) / Hallucination ("the limits") / Grounding (the closing run: celebrate → deflate
+→ name the limits → show the fix → bridge into Part 3's tools) ·
 **3 — Agents** (`04-act-tools.md` + `05-act-agents.md`, ONE part): PartOpener (Agents, spine bar) /
 Tools flow / McpEnvelope / McpHandshake / AgentLoop / AgentContextWindow / Anatomy of an agent / A2A ·
 Close.
@@ -61,6 +61,12 @@ Components: `Hero.vue` (Archetype A), `PartOpener.vue` (part-opener hero w/ spin
 `ContextWindow.vue`, `AgentContextWindow.vue`, `StatelessReplay.vue`, `McpEnvelope.vue`,
 `McpHandshake.vue`, `AgentLoop.vue`, `Hallucination.vue`, `Grounding.vue`.
 
+PART-1 HISTORY (user, 2026-06-18): I built two alternates — `FieldMapV2.vue` (4-ring nested map) and
+`TimelineV2.vue` (3-era / hinge / scale-surge timeline) — as second slides for live comparison. User
+preferred the ORIGINAL on both → both alternate components + their slides were DELETED. Do NOT resurrect
+them: the original inline "small box" zoom and `Timeline.vue` are the keepers. Only tweak from that pass:
+the GenAI box on the "small box" slide was made smaller (see below).
+
 `NextTokenPredictor.vue` — "how a prompt becomes a prediction", `clicks:8`, the D5 pipeline (prompt →
 tokenise → numbers → weights → predict → loop). REWORKED (user, 2026-06-18): the old "The best
 Salesforce acquisition is" statement version was REPLACED by the question version below (the old
@@ -86,20 +92,37 @@ overlay "force"; (e) the numbers→weights arrow is DYNAMIC — centred in the g
 grid's VISIBLE right edge (`numRightEdge`, grows as tokens generate) and the weights grid (`WX`), so it
 repositions every step.
 
-`Hallucination.vue` + `Grounding.vue` are the Part-2 closing PAIR (after the "Prediction→reasoning"
-claim). HALLUCINATION (clicks:2): two cards — the model's fluent answer + a 94% confidence gauge
-(left, warm) vs the actual Order-API record that DIFFERS (right, cool), a "≠" badge between, payoff
-band "no lookup happened · fluent ≠ correct · confident ≠ true". Uses order #7788 (a FRESH number, so
-it doesn't imply the earlier #4471 "shipped" answers were hallucinated). The teaching point: the model
-emits the most PLAUSIBLE tokens over frozen weights — hallucination is what next-token prediction DOES,
-not a patchable bug. GROUNDING (clicks:3): a decision diagram — "two places knowledge can live → change
+`Hallucination.vue` + `Grounding.vue` are the Part-2 closing PAIR (after the "…reasoning…" + "But…"
+heroes). HALLUCINATION — REBUILT 2026-06-18 into "THE LIMITS" (clicks:3), GENERIC (no order demo): the
+earlier order-status version (#7788 vs the Order API record, ≠ badge, 94% confidence gauge) was REMOVED
+per user ("I don't like the where's-my-order thing — reconstruct based on the parts you built"). The
+slide is now three structural-limit CARDS converging on one root cause. Title "It sounds certain — and
+can't know OUR facts". Beats: c0 = card 1 🔒 "Only public knowledge" lit (others dimmed/reserved); c1 =
+card 2 🧊 "Frozen in the past" (no fresh/live data); c2 = card 3 🎲 "Guesses — never checks"
+(= hallucination); c3 = root-cause band "One cause behind all three: a frozen, public model that can only
+predict text — it can't go and check. So we don't change the model. We feed it the facts." Each card has
+a bottom red consequence pill (blind to our data / no fresh data / hallucination). TEACHING POINT (user,
+2026-06-18): the three limits the user wanted named — only-public-data, no-fresh-data, hallucination —
+are three FACES of one root cause; the "can only predict text, can't check" line is the can't-act bridge
+into grounding + Part 3. Lit cards get a warm border-top + glow; dimmed cards sit at opacity 0.28. GROUNDING (clicks:3): a decision diagram — "two places knowledge can live → change
 one". Path A = change the WEIGHTS (re-train = too costly; fine-tune = STYLE/BEHAVIOUR not facts, can't
 cite, goes stale — the misconception to kill). Path B = change the CONTEXT, weights frozen (RAG =
 retrieve static docs; Tool calls = live authoritative API, lit warm as "what we build next"). Payoff
 bridges into Part 3. HONEST CAVEAT baked in (user ask): grounding cuts hallucination on covered facts,
 never to zero. GROUNDING MODEL validated with user 2026-06-17: knowledge = weights OR context; fix one.
-Fine-tune≠facts and RAG-vs-tools-by-data-shape (static unstructured docs vs live structured API) are
-the two accuracy nuances that must stay.
+RAG-vs-tools-by-data-shape (static unstructured docs vs live structured API) is the accuracy nuance
+that must stay. REWORKED 2026-06-18 v2 (user: "remove 'don't change the model' — changing weights IS a
+solution; re-train & fine-tune make sense in certain cases; slide is too one-sidedly about context; be
+LESS provocative — no 'wrong instinct'"). The non-provocative reframe: **weights teach SKILLS & BEHAVIOUR;
+context carries the FACTS** — BOTH paths legitimate, they solve different jobs. (1) Path A is no longer
+dismissed — Re-train = "for deep domain skill" (powerful, costly, rare), Fine-tune = "for tone &
+behaviour" (shapes HOW it responds; weak for facts only because it can't cite + goes stale). (2) Per-card
+pills are now neutral USE-CASE labels (what each is FOR), tinted to the column (cool/warm) — NOT pass/fail
+✗/△/✓. (3) root headline "Two places its knowledge can live — change ONE" (the "Don't change the model"
+headline was REMOVED per user — changing weights is a real option). (4) payoff band lead = "Weights teach
+skills; context carries the facts" → for facts that change, the lever is context → tool call = next part.
+Speaker notes rewritten to present both paths even-handedly. The two columns are now visually EQUAL
+(neither dismissed); context is still where it LANDS for facts, since that's the tools bridge.
 
 `McpEnvelope.vue` + `McpHandshake.vue` are the Part-3 (Agents) MCP pair. The envelope slide shows REST
 (left) vs MCP server (right) as TWO HTTP requests with the SAME Bearer auth and JSON content type —
@@ -133,7 +156,67 @@ session / offload). Segment order is FIXED (system → … → free) so cells on
 
 ## Status (as of session end, 2026-06-18)
 
-- **This session (2026-06-18, STATELESS PAIR POLISH — newest): per user, two small reworks.**
+- **This session (2026-06-18, GROUNDING REWORK + photo — newest): even-handed grounding; real but-limits photo.**
+  Per user: (1) dropped the user-supplied photo into `public/img/but-limits.jpg` (a dark foggy forest
+  path — strong fit for the "But…" turn; copied from `public/img/to-use/pexels-szafran-31218341.jpg`).
+  (2) REWORKED `Grounding.vue` — the prior version was too one-sidedly pro-context and provocative about
+  weights ("wrong instinct", "✗ too costly", "△ style not facts"). User: changing the weights IS a real
+  solution; re-train AND fine-tune make sense in certain cases; be less provocative. New framing: BOTH
+  paths legitimate, they solve different jobs — **weights teach skills & behaviour; context carries the
+  facts**. Removed the "Don't change the model" headline; per-card pills are now neutral use-case labels
+  ("for deep domain skill" / "for tone & behaviour" / "for our private docs" / "for live facts"), tinted
+  to their column, NOT pass/fail. Context still LANDS as the lever for facts-that-change (the tools
+  bridge), but no longer by trashing weights. Speaker notes rewritten even-handedly. See Components.
+  Build compiles clean (`slidev build`, 549 modules). **NOT yet visually verified — user should refresh;
+  confirm both columns read as equally valid, the use-case pills don't crowd the titles on the `.o-row`,
+  and the but-limits forest photo carries the hero text.**
+- **This session (2026-06-18, LLM-CHAPTER ENDING v2): reworked heroes + rebuilt limits/grounding.**
+  Follow-up to the v1 broadening below, all per user: (1) HERO "…reasoning…" (`prediction-at-scale.jpg`)
+  — dropped the subtitle (main line only), changed "reasoning." → "reasoning…" (the hanging ellipsis sets
+  up the next slide). (2) FIXED accent legibility on heroes: the day-theme `--warm-bright` (#b26b00) was
+  illegible on dark photos → new `styles/index.css` rule lights `.hero .grad-warm`/`.part-opener
+  .grad-warm` as bright gold `--warm` + text-shadow (and `.grad-cool` likewise). (3) NEW "But…" turn hero
+  right after, `but-limits.jpg`, one sentence: "But it only ever GUESSES — over what it saw months ago."
+  (deflates the hype, bridges into the limits). (4) REBUILT the limits slide (`Hallucination.vue`) —
+  REMOVED the order-status demo entirely (user disliked it); it's now three generic limit CARDS (🔒 only
+  public · 🧊 frozen in the past · 🎲 guesses, never checks) revealed one per click, converging on a
+  root-cause band → "feed it the facts." (5) REBUILT `Grounding.vue` — killed the order-leaking "✗ not
+  for this" verdict, made everything generic, moved verdicts onto a title-row (title + pill, desc below),
+  new root headline "Don't change the model — change what it KNOWS." See Components for both. Build
+  compiles clean (`slidev build`, 549 modules). NEEDS: real photos for `prediction-at-scale.jpg` (rocket/
+  liftoff) + `but-limits.jpg` (heavier/darker "look closer" mood). **NOT yet visually verified — user
+  should refresh; confirm the gold accent words now read on the photos, the 3 limit cards + root band fit
+  without overflow, the dimmed (0.28) cards read as clearly "not yet," and the new Grounding verdict rows
+  don't wrap awkwardly.**
+- **This session (2026-06-18, LLM-CHAPTER ENDING v1): broadened the limits beat.**
+  User wanted the end of Part 2 (after "Each call re-contains all of the last one") improved: keep the
+  context window + claim hero as-is, then a slide naming the LLM's LIMITS (hallucination, no fresh data,
+  only public data) + a brief fix that sways into Agents. Found the beat was already 80% built
+  (`Hallucination.vue` + `Grounding.vue`) but under-scoped — only "hallucination" was named. Per user
+  (AskUserQuestion: broaden the existing pair; name hallucination + no-fresh-data + only-public-data +
+  can't-act): REWORKED `Hallucination.vue` into "THE LIMITS" — kept the visceral #7788 demo, added a
+  third beat (a 3-chip blind-spots strip: 🔒 only-public · 📅 frozen · 🎲 plausible) + a fourth bridge
+  band ("one cause: a frozen, public model guessing · it can only emit text · feed it the facts").
+  `clicks:2→3`, new title "It sounds certain — and can't know OUR facts", card-h 210→188px. LIGHT touch
+  on `Grounding.vue` — RAG/Tools verdict pills + descriptions now map onto the two named limits ("our
+  PRIVATE docs" / "FRESH data"), speaker notes call out the mapping. The elegant move (mine, user-approved
+  direction): ONE order-status demo proves all three limits at once — wrong because it's private + fresh,
+  so the model guesses; three faces, one root cause. Build compiles clean (`slidev build`, 545 modules).
+  **NOT yet visually verified — user should refresh; confirm the 3-chip blind-spots strip + bridge band
+  fit under the (now-shorter) cards without overflow, the chips read at real res, and the new Grounding
+  verdict pills don't overlap their option descriptions.**
+- **This session (2026-06-18, PART-1 HISTORY): built two alternates, user kept the originals.**
+  User: "improve drastically the first part concerning the history; keep two slides; make alternate
+  versions directly in the deck to iterate." I built `FieldMapV2.vue` (4-ring nested map) + `TimelineV2.vue`
+  (3-era / 2017-hinge / scale-surge timeline) as second slides for comparison. User VERDICT: preferred the
+  ORIGINAL on both slides → both alt components + their two slides were REMOVED; `02-reason-history.md` is
+  back to its original two content slides. The ONE change kept from this pass (per user "make the
+  Generative AI smaller in the boxes"): on the "small box" slide, `.nbox.gen` was shrunk — inset
+  `96px 196px 46px 196px` → `120px 236px 54px 236px` (≈248×114px → ≈168×82px), `.nlabel` 0.68rem→0.6rem,
+  `.gen-sub` 1rem→0.85rem — so the gold GenAI box reads visibly smaller inside ML/AI. Build compiles clean
+  (`slidev build`, 545 modules). **NOT yet visually verified — user should refresh; confirm the smaller
+  gold box still fits its "Generative AI" label + "LLMs · agents" sub-line without clipping.**
+- **This session (2026-06-18, STATELESS PAIR POLISH): per user, two small reworks.**
   (1) `StatelessReplayStack.vue` — shrank the LLM box (`.llm` height 110px→78px, tighter padding/gap)
   and dropped its subtitle: the head label is now just **"LLM"** (was "LLM · stateless function").
   (2) `StatelessReplayFilmstrip.vue` ("Seen another way") — kept the 3-envelope structure / sent-state
@@ -294,8 +377,12 @@ session / offload). Segment order is FIXED (system → … → free) so cells on
   "one pass through them = inference" (the two keywords highlighted warm via `.kw`), and the WEIGHTS
   speaker note spells out training vs inference and ties it to the stateless truth + grounding (we change
   the *context* fed to inference, not the weights). Was: "TODO — deck never names inference."
-- The 7 hero backgrounds are gradient placeholders; drop real photos at `public/img/cover.jpg`,
-  `part-1.jpg`, `part-2.jpg`, `part-2b.jpg`, `part-3.jpg`, `part-4.jpg`, `close.jpg`.
+- The hero backgrounds are gradient placeholders; drop real photos at `public/img/cover.jpg`,
+  `part-1.jpg`, `part-2.jpg`, `part-3.jpg`, `prediction-at-scale.jpg`, `but-limits.jpg`, `close.jpg`.
+  (`part-2b.jpg`/`part-4.jpg` are no longer referenced — see CUT SLIDES.) `but-limits.jpg` (the "But it
+  only ever guesses…" turn hero) is now a REAL photo (user-supplied 2026-06-18 from `public/img/to-use/` —
+  a dark foggy forest path, "can't see ahead"; legible under the white headline + gold word). Still
+  placeholders: `cover.jpg`, `part-1/2/3.jpg`, `prediction-at-scale.jpg` (wants rocket/liftoff), `close.jpg`.
 - The on-slide photo-placeholder corner tags were removed (user, 2026-06-17). `Hero.vue` no longer
   renders a `.photo-tag`, and the `--photo-tag-display` flag is gone from `styles/index.css`.
 
