@@ -39,11 +39,11 @@ import { useSlideContext } from '@slidev/client'
   from the start; clicks only toggle opacity / lit-state — nothing reflows.
   Rule 8: lands on arrival with the root + both path headers already showing.
 
-  Beats (clicks: 3):
+  Beats (clicks: 2):
     c=0  root + the two path headers (weights | context), cards dimmed
     c=1  Path A cards (weights) — teach the model itself
     c=2  Path B cards (context) — RAG + Tools (the lever for facts)
-    c=3  payoff band — weights=skills, context=facts → bridges into Part 3
+  (The payoff band was removed per user — the bridge to Part 3 is spoken.)
 */
 
 const { $clicks } = useSlideContext()
@@ -104,12 +104,6 @@ const c = computed(() => $clicks.value)
           <div class="o-d">call a live API for fresh, authoritative data <span class="dim">(real-time)</span></div>
         </div>
       </div>
-    </div>
-
-    <!-- payoff band -->
-    <div class="band" :style="{ opacity: c >= 3 ? 1 : 0 }">
-      <span class="b-lead">For facts that change, the lever is context</span> — and for live data that’s a <strong>tool call</strong>, the next part.
-      <span class="b-foot">(Grounding cuts hallucination on the facts we supply — never fully to zero.)</span>
     </div>
   </div>
 </template>
@@ -175,15 +169,4 @@ const c = computed(() => $clicks.value)
 }
 .use.cool { color: var(--cool-bright); background: rgba(1,118,211,0.10); }
 .use.warm { color: var(--warm-bright); background: rgba(252,192,3,0.14); }
-
-/* payoff band */
-.band {
-  width: 100%; text-align: center; font-size: 0.92rem; color: var(--ink-soft);
-  line-height: 1.45; padding: 0.7rem 1.2rem; border-radius: 12px;
-  background: var(--sunken); border: 1px solid var(--sunken-border);
-  transition: opacity 0.45s ease;
-}
-.band .b-lead { color: var(--warm-bright); font-weight: 700; }
-.band strong { color: var(--ink); }
-.band .b-foot { display: block; margin-top: 0.2rem; font-size: 0.72rem; color: var(--ink-faint); }
 </style>

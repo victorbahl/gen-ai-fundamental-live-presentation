@@ -123,6 +123,9 @@ headline was REMOVED per user — changing weights is a real option). (4) payoff
 skills; context carries the facts" → for facts that change, the lever is context → tool call = next part.
 Speaker notes rewritten to present both paths even-handedly. The two columns are now visually EQUAL
 (neither dismissed); context is still where it LANDS for facts, since that's the tools bridge.
+TRIMMED 2026-06-18 (user): the payoff band was REMOVED entirely ("For facts that change… never fully to
+zero") — the presenter says the weights=skills/context=facts line + the tools bridge ORALLY. Slide is now
+`clicks:3→2` (only the two path reveals); the `.band`/`.b-lead`/`.b-foot` CSS is gone.
 
 `McpEnvelope.vue` + `McpHandshake.vue` are the Part-3 (Agents) MCP pair. The envelope slide shows REST
 (left) vs MCP server (right) as TWO HTTP requests with the SAME Bearer auth and JSON content type —

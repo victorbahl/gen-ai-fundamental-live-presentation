@@ -328,7 +328,7 @@ it the facts." That's the next slide.
 
 ---
 layout: default
-clicks: 3
+clicks: 2
 ---
 
 <!-- GROUNDING — the answer to hallucination + the on-ramp to tools (Part 3).
@@ -358,8 +358,8 @@ source and it goes stale the moment our data changes. So weights are the lever f
 call time, in the window. RAG: retrieve our private docs and policies and paste them in — great for
 large, static, unstructured knowledge. Tool calls: the model asks our code to call a live API for fresh,
 authoritative data. This is the lever for facts — especially facts that change.
-[click] Land it: weights teach skills, context carries the facts. For the limits we just saw — our data,
-today's state — the facts change, so the lever is context. And for live data that's a tool call: the
-whole next part. One honest caveat: grounding sharply cuts hallucination on the facts we supply; it never
-drives it fully to zero, because the model can still misread what we give it.
+Land it (spoken, no beat): weights teach skills, context carries the facts. For the limits we just saw —
+our data, today's state — the facts change, so the lever is context. And for live data that's a tool
+call: the whole next part. One honest caveat: grounding sharply cuts hallucination on the facts we
+supply; it never drives it fully to zero, because the model can still misread what we give it.
 -->
