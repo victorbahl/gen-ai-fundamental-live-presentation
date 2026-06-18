@@ -57,9 +57,23 @@ sits AFTER the first `---` frontmatter (the pattern `06-close.md` always used). 
 files starting with `---`, never a leading comment.
 
 Components: `Hero.vue` (Archetype A), `PartOpener.vue` (part-opener hero w/ spine bar),
-`Timeline.vue`, `NextTokenPredictor.vue`, `AttentionFlip.vue`, `ContextWindow.vue`,
-`AgentContextWindow.vue`, `StatelessReplay.vue`, `McpEnvelope.vue`, `McpHandshake.vue`,
-`AgentLoop.vue`, `Hallucination.vue`, `Grounding.vue`.
+`Timeline.vue`, `NextTokenPredictor.vue`, `NextTokenPredictorV2.vue`, `AttentionFlip.vue`,
+`ContextWindow.vue`, `AgentContextWindow.vue`, `StatelessReplay.vue`, `McpEnvelope.vue`,
+`McpHandshake.vue`, `AgentLoop.vue`, `Hallucination.vue`, `Grounding.vue`.
+
+`NextTokenPredictorV2.vue` is an ALTERNATE of `NextTokenPredictor.vue` (user, 2026-06-18), placed as
+a SECOND slide immediately after the original in `03-reason-llm.md` (same title "How a prompt becomes
+a prediction"). Same D5 pipeline + `clicks:8`, with these deliberate differences vs the original
+(keep BOTH — don't merge): (1) prompt is a QUESTION — "What's the best Salesforce acquisition?";
+(2) "acquisition" stays ONE token (only "What's"→What+'s and "Salesforce"→Sales+force split);
+(3) on arrival the grey input field hugs the QUESTION TEXT (width = text length, not the chip row)
+and shows NO cursor; (4) the warm caret appears ONLY after the first token (MuleSoft) is generated
+(gated on `predicting`), then rides the trailing edge + blinks; (5) the FIRST distribution is a CLOSE
+race — MuleSoft .30 (just ahead), Slack .24 = Informatica .24 (tied), Tableau .14 — so "ranked guess,
+not a fact" lands harder (later steps unchanged); (6) the vector/weights explanatory captions are
+larger (`.cap` 12px / `.cap.top` 13px, fill `--ink-soft`) and sit lower (caption `y` +12 below grids).
+NB: the weight-sweep clipPath id is `wclipv2` (must differ from the original's `wclip` — duplicate SVG
+ids across two on-deck slides would collide).
 
 `Hallucination.vue` + `Grounding.vue` are the Part-2 closing PAIR (after the "Prediction→reasoning"
 claim). HALLUCINATION (clicks:2): two cards — the model's fluent answer + a 94% confidence gauge
@@ -106,9 +120,22 @@ session / offload). Segment order is FIXED (system → … → free) so cells on
 — never reflow (Rule 4). Token scale differs on purpose: 0.5k/cell in the Part-2 (LLMs) window,
 2k/cell in the Part-3 (Agents) one (agent tool output is big).
 
-## Status (as of session end, 2026-06-17)
+## Status (as of session end, 2026-06-18)
 
-- **This session (2026-06-17, ACCURACY/CONSISTENCY PASS — newest): fixed wrong info + inconsistencies.**
+- **This session (2026-06-18, STATELESS PAIR POLISH — newest): per user, two small reworks.**
+  (1) `StatelessReplayStack.vue` — shrank the LLM box (`.llm` height 110px→78px, tighter padding/gap)
+  and dropped its subtitle: the head label is now just **"LLM"** (was "LLM · stateless function").
+  (2) `StatelessReplayFilmstrip.vue` ("Seen another way") — kept the 3-envelope structure / sent-state
+  / token bars / replay-vs-new legend, but each POST now renders the **actual request JSON** instead of
+  role+text cards: a real Messages API payload — top-level `model: "claude-opus-4-8"` + `system`, then a
+  `messages: [ … ]` array of `{role, content}` objects. Prior turns are dimmed (`.msg.replay`); the one
+  new line per call is the warm-highlighted `{role:"user", …}` object (`.msg.new`). Token count now
+  includes the system string. This makes it visibly "more real" / different from the take-1 stack.
+  JSON is div-per-line (`.jl` + `.ind1`/`.ind2` indent classes), NOT a `<pre>` with inter-span newlines
+  (those render stray blank lines). Build compiles clean (`slidev build`, 551 modules). **NOT yet
+  visually verified — user should refresh; check the JSON doesn't overflow the 308px envelope body at
+  call 3 (longest payload) and the new-line highlight reads clearly.**
+- **This session (2026-06-17, ACCURACY/CONSISTENCY PASS): fixed wrong info + inconsistencies.**
   Full read-through of every slide + component for accuracy/consistency, then fixes (all per user
   "fix everything"): (1) `NextTokenPredictor.vue` step-0 distribution summed to 138% (impossible) —
   retuned to MuleSoft .44 / Slack .21 / Informatica .16 / Tableau .09 (clear winner, sums ≤ 1).
@@ -251,6 +278,13 @@ session / offload). Segment order is FIXED (system → … → free) so cells on
 - Open / not done: visual QA pass; a planned "v2" polish of `NextTokenPredictor.vue`; PDF/PPTX
   export (needs `playwright-chromium`, whose browser download is sandbox-blocked — install to
   project `./.pw-browsers` with sandbox off); the timeline above/below-axis layout at real res.
+- **TODO (user, 2026-06-17): introduce the notion of INFERENCE somewhere.** The deck never names
+  "inference" — the act of running the trained model forward to produce output (one forward pass over
+  frozen weights), as distinct from *training*. Natural home is Part 2 (LLMs): it's exactly what the
+  NextTokenPredictor's compute-sweep IS, and it ties into the stateless truth (each API call = one
+  fresh inference, weights frozen, no memory carried) and grounding (we change the *context* fed to
+  inference, not the weights). Name it explicitly and connect it to those existing beats. NOT yet
+  built.
 - The 7 hero backgrounds are gradient placeholders; drop real photos at `public/img/cover.jpg`,
   `part-1.jpg`, `part-2.jpg`, `part-2b.jpg`, `part-3.jpg`, `part-4.jpg`, `close.jpg`.
 - The on-slide photo-placeholder corner tags were removed (user, 2026-06-17). `Hero.vue` no longer

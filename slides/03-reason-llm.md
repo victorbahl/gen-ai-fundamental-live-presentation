@@ -117,6 +117,72 @@ first.
 
 ---
 layout: default
+clicks: 8
+---
+
+<!-- NEXT-TOKEN PREDICTOR (alternate, V2) — same pipeline, question prompt.
+     The prompt is a QUESTION ("What's the best Salesforce acquisition?"); on
+     arrival the grey field hugs the question with NO cursor; the caret appears
+     only once the first token (MuleSoft) is generated; the first distribution
+     is a CLOSE race (MuleSoft just ahead, Slack = Informatica, Tableau behind)
+     so "ranked guess, not a fact" lands harder; the vector/weights captions are
+     larger and sit lower. See NextTokenPredictorV2.vue. -->
+
+<div class="demo-stage">
+  <div class="demo-head">
+    <div class="kicker">How an LLM generates text</div>
+    <h2>How a prompt becomes a <span class="grad-warm">prediction</span></h2>
+  </div>
+  <NextTokenPredictorV2 />
+</div>
+
+<!--
+Alternate run of the same mechanism — this time the prompt is a QUESTION, the way people actually use
+a chat box. Eight beats, one idea per click; the caret only starts blinking once the model is actually
+generating.
+
+SET-UP (before any click): on screen is just the input field labelled "prompt" — "What's the best
+Salesforce acquisition?" — sized to the question, no cursor. It's a plain typed question, nothing has
+happened yet. Say: "Here's our prompt — a question. To us it's English. The model can't read words at
+all — so step one, it chops them up."
+
+[click 1 — TOKENISE] The field splits IN PLACE into token chips. KEY POINT: tokens, not words — sub-word
+fragments. Notice "What's" → "What" + "'s" and "Salesforce" → "Sales" + "force", while "acquisition"
+stays a single token (common enough to have its own entry). The model has a fixed vocabulary of ~100k
+fragments and builds anything from those bricks. Rule of thumb: ~4 chars per token, ~¾ of a word.
+
+[click 2 — NUMBERS] Each token drops into its own COLUMN OF NUMBERS — text becomes maths. Each token is
+a fixed-length list of numbers (a "vector") and that vector IS its meaning to the model. Values shown
+are illustrative (real models use hundreds to thousands per token).
+
+[click 3 — WEIGHTS] Those numbers flow into the model — itself just a vastly bigger grid of numbers: the
+WEIGHTS. The "billions of parameters." Input numbers change every prompt; the weights are FROZEN, set
+once in training. Running it = multiplying the input through this fixed grid — the sweep crossing once.
+
+[click 4 — PREDICT (token 1)] Out comes a probability for EVERY token in the vocabulary — top four as
+bars. Here's the teaching beat: it's a CLOSE race. MuleSoft is only just ahead at 30%, Slack and
+Informatica are tied at 24%, Tableau trails at 14%. This is the point — it's NOT a fact, it's a
+distribution, a near-tie ranked guess. Ask a slightly different question and Slack could win. It commits
+the top one — "MuleSoft" joins the row in warm, and NOW the caret appears and starts blinking: the model
+is generating. A matching number column slides into the grid.
+
+[click 5 — LOOP (token 2)] The engine: take the longer text — prompt + "MuleSoft" — and feed the WHOLE
+thing back through the SAME pipeline. Sweep replays (a second forward pass), a column appears. New
+distribution, clearer winner this time: a comma at 74%. Append.
+
+[click 6 — LOOP (token 3)] Again. Sweep, new column, "obviously" at 52%. Nothing is planned ahead — each
+token is chosen only once the previous one exists.
+
+[click 7 — LOOP (token 4)] One more pass — a period wins at 63%, the model decides it's done. The row
+reads "…acquisition? MuleSoft, obviously."
+
+[click 8 — THE LOOP, named] Land it: prompt → tokens → numbers → weights → a probability → pick → append
+→ feed it all back. Everything that feels like intelligence is this loop at scale. And notice that first
+near-tie: there's no plan and no memory — each pass starts cold from the text in front of it.
+-->
+
+---
+layout: default
 clicks: 3
 ---
 

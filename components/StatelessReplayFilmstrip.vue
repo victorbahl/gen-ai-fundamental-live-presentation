@@ -12,13 +12,19 @@ import { useSlideContext } from '@slidev/client'
   call is sent. The repeated tinted block visibly grows left→right and a
   token bar under each envelope climbs.
 
-  PHYSICAL-PAGE RULE: all three envelopes + every row own fixed slots and
+  Unlike the take-1 stack (role + text cards), here each envelope shows the
+  ACTUAL request JSON — a real Messages API payload: top-level `model` +
+  `system`, then a `messages` array of {role, content}. Same truth, a more
+  "real" view: you can see the prior turns literally re-listed in the array.
+
+  PHYSICAL-PAGE RULE: all three envelopes + every line own fixed slots and
   are always rendered. Clicks only toggle opacity / "sent" state. Fixed-size
   canvas; nothing inserts or reflows.
 */
 
 const { $clicks } = useSlideContext()
 
+const model = 'claude-opus-4-8'
 const system = 'You are a helpful order assistant.'
 const script = [
   { u: 'Where is my order #4471?',        a: 'It shipped yesterday — arriving Thursday.' },
@@ -35,14 +41,16 @@ const sentUpTo = computed(() => Math.min($clicks.value, script.length - 1)) // i
 // NOT in the body — it hasn't been produced when this call is sent.
 const envelopes = computed(() =>
   script.map((_, k) => {
-    const rows = [{ role: 'system', text: system, kind: 'replay' }]
+    const messages = []
     for (let i = 0; i < k; i++) {
-      rows.push({ role: 'user', text: script[i].u, kind: 'replay' })
-      rows.push({ role: 'assistant', text: script[i].a, kind: 'replay' })
+      messages.push({ role: 'user', text: script[i].u, kind: 'replay' })
+      messages.push({ role: 'assistant', text: script[i].a, kind: 'replay' })
     }
-    rows.push({ role: 'user', text: script[k].u, kind: 'new' })
-    const tok = Math.round(rows.reduce((n, m) => n + m.text.length, 0) / 4) + rows.length * 3
-    return { call: k + 1, rows, tok }
+    messages.push({ role: 'user', text: script[k].u, kind: 'new' })
+    const tok = Math.round(
+      (system.length + messages.reduce((n, m) => n + m.text.length, 0)) / 4
+    ) + (messages.length + 1) * 3
+    return { call: k + 1, messages, tok }
   })
 )
 const maxTok = computed(() => envelopes.value[envelopes.value.length - 1].tok)
@@ -56,18 +64,26 @@ const maxTok = computed(() => envelopes.value[envelopes.value.length - 1].tok)
         class="env" :class="{ sent: sentUpTo >= k }"
       >
         <div class="env-head">
-          <span class="lbl">POST · call {{ env.call }}</span>
+          <span class="lbl">POST /v1/messages · call {{ env.call }}</span>
           <span class="state">{{ sentUpTo >= k ? 'sent' : '—' }}</span>
         </div>
+
+        <!-- the actual request JSON the API receives this call -->
         <div class="env-body">
-          <div
-            v-for="(m, i) in env.rows" :key="i"
-            class="row" :class="[m.role, m.kind]"
-          >
-            <span class="role">{{ m.role }}</span>
-            <span class="text">{{ m.text }}</span>
+          <div class="json">
+            <div class="jl">{</div>
+            <div class="jl ind1"><span class="k">"model"</span>: <span class="s">"{{ model }}"</span>,</div>
+            <div class="jl ind1"><span class="k">"system"</span>: <span class="s">"{{ system }}"</span>,</div>
+            <div class="jl ind1"><span class="k">"messages"</span>: [</div>
+            <div
+              v-for="(m, i) in env.messages" :key="i"
+              class="jl ind2 msg" :class="m.kind"
+            >{<span class="k">"role"</span>: <span class="s" :class="m.role">"{{ m.role }}"</span>, <span class="k">"content"</span>: <span class="s">"{{ m.text }}"</span>}<span v-if="i < env.messages.length - 1">,</span></div>
+            <div class="jl ind1">]</div>
+            <div class="jl">}</div>
           </div>
         </div>
+
         <div class="env-foot">
           <div class="bar"><span :style="{ width: (env.tok / maxTok * 100) + '%' }" /></div>
           <span class="tok">{{ env.tok }} tok</span>
@@ -101,32 +117,38 @@ const maxTok = computed(() => envelopes.value[envelopes.value.length - 1].tok)
   padding: 0.5rem 0.8rem; border-bottom: 1px solid var(--hair);
   background: var(--bg-soft);
 }
-.lbl { font-family: var(--mono); font-size: 0.64rem; font-weight: 700; color: var(--ink-soft); letter-spacing: 0.03em; }
+.lbl { font-family: var(--mono); font-size: 0.6rem; font-weight: 700; color: var(--ink-soft); letter-spacing: 0.02em; }
 .state {
   font-family: var(--mono); font-size: 0.56rem; font-weight: 700; text-transform: uppercase;
   color: var(--ink-faint); letter-spacing: 0.06em;
 }
 .env.sent .state { color: var(--good); }
 
-.env-body { padding: 0.6rem; display: flex; flex-direction: column; gap: 0.3rem; height: 308px; overflow: hidden; }
-.row {
-  display: flex; gap: 0.45rem; align-items: baseline;
-  border-radius: 8px; padding: 0.28rem 0.45rem;
-  font-size: 0.66rem; line-height: 1.25;
+/* ---- the JSON body ---- */
+.env-body { padding: 0.55rem 0.6rem; height: 308px; overflow: hidden; }
+.json {
+  font-family: var(--mono); font-size: 0.56rem; line-height: 1.45;
+  color: var(--ink-faint);
 }
-.row.replay { background: var(--bg-soft); }
-.row.replay .role, .row.replay .text { color: var(--ink-faint); }
-.row.new {
-  background: rgba(252,192,3,0.12); border: 1px solid rgba(252,192,3,0.45);
+.k { color: var(--ink-soft); }          /* JSON keys */
+.s { color: var(--ink-faint); }         /* string values (frame = dim) */
+
+/* one rendered line of the payload */
+.jl { border-radius: 5px; word-break: break-word; }
+.ind1 { padding-left: 0.85rem; }
+.ind2 { padding-left: 1.7rem; }
+/* a message object inside the array */
+.msg { padding-top: 0.08rem; padding-bottom: 0.08rem; transition: background 0.45s ease; }
+.msg.replay { color: var(--ink-faint); }
+.msg.replay .k, .msg.replay .s { color: var(--ink-faint); }
+.msg.new {
+  background: rgba(252,192,3,0.12);
+  box-shadow: inset 0 0 0 1px rgba(252,192,3,0.45);
 }
-.row.new .text { color: var(--ink); font-weight: 500; }
-.role {
-  font-family: var(--mono); font-size: 0.5rem; font-weight: 700; text-transform: uppercase;
-  min-width: 48px; letter-spacing: 0.02em;
-}
-.row.new.user .role { color: var(--cool-bright); }
-.row.new.assistant .role { color: var(--warm-bright); }
-.text { color: var(--ink-soft); }
+.msg.new .s { color: var(--ink); font-weight: 500; }
+.msg.new .k { color: var(--warm-bright); }
+.msg.new .s.user { color: var(--cool-bright); }
+.msg.new .s.assistant { color: var(--warm-bright); }
 
 .env-foot { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0.8rem; border-top: 1px solid var(--hair); }
 .bar { flex: 1; height: 6px; border-radius: 3px; background: var(--bg-soft); overflow: hidden; }

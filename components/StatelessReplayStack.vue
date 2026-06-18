@@ -147,7 +147,7 @@ const roleColor = (r) =>
 
       <!-- 2 · the model: a stateless function that generates the answer -->
       <div class="llm" :key="'l' + beat" :style="{ opacity: showLLM ? 1 : 0 }">
-        <div class="llm-head">LLM · stateless function</div>
+        <div class="llm-head">LLM</div>
         <div class="llm-stage">
           <div class="llm-think" :style="stepped ? { opacity: (showLLM && !showAns) ? 1 : 0 } : null">generating…</div>
           <div class="llm-ans" :style="stepped ? { opacity: showAns ? 1 : 0 } : null">{{ answer }}</div>
@@ -306,9 +306,9 @@ const roleColor = (r) =>
 }
 
 .llm {
-  border-radius: 14px; padding: 0.55rem 0.7rem; height: 110px;
+  border-radius: 14px; padding: 0.45rem 0.7rem; height: 78px;
   background: var(--bg-panel); border: 1px solid var(--hair);
-  display: flex; flex-direction: column; gap: 0.4rem;
+  display: flex; flex-direction: column; gap: 0.25rem;
   transition: opacity 0.4s ease;
   animation: llmGlow 1.4s ease 0.85s both;
 }
