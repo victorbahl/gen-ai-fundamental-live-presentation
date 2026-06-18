@@ -4,22 +4,21 @@ import { useSlideContext } from '@slidev/client'
 
 /*
   NextTokenPredictor — "how a prompt becomes a prediction", end to end, then the
-  LOOP. (This is the "D5 pipeline" design; earlier mesh/map/grid explorations
-  were removed.) Built around the two things that make the mechanism legible:
-    • TOKENISE — the prompt is an INPUT FIELD that SPLITS IN PLACE into token
-      chips (sub-word pieces: Salesforce → "Sales"+"force"). The same row then
-      grows to the right as tokens are generated — prompt and output share ONE
-      line; there is no separate prompt line.
-    • NUMBERS  — each token becomes a COLUMN OF NUMBERS, with real values shown.
-      The grid GROWS BY ONE COLUMN each time a token is generated (the whole,
-      ever-longer text is fed back in) — existing columns never move.
-    • WEIGHTS  — those numbers flow through a grid of learned WEIGHTS, signed
-      values printed in each cell, with a one-shot compute sweep.
-    • PREDICT  — output is an EQUALIZER of bars (height = probability), UNSORTED
-      so the warm winner sits in the MIDDLE (probability ≠ position).
-    • LOOP     — the winning token is appended and we predict again: MuleSoft,
-      ",", "obviously", ".". The weight sweep replays each pass.
-    • a caret rides the trailing edge of the text and blinks until generation ends.
+  LOOP. (This is the "D5 pipeline" design.) Built around the things that make the
+  mechanism legible:
+    • PROMPT is a QUESTION — "What's the best Salesforce acquisition?".
+    • On arrival the grey input field hugs the QUESTION TEXT (no chip-based
+      over-width) and carries NO cursor — it's just the typed question.
+    • "acquisition" stays ONE token (only "Salesforce" → "Sales"+"force" and
+      "What's" → "What"+"'s" show the sub-word split).
+    • the caret appears ONLY once the first token is GENERATED (MuleSoft), then
+      rides the trailing edge and blinks until generation ends.
+    • the first distribution is a CLOSE race — MuleSoft a touch ahead, Slack and
+      Informatica tied, Tableau behind — to make "it's a ranked guess, not a
+      fact" land harder.
+    • the weights caption names the two halves of an LLM's life: fixing the
+      billions of weights once = TRAINING; one forward pass through them = INFERENCE.
+    • the explanatory captions are larger, stronger-coloured and sit a little lower.
 
   ANIMATION: beat-driven (per click), eased, ONE-SHOT — no ambient loops.
   PHYSICAL-PAGE RULE: fixed canvas, fixed slots; every chip (prompt AND every
@@ -36,7 +35,7 @@ const bWeights = computed(() => r.value >= 3)   // numbers → weight grid + swe
 
 // generation beats: r=4 → step 0 (MuleSoft) … r=7 → step 3 (".")
 const steps = [
-  { token: 'MuleSoft',  cands: [['MuleSoft', 0.44], ['Slack', 0.21], ['Informatica', 0.16], ['Tableau', 0.09]] },
+  { token: 'MuleSoft',  cands: [['MuleSoft', 0.30], ['Slack', 0.24], ['Informatica', 0.24], ['Tableau', 0.14]] },
   { token: ',',         cands: [[',', 0.74], ['.', 0.15], ['and', 0.07], ['—', 0.04]] },
   { token: 'obviously', cands: [['obviously', 0.52], ['naturally', 0.27], ['clearly', 0.13], ['right?', 0.08]] },
   { token: '.',         cands: [['.', 0.63], ['too', 0.18], ['really', 0.12], ['!', 0.07]] },
@@ -47,7 +46,8 @@ const current = computed(() => steps[Math.max(genStep.value, 0)])
 const bNote = computed(() => r.value >= 4 + steps.length)   // final "loop" payoff (r>=8)
 const sweepKey = computed(() => predicting.value ? 'g' + genStep.value : 'w')
 
-const prompt = 'The best Salesforce acquisition is'
+// space before "?" so the displayed question telegraphs that "?" is its OWN token
+const prompt = "What's the best Salesforce acquisition ?"
 const showBox = computed(() => r.value < 1)   // input field shown until the split
 
 // deterministic pseudo-random (Math.random is unavailable in this env)
@@ -56,7 +56,8 @@ const f1 = (v) => { const s = v.toFixed(1); return s === '-0.0' ? '0.0' : s }
 const f2 = (v) => { const s = v.toFixed(2); return s === '-0.00' ? '0.00' : s }
 
 // ---- TEXT ROW: prompt tokens + generated tokens share ONE row -------
-const promptTokens = ['The', 'best', 'Sales', 'force', 'acqui', 'sition', 'is']
+// "What's" → What + 's, "Salesforce" → Sales + force, "acquisition" stays whole, "?" alone
+const promptTokens = ['What', "'s", 'the', 'best', 'Sales', 'force', 'acquisition', '?']
 const CHIP_H = 34, CHIP_Y = 24, CHAR = 11, PAD = 18, GAP = 9, LEFT = 150
 const chips = (() => {
   const labels = [...promptTokens, ...steps.map((s) => s.token)]
@@ -68,11 +69,17 @@ const chips = (() => {
     return c
   })
 })()
-const PROMPT_END = chips[promptTokens.length - 1].x + chips[promptTokens.length - 1].w  // right edge of "is"
-const pbX = LEFT - 6, pbW = PROMPT_END - LEFT + 12   // input-field rect spans the prompt chips
+const PROMPT_END = chips[promptTokens.length - 1].x + chips[promptTokens.length - 1].w  // right edge of "?"
+const PROMPT_MID = (LEFT + PROMPT_END) / 2   // centre of the prompt chip row (so the caption sits under it)
+// input field hugs the QUESTION TEXT (not the wider chip row) and carries no cursor
+const PTEXT_CHAR = 9.7
+const pbX = LEFT - 12, pbW = prompt.length * PTEXT_CHAR + 24
+// numbers-grid column headers: long tokens (acquisition / obviously / MuleSoft) would
+// overflow their narrow column and collide with neighbours — truncate so each stays put
+const headLabel = (t) => (t.length > 6 ? t.slice(0, 5) + '…' : t)
 const chipOn = (c) => (c.gen ? genStep.value >= c.gi : bTokens.value)
 const chipDelay = (c, i) => (!c.gen && bTokens.value ? i * 60 : 0) + 'ms'
-// caret rides the trailing edge of the visible text
+// caret rides the trailing edge of the visible text — only AFTER the first generated token
 const caretX = computed(() => {
   const g = genStep.value
   if (g < 0) return PROMPT_END + 6
@@ -98,6 +105,7 @@ const numCells = (() => {
 })()
 const numDelay = (cell) => (colOn(cell.c) ? (cell.c <= promptTokens.length - 1 ? cell.c * 28 + cell.r * 16 : cell.r * 45) : 0) + 'ms'
 const nBottom = NY0 + NROWS * (NCH + 4) - 4
+const NUMCAP_X = nColX(0) - NCW / 2   // left edge of the first vector column (caption aligns here)
 
 // ---- WEIGHTS grid: signed learned values printed in each cell --------
 const WCOLS = 6, WROWS = 4, WCELL = 36, WGAP = 4, WX = 470, WY = 160
@@ -114,6 +122,17 @@ const wCells = (() => {
 const wGridW = WCOLS * wPitch - WGAP
 const wGridH = WROWS * wPitch - WGAP
 
+// numbers → weights arrow: sits CENTRED in the gap between the numbers grid's
+// VISIBLE right edge (which grows as tokens generate) and the weights grid (WX).
+const numRightEdge = computed(() => {
+  const lastCol = promptTokens.length - 1 + (genStep.value >= 0 ? genStep.value + 1 : 0)
+  return nColX(lastCol) + NCW / 2
+})
+const ARROW_LEN = 26
+const arrowMid = computed(() => (numRightEdge.value + WX) / 2)
+const arrowX1 = computed(() => arrowMid.value - ARROW_LEN / 2)
+const arrowX2 = computed(() => arrowMid.value + ARROW_LEN / 2)
+
 // ---- PREDICTION: equalizer (unsorted; winner in the MIDDLE) ----------
 const slotX = [800, 868, 936, 1004]
 const slotOf = [1, 0, 3, 2]   // cand 0 (winner) → slot 1, a smaller bar to its left
@@ -122,13 +141,13 @@ const BASE = 332, MAXH = 150, BW = 52
 
 <template>
   <div class="ntp">
-    <svg class="net" viewBox="0 0 1100 400">
+    <svg class="net" viewBox="0 0 1100 436">
       <!-- ============ TEXT ROW : the prompt input field, then tokens ===== -->
-      <!-- the prompt is an input field; click 1 SPLITS it in place into chips -->
+      <!-- the prompt is an input field hugging the question; click 1 SPLITS it into chips -->
       <g class="promptbox" :class="{ on: showBox }">
         <text class="ptag" :x="pbX + 4" :y="CHIP_Y - 8">prompt</text>
         <rect :x="pbX" :y="CHIP_Y" :width="pbW" :height="CHIP_H" rx="9" />
-        <text class="ptext" :x="LEFT + 6" :y="CHIP_Y + 23">{{ prompt }}<tspan class="boxcaret blink"> ▌</tspan></text>
+        <text class="ptext" :x="LEFT" :y="CHIP_Y + 23">{{ prompt }}</text>
       </g>
 
       <g class="chips">
@@ -138,18 +157,22 @@ const BASE = 332, MAXH = 150, BW = 52
           <rect :x="c.x" :y="CHIP_Y" :width="c.w" :height="CHIP_H" rx="8" />
           <text :x="c.cx" :y="CHIP_Y + 23" text-anchor="middle">{{ c.t }}</text>
         </g>
-        <text v-if="!showBox" class="caret" :class="{ blink: !bNote }"
+        <!-- caret appears ONLY after the first token is generated (MuleSoft) -->
+        <text v-if="predicting" class="caret" :class="{ blink: !bNote }"
           :x="caretX" :y="CHIP_Y + 23">▌</text>
       </g>
-      <text class="cap top" x="405" y="78" text-anchor="middle" :class="{ on: bTokens }">
+      <text class="cap top" :x="PROMPT_MID" y="92" text-anchor="middle" :class="{ on: bTokens }">
         tokens — sub-word pieces of text, not always whole words
       </text>
 
+      <!-- everything below the prompt row is shifted DOWN so the pipeline isn't
+           crowded against the tokens line above -->
+      <g class="lower">
       <!-- ============ NUMBERS : each token → a column of numbers ====== -->
       <text class="panel-h" x="214" y="118" text-anchor="middle" :class="{ on: bNumbers }">each token → numbers</text>
       <g class="numgrid">
         <text v-for="(c, i) in chips" :key="'nh' + i"
-          class="ntok" :class="{ on: colOn(i), genh: c.gen }" :x="nColX(i)" y="148" text-anchor="middle">{{ c.t }}</text>
+          class="ntok" :class="{ on: colOn(i), genh: c.gen }" :x="nColX(i)" y="148" text-anchor="middle">{{ headLabel(c.t) }}</text>
         <g v-for="(c, i) in numCells" :key="'nc' + i"
            class="ncellg" :class="{ on: colOn(c.c) }"
            :style="{ transitionDelay: numDelay(c) }">
@@ -158,14 +181,15 @@ const BASE = 332, MAXH = 150, BW = 52
           <text class="nval" :x="c.x + NCW / 2" :y="c.y + NCH / 2 + 3.5" text-anchor="middle">{{ c.txt }}</text>
         </g>
       </g>
-      <text class="cap" x="214" :y="nBottom + 22" text-anchor="middle" :class="{ on: bNumbers }">
-        each token's meaning, written as a vector
+      <text class="cap" :x="NUMCAP_X" :y="nBottom + 34" text-anchor="start" :class="{ on: bNumbers }">
+        <tspan :x="NUMCAP_X" dy="0">each token's meaning,</tspan>
+        <tspan :x="NUMCAP_X" dy="17">written as a vector</tspan>
       </text>
 
-      <!-- numbers → weights -->
+      <!-- numbers → weights : arrow CENTRED in the gap, repositions as columns grow -->
       <g class="flow" :class="{ on: bWeights }">
-        <line x1="412" y1="236" x2="460" y2="236" />
-        <path d="M 462 236 l -10 -5 v 10 z" class="head" />
+        <line :x1="arrowX1" y1="236" :x2="arrowX2" y2="236" />
+        <path :d="`M ${arrowX2 + 2} 236 l -10 -5 v 10 z`" class="head" />
       </g>
 
       <!-- ============ WEIGHTS : the learned model ===================== -->
@@ -184,8 +208,9 @@ const BASE = 332, MAXH = 150, BW = 52
         </g>
         <clipPath id="wclip"><rect :x="WX" :y="WY" :width="wGridW" :height="wGridH" rx="3" /></clipPath>
       </g>
-      <text class="cap" :x="WX + wGridW / 2" :y="WY + wGridH + 22" text-anchor="middle" :class="{ on: bWeights }">
-        billions of these · learned once, then frozen
+      <text class="cap" :x="WX + wGridW / 2" :y="WY + wGridH + 34" text-anchor="middle" :class="{ on: bWeights }">
+        <tspan :x="WX + wGridW / 2" dy="0">billions · learned once = <tspan class="kw">training</tspan></tspan>
+        <tspan :x="WX + wGridW / 2" dy="17">one pass through them = <tspan class="kw">inference</tspan></tspan>
       </text>
 
       <!-- weights → prediction -->
@@ -208,6 +233,7 @@ const BASE = 332, MAXH = 150, BW = 52
             :x="slotX[slotOf[i]]" :y="BASE + 20" text-anchor="middle">{{ c[0] }}</text>
         </g>
       </g>
+      </g>
     </svg>
 
     <div class="done-note" :class="{ on: bNote }">
@@ -221,13 +247,16 @@ const BASE = 332, MAXH = 150, BW = 52
 
 .net { width: 100%; max-width: 980px; height: auto; overflow: visible; --ease: cubic-bezier(0.22, 1, 0.36, 1); }
 
-/* prompt input field (shown until the split) */
+/* the whole pipeline below the prompt row, pushed down so it isn't crowded
+   against the "tokens — sub-word pieces" line */
+.lower { transform: translateY(36px); }
+
+/* prompt input field (shown until the split) — hugs the question, no cursor */
 .promptbox { opacity: 0; transition: opacity 0.4s var(--ease); }
 .promptbox.on { opacity: 1; }
 .promptbox rect { fill: var(--bg-soft); stroke: var(--hair); stroke-width: 1.3; }
 .ptag { font-family: var(--mono); font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; fill: var(--ink-faint); }
 .ptext { font-family: var(--mono); font-size: 16px; fill: var(--ink); }
-.boxcaret { fill: var(--warm); }
 
 /* token chips — prompt (cool) and generated (warm) share one row */
 .chip { opacity: 0; transform: translateY(8px) scale(0.9); transform-box: fill-box; transform-origin: center;
@@ -242,10 +271,12 @@ const BASE = 332, MAXH = 150, BW = 52
 .blink { animation: blink 1.06s ease-in-out infinite; }
 @keyframes blink { 0%, 38% { opacity: 1; } 50%, 62% { opacity: 0; } 100% { opacity: 1; } }
 
-.cap { font-family: var(--mono); font-size: 10px; letter-spacing: 0.07em; text-transform: uppercase; fill: var(--ink-faint);
+/* explanatory captions — bigger + stronger so they actually read */
+.cap { font-family: var(--mono); font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; fill: var(--ink-soft);
   opacity: 0; transition: opacity 0.5s ease; }
 .cap.on { opacity: 1; }
-.cap.top { font-size: 11px; }
+.cap.top { font-size: 13px; }
+.cap .kw { fill: var(--warm-bright); font-weight: 700; }
 .panel-h { font-family: var(--mono); font-size: 12px; fill: var(--ink-soft); opacity: 0; transition: opacity 0.5s ease; }
 .panel-h.on { opacity: 1; }
 

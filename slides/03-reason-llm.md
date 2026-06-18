@@ -35,7 +35,14 @@ layout: default
 clicks: 8
 ---
 
-<!-- NEXT-TOKEN PREDICTOR — prompt → tokens → numbers → weights → predict → loop -->
+<!-- NEXT-TOKEN PREDICTOR — same pipeline, question prompt.
+     The prompt is a QUESTION ("What's the best Salesforce acquisition?"); on
+     arrival the grey field hugs the question with NO cursor; the caret appears
+     only once the first token (MuleSoft) is generated; the first distribution
+     is a CLOSE race (MuleSoft just ahead, Slack = Informatica, Tableau behind)
+     so "ranked guess, not a fact" lands harder; the vector/weights captions are
+     larger and sit lower; the weights caption names training vs inference.
+     See NextTokenPredictor.vue. -->
 
 <div class="demo-stage">
   <div class="demo-head">
@@ -46,100 +53,9 @@ clicks: 8
 </div>
 
 <!--
-This one slide is the whole mechanism end to end: how the text you type becomes the next word, then
-the word after that. Eight beats — don't rush, each click is one idea. The caret keeps blinking to
-signal "still generating".
-
-SET-UP (before any click): on screen is just the input field labelled "prompt" — "The best
-Salesforce acquisition is" — with a blinking cursor, exactly what a user types in a chat box. Say:
-"Here's our prompt. To us it's five English words. The model can't read words at all — so step one,
-it has to chop them up."
-
-[click 1 — TOKENISE] The input field splits IN PLACE — same line, same position — into token chips.
-KEY TEACHING POINT: these are *tokens*, not words. Tokens are sub-word fragments — notice "Salesforce"
-splits into "Sales" + "force", and "acquisition" into "acqui" + "sition". Why: the model has a fixed
-vocabulary of ~100k common fragments and builds anything from those Lego bricks, so it's never stumped
-by a new or rare word. Rule of thumb for the room: ~4 characters per token, ~¾ of a word on average.
-This is also exactly what you're billed on — "tokens in, tokens out".
-
-[click 2 — NUMBERS] Each token drops into its own COLUMN OF NUMBERS. This is the step that makes
-everything else possible: text becomes maths. Each token is turned into a fixed-length list of
-numbers — a "vector" — and that vector IS the token's meaning to the model. The values on screen are
-illustrative (real models use hundreds to thousands per token; I'm showing five). Intuition: each
-slot captures some learned aspect of meaning, and tokens used in similar ways get similar-looking
-columns. "This grid of numbers is the entire input, as the machine sees it."
-
-[click 3 — WEIGHTS] Those input numbers flow into the model itself — and the model is nothing but
-another, vastly bigger grid of numbers: the WEIGHTS. Point at the printed values. These are the
-"billions of parameters" you hear about — for a frontier model, hundreds of billions to over a
-trillion. Crucial contrast: the input numbers CHANGE every prompt, but these weights are FROZEN —
-set once during training, then fixed. Training = showing the model the internet and nudging these
-numbers until its guesses got good. "Running" it is just multiplying your input through this fixed
-grid — that's the sweep crossing it once. No facts looked up; it's arithmetic over learned numbers.
-
-[click 4 — PREDICT (token 1)] Out comes the answer: a probability for EVERY token in the vocabulary —
-showing the top four as a bar chart, height = likelihood. MuleSoft wins at 44%, the tall warm bar.
-Two deliberate things: (1) it's not a fact, it's a distribution — a ranked guess; (2) I did NOT sort
-the bars tallest-first — the winner sits in the middle, because the model scores the whole vocabulary
-at once and "highest probability" has nothing to do with position. It commits the winner — "MuleSoft"
-joins the SAME token row, in warm = generated text, and a matching NEW number column slides into the
-grid: the longer text is now the input.
-
-[click 5 — LOOP (token 2)] Here's the engine. It takes the new, longer text — prompt + "MuleSoft" —
-and feeds the WHOLE thing back through the SAME pipeline. Watch the weight grid sweep again: that's a
-second forward pass; another number column appears. New distribution, new winner: a comma at 74%. It
-appends the ",".
-
-[click 6 — LOOP (token 3)] And again. Prompt + "MuleSoft" + "," goes back in, sweep replays, a column
-is added, out comes "obviously" at 52%. Append. Make the point that nothing here is planned ahead —
-each word is chosen only once the previous one exists; the "sentence" emerges one token at a time.
-
-[click 7 — LOOP (token 4)] One more pass and the model decides it's done the thought: a period "."
-wins at 63%. Append. The row now reads "…is MuleSoft, obviously." — every generated token sitting in
-the same line as the original prompt, and one number column per token.
-
-[click 8 — THE LOOP, named] Land it: prompt → tokens → numbers → weights → a probability → pick →
-append → feed the whole thing back. "Everything that feels like intelligence is this loop, run fast
-at enormous scale. Notice what's NOT here: no plan, and no memory — each pass starts cold from the
-text in front of it. Hold that thought; it's the key to the whole back half of the talk."
-
-HOW DOES IT STOP? (likely question) There's no "nothing" with a probability — stopping is just
-another ordinary token winning the distribution. The vocabulary includes a special END-OF-SEQUENCE
-token (EOS = End Of Sequence; written <eos> / <|endoftext|>, or for chat models an end-of-turn marker
-like <|eot_id|> / <|im_end|>). It sits in the vocab right next to "the" and "MuleSoft", and the model
-scores it on every pass. When the model has finished the thought, that EOS token is the tallest bar —
-it wins, we halt. So it's not the ABSENCE of a token; it's the PRESENCE of a learned "I'm done" token
-(real text in training ended, and those endings were marked with it). Footnote if pressed: the runtime
-can also force a stop independently of the model — a max_tokens cap (the "cut off mid-sentence" case)
-or a user-supplied stop sequence. "Finished naturally" = model emitted EOS; "cut off" = a limit hit
-first.
--->
-
----
-layout: default
-clicks: 8
----
-
-<!-- NEXT-TOKEN PREDICTOR (alternate, V2) — same pipeline, question prompt.
-     The prompt is a QUESTION ("What's the best Salesforce acquisition?"); on
-     arrival the grey field hugs the question with NO cursor; the caret appears
-     only once the first token (MuleSoft) is generated; the first distribution
-     is a CLOSE race (MuleSoft just ahead, Slack = Informatica, Tableau behind)
-     so "ranked guess, not a fact" lands harder; the vector/weights captions are
-     larger and sit lower. See NextTokenPredictorV2.vue. -->
-
-<div class="demo-stage">
-  <div class="demo-head">
-    <div class="kicker">How an LLM generates text</div>
-    <h2>How a prompt becomes a <span class="grad-warm">prediction</span></h2>
-  </div>
-  <NextTokenPredictorV2 />
-</div>
-
-<!--
-Alternate run of the same mechanism — this time the prompt is a QUESTION, the way people actually use
-a chat box. Eight beats, one idea per click; the caret only starts blinking once the model is actually
-generating.
+This one slide is the whole mechanism end to end: how the text we type becomes the next token, then the
+one after that. The prompt is a QUESTION, the way people actually use a chat box. Eight beats, one idea
+per click; the caret only starts blinking once the model is actually generating.
 
 SET-UP (before any click): on screen is just the input field labelled "prompt" — "What's the best
 Salesforce acquisition?" — sized to the question, no cursor. It's a plain typed question, nothing has
@@ -157,7 +73,11 @@ are illustrative (real models use hundreds to thousands per token).
 
 [click 3 — WEIGHTS] Those numbers flow into the model — itself just a vastly bigger grid of numbers: the
 WEIGHTS. The "billions of parameters." Input numbers change every prompt; the weights are FROZEN, set
-once in training. Running it = multiplying the input through this fixed grid — the sweep crossing once.
+once in TRAINING. Now name the two halves of an LLM's life, the caption under the grid spells it out:
+fixing those billions of weights, once, is TRAINING; running one forward pass through them to produce
+output — the sweep crossing the grid once — is INFERENCE. Everything from here on (every token we
+generate, every API call we'll make later) is inference: the weights never change again. Hold "one pass
+= inference" — it's why the model is stateless and why we ground it by changing the INPUT, not the weights.
 
 [click 4 — PREDICT (token 1)] Out comes a probability for EVERY token in the vocabulary — top four as
 bars. Here's the teaching beat: it's a CLOSE race. MuleSoft is only just ahead at 30%, Slack and
@@ -177,8 +97,22 @@ token is chosen only once the previous one exists.
 reads "…acquisition? MuleSoft, obviously."
 
 [click 8 — THE LOOP, named] Land it: prompt → tokens → numbers → weights → a probability → pick → append
-→ feed it all back. Everything that feels like intelligence is this loop at scale. And notice that first
-near-tie: there's no plan and no memory — each pass starts cold from the text in front of it.
+→ feed it all back. Everything that feels like intelligence is this loop at scale — and every pass is one
+INFERENCE over the same frozen weights. And notice that first near-tie: there's no plan and no memory —
+each pass starts cold from the text in front of it.
+
+(Aside, when useful) Tokens are also exactly what we're billed on — "tokens in, tokens out".
+
+HOW DOES IT STOP? (likely question) There's no "nothing" with a probability — stopping is just
+another ordinary token winning the distribution. The vocabulary includes a special END-OF-SEQUENCE
+token (EOS = End Of Sequence; written <eos> / <|endoftext|>, or for chat models an end-of-turn marker
+like <|eot_id|> / <|im_end|>). It sits in the vocab right next to "the" and "MuleSoft", and the model
+scores it on every pass. When the model has finished the thought, that EOS token is the tallest bar —
+it wins, we halt. So it's not the ABSENCE of a token; it's the PRESENCE of a learned "I'm done" token
+(real text in training ended, and those endings were marked with it). Footnote if pressed: the runtime
+can also force a stop independently of the model — a max_tokens cap (the "cut off mid-sentence" case)
+or a user-supplied stop sequence. "Finished naturally" = model emitted EOS; "cut off" = a limit hit
+first.
 -->
 
 ---

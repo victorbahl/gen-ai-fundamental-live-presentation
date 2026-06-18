@@ -57,23 +57,34 @@ sits AFTER the first `---` frontmatter (the pattern `06-close.md` always used). 
 files starting with `---`, never a leading comment.
 
 Components: `Hero.vue` (Archetype A), `PartOpener.vue` (part-opener hero w/ spine bar),
-`Timeline.vue`, `NextTokenPredictor.vue`, `NextTokenPredictorV2.vue`, `AttentionFlip.vue`,
+`Timeline.vue`, `NextTokenPredictor.vue`, `AttentionFlip.vue`,
 `ContextWindow.vue`, `AgentContextWindow.vue`, `StatelessReplay.vue`, `McpEnvelope.vue`,
 `McpHandshake.vue`, `AgentLoop.vue`, `Hallucination.vue`, `Grounding.vue`.
 
-`NextTokenPredictorV2.vue` is an ALTERNATE of `NextTokenPredictor.vue` (user, 2026-06-18), placed as
-a SECOND slide immediately after the original in `03-reason-llm.md` (same title "How a prompt becomes
-a prediction"). Same D5 pipeline + `clicks:8`, with these deliberate differences vs the original
-(keep BOTH — don't merge): (1) prompt is a QUESTION — "What's the best Salesforce acquisition?";
-(2) "acquisition" stays ONE token (only "What's"→What+'s and "Salesforce"→Sales+force split);
-(3) on arrival the grey input field hugs the QUESTION TEXT (width = text length, not the chip row)
-and shows NO cursor; (4) the warm caret appears ONLY after the first token (MuleSoft) is generated
-(gated on `predicting`), then rides the trailing edge + blinks; (5) the FIRST distribution is a CLOSE
-race — MuleSoft .30 (just ahead), Slack .24 = Informatica .24 (tied), Tableau .14 — so "ranked guess,
-not a fact" lands harder (later steps unchanged); (6) the vector/weights explanatory captions are
-larger (`.cap` 12px / `.cap.top` 13px, fill `--ink-soft`) and sit lower (caption `y` +12 below grids).
-NB: the weight-sweep clipPath id is `wclipv2` (must differ from the original's `wclip` — duplicate SVG
-ids across two on-deck slides would collide).
+`NextTokenPredictor.vue` — "how a prompt becomes a prediction", `clicks:8`, the D5 pipeline (prompt →
+tokenise → numbers → weights → predict → loop). REWORKED (user, 2026-06-18): the old "The best
+Salesforce acquisition is" statement version was REPLACED by the question version below (the old
+component + its slide were DELETED — do not resurrect a second predictor slide; there is ONE).
+Design decisions, all per user: (1) prompt is a QUESTION — "What's the best Salesforce acquisition ?"
+(space before "?" telegraphs it's its OWN token); (2) "acquisition" stays ONE token (only
+"What's"→What+'s and "Salesforce"→Sales+force split); (3) on arrival the grey input field hugs the
+QUESTION TEXT (width = text length, not the chip row) and shows NO cursor; (4) the warm caret appears
+ONLY after the first token (MuleSoft) is generated (gated on `predicting`), then rides the trailing
+edge + blinks; (5) the FIRST distribution is a CLOSE race — MuleSoft .30 (just ahead), Slack .24 =
+Informatica .24 (tied), Tableau .14 — so "ranked guess, not a fact" lands harder (later steps
+unchanged); (6) the explanatory captions are larger (`.cap` 12px / `.cap.top` 13px, fill `--ink-soft`)
+and two-line; (7) INFERENCE is named here (closes the long-standing TODO): the weights caption reads
+"billions · learned once = training" / "one pass through them = inference", the two keywords in warm
+`.kw`, and the WEIGHTS speaker-note beat spells out training vs inference + ties it to stateless/grounding.
+LAYOUT: (a) the "tokens — sub-word pieces" caption is centred under the prompt row via computed
+`PROMPT_MID` and sits at `y=92`; (b) the whole pipeline below the prompt row (numbers grid, weights,
+prediction bars) is wrapped in `<g class="lower">` shifted `translateY(36px)` so it isn't crowded
+against the tokens line (viewBox height bumped 400→436); (c) the "each token's meaning…" caption is
+LEFT-aligned (`text-anchor="start"`) to `NUMCAP_X` = left edge of the first vector column; (d) long
+numbers-grid column headers are truncated via `headLabel()` (>6 chars → 5+`…`) so "acquisition" doesn't
+overlay "force"; (e) the numbers→weights arrow is DYNAMIC — centred in the gap between the numbers
+grid's VISIBLE right edge (`numRightEdge`, grows as tokens generate) and the weights grid (`WX`), so it
+repositions every step.
 
 `Hallucination.vue` + `Grounding.vue` are the Part-2 closing PAIR (after the "Prediction→reasoning"
 claim). HALLUCINATION (clicks:2): two cards — the model's fluent answer + a 94% confidence gauge
@@ -278,13 +289,11 @@ session / offload). Segment order is FIXED (system → … → free) so cells on
 - Open / not done: visual QA pass; a planned "v2" polish of `NextTokenPredictor.vue`; PDF/PPTX
   export (needs `playwright-chromium`, whose browser download is sandbox-blocked — install to
   project `./.pw-browsers` with sandbox off); the timeline above/below-axis layout at real res.
-- **TODO (user, 2026-06-17): introduce the notion of INFERENCE somewhere.** The deck never names
-  "inference" — the act of running the trained model forward to produce output (one forward pass over
-  frozen weights), as distinct from *training*. Natural home is Part 2 (LLMs): it's exactly what the
-  NextTokenPredictor's compute-sweep IS, and it ties into the stateless truth (each API call = one
-  fresh inference, weights frozen, no memory carried) and grounding (we change the *context* fed to
-  inference, not the weights). Name it explicitly and connect it to those existing beats. NOT yet
-  built.
+- **DONE (user, 2026-06-18): the INFERENCE notion is now named.** It lives in `NextTokenPredictor.vue`
+  at the WEIGHTS beat: the caption under the weights grid reads "billions · learned once = training" /
+  "one pass through them = inference" (the two keywords highlighted warm via `.kw`), and the WEIGHTS
+  speaker note spells out training vs inference and ties it to the stateless truth + grounding (we change
+  the *context* fed to inference, not the weights). Was: "TODO — deck never names inference."
 - The 7 hero backgrounds are gradient placeholders; drop real photos at `public/img/cover.jpg`,
   `part-1.jpg`, `part-2.jpg`, `part-2b.jpg`, `part-3.jpg`, `part-4.jpg`, `close.jpg`.
 - The on-slide photo-placeholder corner tags were removed (user, 2026-06-17). `Hero.vue` no longer
