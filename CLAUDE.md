@@ -43,18 +43,38 @@ Every rule the user gives is recorded here and must be respected on every slide.
   — it holds the answer key + scores and is the only place that knows who's right; phones
   (`public/battle.html`) only get the question (text+options, NO `correct`), live "answered" counts,
   and their OWN rank. Reuses the AnyCable + Netlify infra. Pieces: `components/battle/useBattle.ts`
-  (engine: listen players/answers, score BASE 500 + SPEED 500*remaining-fraction, push state),
-  `battleConfig.ts` (questions + answer key + shared singleton `battle()`; `BATTLE_WS_URL` here, and
-  `battleGroupId()` — the ROOM: `?groupId=<id>` in the deck URL forces a fixed shareable room, else a
-  FRESH random room generated once + kept stable for the browser session via sessionStorage, so every
-  run starts clean and never collides with old scores; SSR-safe, falls back to `genai-battle` at build
-  time). `BattleLobby.vue` (QR + live names; copy is "Scan. Name yourself. Play."), `BattleQuestion.vue`
-  (clicks:2 — open→lock→reveal; reuses the addon's `SlideQuizQR.vue`), `BattleLeaderboard.vue`
-  (clicks:3 — podium reveals 3rd→2nd→1st). Functions: `netlify/functions/battle-{shared,join,answer,
-  state}.mts` (3 streams: players/answers/state). THEME: Battle slides are NORMAL themed slides — they
-  read the standard tokens and follow Slidev's day/night toggle (the old forced-dark `.battle-slide`
-  override was removed 2026-06-19); only `.battle-slide { padding: 0 }` remains, for full-bleed.
-  Scoring + the "no `correct` in the broadcast payload" invariant were verified (Node test + grep).
+  (engine: listen players/answers, score, push state). SCORING is deliberately SIMPLE + bulletproof
+  (user: "simplify, no timer"): correct = 1000 pts FIXED, wrong = 0 — no speed bonus, no countdown, no
+  cross-device clock (`POINTS` const; the old BASE+SPEED+timestamp model + `seconds`/`questionStartedAt`
+  were removed 2026-06-19). SYNC RELIABILITY: state is pushed immediately on change AND re-broadcast on
+  a 2s HEARTBEAT (`HEARTBEAT_MS`, started in `connect()`, cleared in `disconnect()`). The heartbeat is
+  the key fix for "move slide → phone didn't update": a phone that missed a one-shot broadcast (signal
+  blip, backgrounded tab, late join, reconnect) self-heals within ~2s, AND the steady traffic keeps the
+  Netlify function warm (kills cold-start lag). All three battle slides drive their phase via
+  **`onSlideEnter`, NOT `onMounted`** — Slidev keeps slides mounted + pre-renders neighbours, so
+  `onMounted` fired at the wrong time and broke back-navigation (revisiting the podium never re-pushed
+  `final`). `battleConfig.ts` (questions + answer key + shared singleton `battle()`; `BATTLE_WS_URL`
+  here, and `battleGroupId()` — the ROOM: `?groupId=<id>` in the deck URL forces a fixed shareable room,
+  else a FRESH random room generated once + kept stable for the browser session via sessionStorage, so
+  every run starts clean and never collides with old scores; SSR-safe, falls back to `genai-battle` at
+  build time). `BattleLobby.vue` (QR + live names; copy is "Scan. Name yourself. Play."),
+  `BattleQuestion.vue` (clicks:2 — open→lock→reveal, shows OPEN/LOCKED not a timer; reuses the addon's
+  `SlideQuizQR.vue`), `BattleLeaderboard.vue` (clicks:3 — podium reveals 3rd→2nd→1st). PHONE
+  (`public/battle.html`): incoming state never re-renders the join form (the heartbeat was wiping a
+  half-typed name + stealing focus); a render-SIGNATURE guard skips no-op heartbeats (no flicker, never
+  interrupts a tap). Functions: `netlify/functions/battle-{shared,join,answer,state}.mts` (3 streams:
+  players/answers/state). THEME: Battle slides are NORMAL themed slides — they read the standard tokens
+  and follow Slidev's day/night toggle (the old forced-dark `.battle-slide` override was removed
+  2026-06-19); only `.battle-slide { padding: 0 }` remains, for full-bleed.
+  INFRA — AnyCable PUBLIC MODE REQUIRED: the Fly app (`vb-cable-4vsc.fly.dev`) MUST have a BLANK
+  Application secret (plus.anycable.io → the cable → clear "Application secret"). It's a public-streams
+  app: deck + phones connect with NO token. A non-blank app secret makes the WS handshake return
+  `{"type":"disconnect","reason":"unauthorized"}` / close "Auth Failed" → deck shows 0 players + phones
+  stuck "waiting for the host" (broadcasts still 200 because they use the separate Broadcast key, which
+  STAYS set + matches `ANYCABLE_BROADCAST_KEY`). This bit us 2026-06-19. RPC URL/key stay empty.
+  Scoring + sync + the "no `correct` in the broadcast payload" invariant were verified end-to-end
+  against PROD (Node subscribe→broadcast→receive + full join/answer/state flow; `/tmp/anycable-test.mjs`,
+  `/tmp/battle-flow.mjs`).
 - SPINE HISTORY: the original "Compute → Reason → Act" triad was retired for **AI → LLMs → Agents**.
   Do NOT resurrect the two dead part-opener heroes ("Seventy years in one breath", "It predicts the
   next word. That's it."). Tools/MCP + agents are ONE part (Part 3 "Agents").
@@ -226,11 +246,12 @@ tool output is big). Both use striped cells (45° gradient) for the compressed/o
 ## Open / current state
 
 - **Build compiles clean** (`slidev build`, verified 2026-06-19 after the quiz→battle rework).
-- **BATTLE follow-ups (user-flagged, not blockers):** (1) the opener questions still test concepts
-  taught later in the deck — improve them to be fair as an icebreaker; (2) may add MORE quiz rounds at
-  the END later; (3) the Battle is now theme-aware — do a visual QA pass in BOTH light and dark (it was
-  built dark-only, so check the QR panel, option cards, podium rank numbers, and accent legibility on
-  the light canvas). Functions can only be exercised on the deployed site (Engineering lesson 9).
+- **BATTLE — live sync VERIFIED end-to-end against prod 2026-06-19** (heartbeat resync + fixed-point
+  scoring + onSlideEnter timing; public-streams AnyCable). Follow-ups (user-flagged, not blockers):
+  (1) the opener questions still test concepts taught later in the deck — improve them to be fair as an
+  icebreaker; (2) may add MORE quiz rounds at the END later; (3) the Battle is theme-aware — do a visual
+  QA pass in BOTH light and dark (built dark-only originally; check QR panel, option cards, podium rank
+  numbers, accent legibility on the light canvas). Functions only run on the deployed site (lesson 9).
 - **KNOWN MINOR (fix later, do NOT block):** `ToolRoundtrip`'s right-hand column (two stacked cards)
   sits a touch tall — its lower card slightly kisses the payoff band at real canvas res (980×551);
   stage height was mid-adjustment (currently 330px). Do a click-by-click pass on
@@ -300,6 +321,26 @@ tool output is big). Both use striped cells (45° gradient) for the compressed/o
     Cost: wasted migration churn + a from-scratch battle rebuild. Lesson: when the user names a concrete
     product/behaviour, verify the candidate library actually does THAT (read its model) before wiring or
     re-architecting around it.
+
+11. **TEST BOTH HALVES OF A PUB/SUB SYSTEM — broadcast OK ≠ subscribe OK.** The battle's HTTP
+    broadcast functions returned `{"ok":true}` (they sign with the Broadcast key), so it LOOKED wired —
+    but the WebSocket SUBSCRIBE side was never tested and the server rejected every client connection
+    (`"unauthorized"` / "Auth Failed") because the AnyCable app had a non-blank Application secret
+    (it must be PUBLIC mode — blank app secret — for tokenless deck/phone clients). Symptom: deck 0
+    players + phones stuck "waiting". Lesson: for any pub/sub, verify the FULL loop
+    (subscribe→broadcast→RECEIVE), not just that the publish endpoint 200s. A standalone Node script
+    using the real client lib (`/tmp/anycable-test.mjs`, `/tmp/battle-flow.mjs`) nails this in seconds.
+
+12. **One-shot broadcasts are fragile — add a heartbeat resync.** State pushed only on change means
+    any single missed/late message strands a client until the NEXT change. Re-broadcasting current
+    state on an interval (battle uses 2s) makes clients self-heal (missed msg, late join, reconnect,
+    backgrounded tab) AND keeps serverless functions warm (no cold-start lag). Make the receiver
+    idempotent (signature-guard the render) so heartbeats don't flicker or interrupt input.
+
+13. **Drive Slidev slide-phase side-effects from `onSlideEnter`, NOT `onMounted`.** Slidev keeps slides
+    mounted and pre-renders neighbours, so `onMounted` fires once at an unpredictable time and never
+    re-fires on back-navigation. Anything that must happen "when the host lands on THIS slide" (e.g.
+    pushing a game phase to phones) belongs in `onSlideEnter` (+ `onSlideLeave` to undo).
 
 ## Rules (newest at the bottom)
 
