@@ -8,9 +8,11 @@
     "export": "slidev export"
   },
   "dependencies": {
+    "@anycable/serverless-js": "^0.2.2",
     "@slidev/cli": "52.15.2",
     "@slidev/theme-default": "^0.25.0",
     "slidev-addon-slide-quiz": "^0.3.2",
+    "valibot": "^1.0.0",
     "vue": "^3.5.13"
   }
 }
