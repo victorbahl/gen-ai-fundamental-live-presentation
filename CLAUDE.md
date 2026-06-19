@@ -58,10 +58,20 @@ Every rule the user gives is recorded here and must be respected on every slide.
   **`onSlideEnter`, NOT `onMounted`** — Slidev keeps slides mounted + pre-renders neighbours, so
   `onMounted` fired at the wrong time and broke back-navigation (revisiting the podium never re-pushed
   `final`). `battleConfig.ts` (questions + answer key + shared singleton `battle()`; `BATTLE_WS_URL`
-  here, and `battleGroupId()` — the ROOM: `?groupId=<id>` in the deck URL forces a fixed shareable room,
-  else a FRESH random room generated once + kept stable for the browser session via sessionStorage, so
-  every run starts clean and never collides with old scores; SSR-safe, falls back to `genai-battle` at
-  build time). `BattleLobby.vue` (QR + live names; copy is "Scan. Name yourself. Play."; the player
+  here, and `battleGroupId()` — the ROOM, URL-AUTHORITATIVE (changed 2026-06-19, user: "I want to see
+  the groupId in the URL; absent → create, present → use"): `?groupId=<id>` in the deck URL wins; if
+  absent we MINT a fresh `room-xxxx` (cached in-memory, side-effect-free here) and the LOBBY writes it
+  back into the URL via vue-router (`router.replace`, NOT raw history.replaceState — Slidev spreads the
+  current query onto every slide nav, so a raw write would be dropped on the next advance). So the room
+  is always visible/shareable AND survives a deck RELOAD (the query string persists). The old
+  sessionStorage `ROOM_KEY` layer was removed. SSR-safe, falls back to `genai-battle` at build time.
+  RELOAD ROSTER FIX (user: "reload loses players even in the same room"): the deck holds the roster
+  only IN MEMORY, so a deck reload empties it; phones SELF-HEAL — the phone re-POSTs its join whenever
+  it receives a state where it's joined but ABSENT from the roster (debounced ≤1/3s), so a deck (or
+  phone) reload re-populates the lobby within a heartbeat. Caveat: a mid-game deck reload resets scores
+  to 0 (no persistence) — players reappear but start fresh; acceptable degraded behaviour.
+  `BattleLobby.vue` (QR + live names; copy is "Scan. Name yourself. Play."; reflects the room into the
+  deck URL on slide-enter via vue-router; the player
   grid is sized to hold ~40 names without scroll: compact chips, ellipsis on long names, multi-column
   wrap),
   `BattleQuestion.vue` (clicks:1 — open→reveal, ONE click; the old open→lock→reveal LOCK step was

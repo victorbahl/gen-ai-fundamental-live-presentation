@@ -6,15 +6,29 @@
  * live. Presenter advances to the first question on the next slide.
  */
 import { computed } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import { onSlideEnter } from "@slidev/client";
 import SlideQuizQR from "../node_modules/slidev-addon-slide-quiz/components/SlideQuizQR.vue";
 import { battle, BATTLE_WS_URL, battleGroupId } from "./battle/battleConfig";
 
 const b = battle();
+const route = useRoute();
+const router = useRouter();
+
+// Reflect the resolved room into the deck URL (so it's visible/shareable and
+// survives a reload). Done THROUGH vue-router — Slidev spreads the current query
+// onto every slide navigation, so writing it here keeps `?groupId=` across all
+// later slides; a raw history.replaceState would be dropped on the next advance.
+function syncGroupIdToUrl() {
+  const gid = battleGroupId();
+  if (route.query.groupId === gid) return;          // already there (forced or written)
+  router.replace({ query: { ...route.query, groupId: gid } }).catch(() => {});
+}
+
 // onSlideEnter (not onMounted): Slidev keeps slides mounted, so onMounted fires
 // once — possibly during pre-render of an adjacent slide. We want the phase set
 // every time the host actually lands here (incl. navigating back).
-onSlideEnter(() => { b.toLobby(); });
+onSlideEnter(() => { syncGroupIdToUrl(); b.toLobby(); });
 
 const joinUrl = computed(() => {
   const base = typeof window !== "undefined" ? window.location.origin : "";

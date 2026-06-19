@@ -7,11 +7,13 @@
  *
  * wsUrl: the public AnyCable URL the audience's phones connect to.
  *
- * groupId (the "room"): resolved at runtime by `battleGroupId()`:
- *   - `?groupId=<id>` in the deck URL  → that exact room (share the link to rejoin it).
- *   - otherwise                        → a FRESH random room, generated once and kept
- *     stable for this browser session, so every rehearsal/run starts clean automatically
- *     and never collides with a previous run's scores.
+ * groupId (the "room"): resolved at runtime by `battleGroupId()`. The URL is the
+ * single source of truth:
+ *   - `?groupId=<id>` present in the deck URL → that exact room.
+ *   - absent → generate a FRESH random room AND write it into the URL (so it's
+ *     visible + shareable, and survives a page RELOAD because the query string
+ *     stays). The deck is the only place a room is minted; phones always read
+ *     their room from the QR/URL, never generate one.
  * The lobby bakes whatever we resolve into the phone join URL, so phones always
  * land in the same room as the deck — no manual sync.
  */
@@ -22,7 +24,6 @@ export const BATTLE_WS_URL = "wss://vb-cable-4vsc.fly.dev/cable";
 // SSR placeholder (slidev build runs this in Node, where there's no window and
 // nothing actually connects). The real room is resolved in the browser below.
 const SSR_GROUP_ID = "genai-battle";
-const ROOM_KEY = "battle-room-id";
 
 let _groupId: string | null = null;
 
@@ -45,6 +46,12 @@ function freshRoom(): string {
 /**
  * The active battle room. Cached after first resolution so the deck and the QR
  * always agree, and slide navigation never switches rooms mid-game.
+ *
+ * URL is authoritative: a present `?groupId` wins; if absent we MINT one (cached
+ * in-memory). The lobby is responsible for writing a freshly-minted id back into
+ * the deck URL — and it does so THROUGH vue-router (see BattleLobby), not raw
+ * history, so Slidev's per-navigation query-preservation keeps it across slides
+ * and a reload resurfaces the same room. Resolution here is side-effect-free.
  */
 export function battleGroupId(): string {
   if (_groupId) return _groupId;
@@ -53,14 +60,7 @@ export function battleGroupId(): string {
   const forced = new URLSearchParams(window.location.search).get("groupId");
   if (forced) { _groupId = forced; return _groupId; }
 
-  try {
-    const stored = sessionStorage.getItem(ROOM_KEY);
-    if (stored) { _groupId = stored; return _groupId; }
-  } catch { /* private mode — fall through to a non-persisted room */ }
-
-  const room = freshRoom();
-  try { sessionStorage.setItem(ROOM_KEY, room); } catch { /* ignore */ }
-  _groupId = room;
+  _groupId = freshRoom(); // minted now; the lobby reflects it into the URL
   return _groupId;
 }
 

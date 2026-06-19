@@ -127,7 +127,24 @@
     // the player is still typing their name (not joined), do NOT re-render — that
     // would wipe the half-typed input and steal focus. Once joined, render() is
     // signature-guarded so a heartbeat with no real change leaves the DOM alone.
-    stateCh.on('message', (msg) => { lastState = msg; if (joined) render(); });
+    stateCh.on('message', (msg) => { lastState = msg; maybeReannounce(msg); if (joined) render(); });
+
+    // RE-ANNOUNCE: the deck holds the roster only in memory, so if the DECK
+    // reloads (or we briefly dropped) its player list resets and we vanish from
+    // the lobby. Whenever a state arrives in which we're joined but absent from
+    // the roster, re-POST our join so the host re-adds us. Debounced so a burst
+    // of heartbeats (all missing us until the host catches up) fires just once.
+    let lastReannounce = 0;
+    function maybeReannounce(msg) {
+      if (!joined || !myName) return;
+      const roster = Array.isArray(msg?.players) ? msg.players : [];
+      const present = roster.some(p => p.sessionId === sessionId);
+      if (present) return;
+      const now = (typeof performance !== 'undefined' ? performance.now() : 0);
+      if (now - lastReannounce < 3000) return;   // at most once / 3s
+      lastReannounce = now;
+      post(ep.join, { name: myName, sessionId, groupId });
+    }
 
     // --- joining ---
     function showJoin(msg) {
