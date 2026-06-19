@@ -7,15 +7,17 @@
  *
  * Slide usage:  <BattleLeaderboard /> with `clicks: 3`
  */
-import { computed, onMounted } from "vue";
-import { useSlideContext } from "@slidev/client";
+import { computed } from "vue";
+import { useSlideContext, onSlideEnter } from "@slidev/client";
 import { battle } from "./battle/battleConfig";
 
 const b = battle();
 const { $clicks } = useSlideContext();
 const c = computed(() => $clicks.value);
 
-onMounted(() => { b.final(); });
+// onSlideEnter (not onMounted): re-assert the final phase every time the host
+// lands here, so phones get the podium even on back-and-forth navigation.
+onSlideEnter(() => { b.final(); });
 
 const board = computed(() => b.leaderboard());
 const top3 = computed(() => board.value.slice(0, 3));

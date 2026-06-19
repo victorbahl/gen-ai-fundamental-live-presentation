@@ -11,7 +11,14 @@
  *   - broadcast: battle:<group>:state                              (battle-state function)
  *
  * Phases: lobby → question → locked → reveal → (next question…) → final
- * Speed scoring: correct = BASE + floor(SPEED * remainingFraction); wrong/none = 0.
+ * Scoring: deliberately SIMPLE + bulletproof — correct = POINTS (fixed), wrong = 0.
+ * No timer, no speed bonus, no cross-device clock dependency.
+ *
+ * SYNC RELIABILITY: state is pushed immediately on every change AND re-broadcast
+ * on a heartbeat (every HEARTBEAT_MS). The heartbeat means a phone that missed a
+ * single broadcast (signal blip, backgrounded tab, late join, reconnect) catches
+ * up within ~2s instead of being stuck until the next change — and the steady
+ * traffic keeps the Netlify function warm, killing cold-start lag.
  */
 import { reactive, readonly } from "vue";
 import { createCable } from "@anycable/web";
@@ -22,19 +29,18 @@ export interface BattleQuestion {
   question: string;
   options: BattleOption[];
   correct: string;      // option label — host-only, never sent to phones
-  seconds?: number;     // countdown for this question (default 20)
 }
 export interface Player {
   sessionId: string;
   name: string;
   score: number;
-  lastDelta: number;    // points won on the most recent question
+  lastDelta: number;    // points won on the most recent question (POINTS or 0)
   answeredQuiz: string | null;
   correctLast: boolean;
 }
 
-const BASE = 500;       // points for a correct answer
-const SPEED = 500;      // additional points scaled by how fast (full → 0 over the timer)
+const POINTS = 1000;          // points for a correct answer (fixed — no speed bonus)
+const HEARTBEAT_MS = 2000;    // re-broadcast current state this often (resync safety net)
 
 type Phase = "lobby" | "question" | "locked" | "reveal" | "final";
 
@@ -47,14 +53,13 @@ export function useBattle(opts: {
     phase: "lobby" as Phase,
     qIndex: -1,
     players: new Map<string, Player>(),
-    // per-question bookkeeping
-    questionStartedAt: 0,
     answeredCount: 0,
     connected: false,
   });
 
   const answer = opts.questions; // alias for brevity
   let cable: ReturnType<typeof createCable> | null = null;
+  let heartbeat: ReturnType<typeof setInterval> | null = null;
 
   // ---- connect & listen ---------------------------------------------------
   function connect() {
@@ -79,6 +84,19 @@ export function useBattle(opts: {
     answers.on("message", (m: any) => handleAnswer(m));
 
     state.connected = true;
+
+    // Heartbeat: re-broadcast the current state on an interval so phones that
+    // missed a one-shot push self-heal, late joiners/reconnects sync, and the
+    // serverless function stays warm. Idempotent — phones just re-render the
+    // same state. Guarded so we never stack intervals on re-connect.
+    if (!heartbeat) heartbeat = setInterval(() => { pushState(); }, HEARTBEAT_MS);
+  }
+
+  function disconnect() {
+    if (heartbeat) { clearInterval(heartbeat); heartbeat = null; }
+    try { cable?.disconnect(); } catch { /* ignore */ }
+    cable = null;
+    state.connected = false;
   }
 
   // ---- scoring ------------------------------------------------------------
@@ -104,16 +122,8 @@ export function useBattle(opts: {
     p.answeredQuiz = q.quizId;
     const correct = String(m.answer) === String(q.correct);
     p.correctLast = correct;
-    if (correct) {
-      const secs = (q.seconds ?? 20) * 1000;
-      const elapsed = Math.max(0, (m.at || Date.now()) - state.questionStartedAt);
-      const frac = Math.max(0, 1 - elapsed / secs);            // 1 = instant, 0 = at/after timeout
-      const delta = BASE + Math.floor(SPEED * frac);
-      p.lastDelta = delta;
-      p.score += delta;
-    } else {
-      p.lastDelta = 0;
-    }
+    p.lastDelta = correct ? POINTS : 0;                        // fixed points, no speed bonus
+    p.score += p.lastDelta;
     state.answeredCount += 1;
     pushState();
   }
@@ -174,7 +184,6 @@ export function useBattle(opts: {
     state.qIndex = index;
     state.phase = "question";
     state.answeredCount = 0;
-    state.questionStartedAt = Date.now();
     // reset per-question marks
     for (const p of state.players.values()) { p.answeredQuiz = null; p.lastDelta = 0; p.correctLast = false; }
     pushState();
@@ -186,6 +195,7 @@ export function useBattle(opts: {
   return {
     state: readonly(state),
     connect,
+    disconnect,
     connected: () => state.connected,
     players: () => [...state.players.values()],
     leaderboard,

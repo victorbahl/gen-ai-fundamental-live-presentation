@@ -105,10 +105,15 @@
     let lastState = null;   // latest host state
     let answeredFor = null; // quizId we've already answered
     let pickedLabel = null;
+    let lastSig = null;     // signature of the last painted view (skip no-op heartbeats)
 
     const cable = createCable(wsUrl, { protocol: 'actioncable-v1-ext-json' });
     const stateCh = cable.streamFrom(`battle:${groupId}:state`);
-    stateCh.on('message', (msg) => { lastState = msg; render(); });
+    // State arrives both on host changes AND on the host's ~2s heartbeat. While
+    // the player is still typing their name (not joined), do NOT re-render — that
+    // would wipe the half-typed input and steal focus. Once joined, render() is
+    // signature-guarded so a heartbeat with no real change leaves the DOM alone.
+    stateCh.on('message', (msg) => { lastState = msg; if (joined) render(); });
 
     // --- joining ---
     function showJoin(msg) {
@@ -146,6 +151,24 @@
       // Not joined yet → always the name form (unless we have a stored name).
       if (!joined) { showJoin(); return; }
 
+      // Heartbeat guard: if nothing the player sees has changed, leave the DOM
+      // untouched (no flicker, never interrupt a tap mid-press). Signature covers
+      // exactly what's rendered: phase, my score/rank, the active question, and
+      // whether I've answered it.
+      const s0 = lastState;
+      const me0 = meFromState();
+      const sig = JSON.stringify([
+        s0?.phase ?? null,
+        me0?.score ?? 0,
+        me0?.rank ?? null,
+        s0?.playerCount ?? 0,
+        s0?.question?.quizId ?? null,
+        answeredFor,
+        s0?.phase === 'final' ? (s0.leaderboard || []).map(p => [p.name, p.score]) : null,
+      ]);
+      if (sig === lastSig) return;
+      lastSig = sig;
+
       const s = lastState;
       if (!s) {
         app.innerHTML = `<div class="me"><div class="nm">${escapeHtml(myName)}</div></div>
@@ -178,7 +201,7 @@
         app.innerHTML = meHeader +
           `<p class="q">${escapeHtml(s.question.question)}</p>
            <div class="opts">${opts}</div>
-           <div class="status">${alreadyAnswered ? 'Locked in ✓ — hang tight' : 'Tap your answer — faster = more points'}</div>`;
+           <div class="status">${alreadyAnswered ? 'Locked in ✓ — hang tight' : 'Tap your answer'}</div>`;
         if (!alreadyAnswered) {
           app.querySelectorAll('.opt').forEach(b => {
             b.onclick = async () => {

@@ -1,16 +1,17 @@
 <script setup lang="ts">
 /**
  * One battle question, on screen. The host drives phases by CLICK:
- *   c0  question + options visible, answers OPEN, live "answered" counter + timer
+ *   c0  question + options visible, answers OPEN, live "answered" counter
  *   c1  LOCK answers (no more scoring)
- *   c2  REVEAL the correct option + this round's points
+ *   c2  REVEAL the correct option + who scored
  * Players answer on their phones; we never show the per-option distribution —
  * only how many have locked in. The correct answer is revealed on the last click.
+ * No timer: scoring is fixed-points (correct = POINTS, wrong = 0).
  *
  * Slide usage:  <BattleQuestion :index="0" /> with `clicks: 2`
  */
-import { computed, watch, onMounted, ref, onUnmounted } from "vue";
-import { useSlideContext } from "@slidev/client";
+import { computed, watch } from "vue";
+import { useSlideContext, onSlideEnter } from "@slidev/client";
 import { battle, BATTLE_QUESTIONS } from "./battle/battleConfig";
 
 const props = defineProps<{ index: number }>();
@@ -22,37 +23,21 @@ const q = computed(() => BATTLE_QUESTIONS[props.index]);
 const answered = computed(() => b.state.answeredCount);
 const total = computed(() => b.players().length);
 
-// Phase follows clicks while this slide is the active one.
+// Phase follows clicks. Driven off the click count, but only committed once this
+// slide is actually entered (onSlideEnter) — Slidev pre-renders adjacent slides,
+// so binding to onMounted could push a phase for a slide that isn't on screen yet.
 function syncPhase() {
   if (c.value <= 0) b.startQuestion(props.index);
   else if (c.value === 1) b.lock();
   else b.reveal();
 }
-onMounted(syncPhase);
+onSlideEnter(syncPhase);
 watch(c, syncPhase);
 
-// Lightweight countdown (display only; scoring uses real timestamps server-side).
-const secs = computed(() => q.value.seconds ?? 20);
-const left = ref(secs.value);
-let timer: any = null;
-function startTimer() {
-  left.value = secs.value;
-  clearInterval(timer);
-  timer = setInterval(() => {
-    if (c.value !== 0) { clearInterval(timer); return; }
-    left.value = Math.max(0, left.value - 1);
-    if (left.value === 0) clearInterval(timer);
-  }, 1000);
-}
-onMounted(startTimer);
-watch(c, (v) => { if (v === 0) startTimer(); });
-onUnmounted(() => clearInterval(timer));
-
 const revealed = computed(() => c.value >= 2);
-// Top movers this round (by points won), for the reveal beat.
+// Who scored this round, for the reveal beat (order = host receive order).
 const movers = computed(() =>
-  b.players().filter((p) => p.lastDelta > 0)
-    .sort((a, z) => z.lastDelta - a.lastDelta).slice(0, 3),
+  b.players().filter((p) => p.lastDelta > 0).slice(0, 3),
 );
 </script>
 
@@ -62,8 +47,8 @@ const movers = computed(() =>
       <div class="bq-num">Q{{ index + 1 }} / {{ BATTLE_QUESTIONS.length }}</div>
       <div class="bq-meta">
         <span class="bq-answered">{{ answered }}<span class="of">/{{ total }}</span> locked in</span>
-        <span class="bq-timer" :class="{ low: left <= 5, done: c >= 1 }">
-          {{ c >= 1 ? 'LOCKED' : left + 's' }}
+        <span class="bq-status" :class="{ open: c === 0, locked: c >= 1 }">
+          {{ c === 0 ? 'OPEN' : 'LOCKED' }}
         </span>
       </div>
     </div>
@@ -81,7 +66,7 @@ const movers = computed(() =>
 
     <transition name="fade">
       <div v-if="revealed" class="bq-reveal">
-        <span class="lead">Fastest correct:</span>
+        <span class="lead">Scored this round:</span>
         <template v-if="movers.length">
           <span v-for="(m, i) in movers" :key="m.sessionId" class="mv">
             <b>{{ m.name }}</b> +{{ m.lastDelta }}<span v-if="i < movers.length - 1"> ·</span>
@@ -101,10 +86,9 @@ const movers = computed(() =>
 .bq-meta { display: flex; gap: 18px; align-items: center; }
 .bq-answered { color: var(--ink-soft); font-weight: 700; font-size: 1.1rem; }
 .bq-answered .of { color: var(--ink-faint); font-weight: 600; }
-.bq-timer { font-weight: 900; font-size: 1.3rem; min-width: 4ch; text-align: right;
-  color: var(--cool-bright); }
-.bq-timer.low { color: var(--bad); }
-.bq-timer.done { color: var(--ink-faint); font-size: 1rem; letter-spacing: .1em; }
+.bq-status { font-weight: 900; font-size: 1rem; letter-spacing: .12em; text-align: right; }
+.bq-status.open { color: var(--cool-bright); }
+.bq-status.locked { color: var(--ink-faint); }
 
 .bq-q { font-size: 2.3rem; line-height: 1.15; margin: 10px 0 26px; }
 .bq-opts { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }

@@ -5,12 +5,16 @@
  * player count and the names lighting up as people join. No clicks needed; it's
  * live. Presenter advances to the first question on the next slide.
  */
-import { computed, onMounted } from "vue";
+import { computed } from "vue";
+import { onSlideEnter } from "@slidev/client";
 import SlideQuizQR from "../node_modules/slidev-addon-slide-quiz/components/SlideQuizQR.vue";
 import { battle, BATTLE_WS_URL, battleGroupId } from "./battle/battleConfig";
 
 const b = battle();
-onMounted(() => { b.toLobby(); });
+// onSlideEnter (not onMounted): Slidev keeps slides mounted, so onMounted fires
+// once — possibly during pre-render of an adjacent slide. We want the phase set
+// every time the host actually lands here (incl. navigating back).
+onSlideEnter(() => { b.toLobby(); });
 
 const joinUrl = computed(() => {
   const base = typeof window !== "undefined" ? window.location.origin : "";
