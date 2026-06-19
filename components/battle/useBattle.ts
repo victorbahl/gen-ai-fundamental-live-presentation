@@ -39,7 +39,7 @@ export interface Player {
   correctLast: boolean;
 }
 
-const POINTS = 1000;          // points for a correct answer (fixed — no speed bonus)
+const POINTS = 10;            // points for a correct answer (fixed — no speed bonus)
 const HEARTBEAT_MS = 2000;    // re-broadcast current state this often (resync safety net)
 
 type Phase = "lobby" | "question" | "locked" | "reveal" | "final";

@@ -23,6 +23,13 @@ const board = computed(() => b.leaderboard());
 const top3 = computed(() => board.value.slice(0, 3));
 const rest = computed(() => board.value.slice(3, 8));
 
+// Winners = everyone sharing the top score. With fixed 10-pt scoring, ties at
+// the top are common, so the crown isn't tied to "column 1" — it sits on any
+// podium player whose score equals the best. >0 guard: an all-zero board (or no
+// players) has no winner, so no crown floats over an empty podium.
+const topScore = computed(() => (board.value.length ? board.value[0].score : 0));
+function isWinner(p) { return !!p && topScore.value > 0 && p.score === topScore.value; }
+
 // Podium reveal order: 3rd at c>=1, 2nd at c>=2, 1st at c>=3.
 function shown(rank: number) {
   if (rank === 3) return c.value >= 1;
@@ -44,19 +51,21 @@ const third = computed(() => top3.value[2]);
     <div class="podium">
       <!-- 2nd -->
       <div class="col second" :class="{ in: shown(2) }">
+        <div class="crown" v-if="isWinner(second)">👑</div>
         <div class="who" v-if="second"><span class="medal">🥈</span>
           <span class="nm">{{ second.name }}</span><span class="sc">{{ second.score }}</span></div>
         <div class="bar"><span class="rk">2</span></div>
       </div>
       <!-- 1st -->
       <div class="col first" :class="{ in: shown(1) }">
-        <div class="crown">👑</div>
+        <div class="crown" v-if="isWinner(first)">👑</div>
         <div class="who" v-if="first"><span class="medal">🥇</span>
           <span class="nm">{{ first.name }}</span><span class="sc">{{ first.score }}</span></div>
         <div class="bar"><span class="rk">1</span></div>
       </div>
       <!-- 3rd -->
       <div class="col third" :class="{ in: shown(3) }">
+        <div class="crown" v-if="isWinner(third)">👑</div>
         <div class="who" v-if="third"><span class="medal">🥉</span>
           <span class="nm">{{ third.name }}</span><span class="sc">{{ third.score }}</span></div>
         <div class="bar"><span class="rk">3</span></div>

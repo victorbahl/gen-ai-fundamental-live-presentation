@@ -49,7 +49,6 @@
     .big .emoji { font-size: 3.2rem; }
     .big .line { font-size: 1.3rem; font-weight: 700; margin-top: 10px; }
     .big .sub { color: var(--soft); margin-top: 6px; }
-    .rank { font-size: 2.4rem; font-weight: 900; color: var(--warm); }
     .podium { display: grid; gap: 10px; margin-top: 8px; }
     .prow { display: flex; align-items: center; gap: 12px; background: var(--panel);
             border: 1px solid var(--line); padding: 12px 14px; border-radius: 12px; }
@@ -160,7 +159,6 @@
       const sig = JSON.stringify([
         s0?.phase ?? null,
         me0?.score ?? 0,
-        me0?.rank ?? null,
         s0?.playerCount ?? 0,
         s0?.question?.quizId ?? null,
         answeredFor,
@@ -178,8 +176,9 @@
 
       const me = meFromState();
       const score = me ? me.score : 0;
+      // No rank in the live header — players only learn standings at the podium.
       const meHeader = `<div class="me"><div class="nm">${escapeHtml(myName)}</div>
-        <div class="sc">${score} pts${me && me.rank ? ` · #${me.rank}` : ''}</div></div>`;
+        <div class="sc">${score} pts</div></div>`;
 
       if (s.phase === 'lobby') {
         app.innerHTML = meHeader +
@@ -225,10 +224,12 @@
       }
 
       if (s.phase === 'reveal' || s.phase === 'scores') {
-        const moved = me && typeof me.rank === 'number';
+        // Show their running score, never their rank — standings are saved for
+        // the final podium so there's a reveal to wait for.
         app.innerHTML = meHeader +
-          `<div class="big"><div class="rank">${moved ? '#' + me.rank : '—'}</div>
-           <div class="sub">of ${s.playerCount ?? '?'} players</div></div>`;
+          `<div class="big"><div class="emoji">👀</div>
+           <div class="line">Answer revealed</div>
+           <div class="sub">Look up at the screen — standings come at the end</div></div>`;
         return;
       }
 

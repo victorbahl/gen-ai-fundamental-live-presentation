@@ -68,7 +68,6 @@ export const BATTLE_QUESTIONS: BattleQuestion[] = [
   {
     quizId: "b1",
     question: "What does an LLM actually produce at each step?",
-    seconds: 20,
     options: [
       { label: "A", text: "The single true answer" },
       { label: "B", text: "A ranked guess for the next token" },
@@ -80,7 +79,6 @@ export const BATTLE_QUESTIONS: BattleQuestion[] = [
   {
     quizId: "b2",
     question: "Why can't a base model tell you our live order status?",
-    seconds: 20,
     options: [
       { label: "A", text: "It's too slow" },
       { label: "B", text: "Its knowledge is frozen & private data isn't in it" },
@@ -92,7 +90,6 @@ export const BATTLE_QUESTIONS: BattleQuestion[] = [
   {
     quizId: "b3",
     question: "In the agent loop, who decides the next step?",
-    seconds: 20,
     options: [
       { label: "A", text: "We hard-code every step" },
       { label: "B", text: "The model, from what it just observed" },
@@ -104,7 +101,6 @@ export const BATTLE_QUESTIONS: BattleQuestion[] = [
   {
     quizId: "b4",
     question: "What does MCP standardize?",
-    seconds: 20,
     options: [
       { label: "A", text: "A new model architecture" },
       { label: "B", text: "How an AI app discovers & calls tools over HTTP" },
@@ -116,7 +112,6 @@ export const BATTLE_QUESTIONS: BattleQuestion[] = [
   {
     quizId: "b5",
     question: "Grounding fixes hallucination by changing…",
-    seconds: 20,
     options: [
       { label: "A", text: "The model's weights, every time" },
       { label: "B", text: "The context we feed it (facts/tools)" },

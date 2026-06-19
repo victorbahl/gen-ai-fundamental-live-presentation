@@ -35,10 +35,8 @@ onSlideEnter(syncPhase);
 watch(c, syncPhase);
 
 const revealed = computed(() => c.value >= 2);
-// Who scored this round, for the reveal beat (order = host receive order).
-const movers = computed(() =>
-  b.players().filter((p) => p.lastDelta > 0).slice(0, 3),
-);
+// How many got it right this round (we don't name them — just the count).
+const scoredCount = computed(() => b.players().filter((p) => p.lastDelta > 0).length);
 </script>
 
 <template>
@@ -67,11 +65,8 @@ const movers = computed(() =>
     <transition name="fade">
       <div v-if="revealed" class="bq-reveal">
         <span class="lead">Scored this round:</span>
-        <template v-if="movers.length">
-          <span v-for="(m, i) in movers" :key="m.sessionId" class="mv">
-            <b>{{ m.name }}</b> +{{ m.lastDelta }}<span v-if="i < movers.length - 1"> ·</span>
-          </span>
-        </template>
+        <span v-if="scoredCount" class="mv"><b>{{ scoredCount }}</b>
+          player{{ scoredCount === 1 ? '' : 's' }} got it ✓</span>
         <span v-else class="none">nobody got it 😅</span>
       </div>
     </transition>
