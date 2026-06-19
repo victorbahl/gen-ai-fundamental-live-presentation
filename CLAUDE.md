@@ -61,19 +61,22 @@ Every rule the user gives is recorded here and must be respected on every slide.
   here, and `battleGroupId()` — the ROOM: `?groupId=<id>` in the deck URL forces a fixed shareable room,
   else a FRESH random room generated once + kept stable for the browser session via sessionStorage, so
   every run starts clean and never collides with old scores; SSR-safe, falls back to `genai-battle` at
-  build time). `BattleLobby.vue` (QR + live names; copy is "Scan. Name yourself. Play."; carries the
-  COVER BRAND LOCKUP for consistency — MuleSoft+Informatica logos top-right in a white pill so they
-  read on both themes, + kicker "⚔️ AI Battle · Hackathon AI · SE French Team"; the player grid is
-  sized to hold ~40 names without scroll: compact chips, ellipsis on long names, multi-column wrap),
+  build time). `BattleLobby.vue` (QR + live names; copy is "Scan. Name yourself. Play."; the player
+  grid is sized to hold ~40 names without scroll: compact chips, ellipsis on long names, multi-column
+  wrap),
   `BattleQuestion.vue` (clicks:2 — open→lock→reveal, shows OPEN/LOCKED not a timer; the reveal beat
   shows a COUNT of correct players "N players got it ✓", NOT names — user: "just the number of people
   who scored"; reuses the addon's `SlideQuizQR.vue`), `BattleLeaderboard.vue` (clicks:3 — podium
   reveals 3rd→2nd→1st; the 👑 CROWN sits on EVERY top-score player via `isWinner()`, not just column 1
   — fixed 10-pt scoring makes top-score TIES common — and is guarded so it never floats over an
   empty/all-zero podium). PHONE
-  (`public/battle.html`): incoming state never re-renders the join form (the heartbeat was wiping a
-  half-typed name + stealing focus); a render-SIGNATURE guard skips no-op heartbeats (no flicker, never
-  interrupts a tap). Functions: `netlify/functions/battle-{shared,join,answer,state}.mts` (3 streams:
+  (`public/battle.html`): self-contained dark-themed page (NOT Slidev — its own CSS vars). Carries the
+  BRAND LOCKUP at the top (user: "the design of the ui on the MOBILE" — the logos/Hackathon/SE-French
+  bits go on the PHONE, not the slide): MuleSoft+Informatica logos (`/img/*.svg`, served at site root,
+  copied into `dist/img/`) in a white pill + "⚔️ AI Battle" brand + "Hackathon AI · SE French Team"
+  teamline. Incoming state never re-renders the join form (the heartbeat was wiping a half-typed name +
+  stealing focus); a render-SIGNATURE guard skips no-op heartbeats (no flicker, never interrupts a tap).
+  Functions: `netlify/functions/battle-{shared,join,answer,state}.mts` (3 streams:
   players/answers/state). THEME: Battle slides are NORMAL themed slides — they read the standard tokens
   and follow Slidev's day/night toggle (the old forced-dark `.battle-slide` override was removed
   2026-06-19); only `.battle-slide { padding: 0 }` remains, for full-bleed.

@@ -11,12 +11,6 @@ import SlideQuizQR from "../node_modules/slidev-addon-slide-quiz/components/Slid
 import { battle, BATTLE_WS_URL, battleGroupId } from "./battle/battleConfig";
 
 const b = battle();
-
-// Same brand lockup as the cover (slides.md): kicker + the two logos, so the
-// battle opener reads as part of the same talk. Logos resolve under the Vite
-// base, and sit in a white pill so they stay legible in BOTH light + dark theme.
-const base = import.meta.env.BASE_URL;
-const logos = ["mulesoft.svg", "informatica.svg"].map((f) => `${base}img/${f}`);
 // onSlideEnter (not onMounted): Slidev keeps slides mounted, so onMounted fires
 // once — possibly during pre-render of an adjacent slide. We want the phase set
 // every time the host actually lands here (incl. navigating back).
@@ -36,11 +30,8 @@ const count = computed(() => players.value.length);
 
 <template>
   <div class="battle-stage">
-    <div class="bl-logos">
-      <img v-for="(src, i) in logos" :key="i" :src="src" alt="" class="bl-logo" />
-    </div>
     <div class="bl-left">
-      <div class="bl-kicker">⚔️ AI Battle · Hackathon AI · SE French Team</div>
+      <div class="bl-kicker">⚔️ AI Battle</div>
       <h2 class="bl-title">Scan. Name yourself. <span class="grad-warm">Play.</span></h2>
       <div class="bl-qr">
         <SlideQuizQR :url="joinUrl" :size="230" />
@@ -63,14 +54,6 @@ const count = computed(() => players.value.length);
 <style scoped>
 .battle-stage { position: absolute; inset: 0; display: grid; grid-template-columns: 1fr 1fr;
   gap: 40px; padding: 56px 64px; align-items: start; }
-
-/* Brand lockup — mirrors the cover's top-right logos, in a light pill so the
-   dark-on-transparent marks read on both the light and dark canvas. */
-.bl-logos { position: absolute; top: 26px; right: 32px; display: flex; align-items: center;
-  gap: 18px; background: #fff; padding: 8px 16px; border-radius: 12px;
-  box-shadow: 0 6px 18px rgba(0,0,0,.18); }
-.bl-logo { height: 24px; width: auto; }
-
 .bl-kicker { font-weight: 800; letter-spacing: .14em; text-transform: uppercase;
   color: var(--warm-bright); font-size: .9rem; }
 .bl-title { font-size: 2.6rem; line-height: 1.08; margin: 10px 0 22px; }
