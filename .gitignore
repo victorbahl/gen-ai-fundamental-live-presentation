@@ -20,3 +20,11 @@ scripts/_candidates/
 
 # Local Netlify folder
 .netlify
+
+# Deno lockfile generated locally by `netlify dev` (edge runtime) — not needed in VCS
+deno.lock
+
+# Local secrets for `netlify dev` (AnyCable broadcast URL/key) — NEVER commit
+.env
+.env.*
+!.env.example

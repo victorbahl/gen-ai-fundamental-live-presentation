@@ -9,12 +9,23 @@
 
 [build]
   # Slidev builds to ./dist. No --base sub-path: served at the site root on Netlify.
+  # This runs automatically on every push to `main` (the site is linked to the
+  # GitHub repo; see README "Deploy"). Manual `netlify deploy` still works too.
   command = "npm run build"
   publish = "dist"
   functions = "netlify/functions"
 
 [build.environment]
   NODE_VERSION = "22"
+
+# Local dev: `npm run dev:netlify` runs Slidev AND the serverless functions
+# together so the live quiz / battle work locally (plain `npm run dev` serves
+# the slides only — functions 404, so votes can't relay).
+[dev]
+  command = "npm run dev"   # Slidev dev server (localhost:3030)
+  targetPort = 3030         # the port Slidev binds
+  framework = "#custom"
+  autoLaunch = false
 
 # Audience voting page is a real static file; everything else falls back to the
 # Slidev SPA. (The addon also ships these rules via public/_redirects; kept here

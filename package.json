@@ -3,7 +3,9 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "slidev --open",
+    "dev": "slidev",
+    "dev:open": "slidev --open",
+    "dev:netlify": "netlify dev",
     "build": "slidev build",
     "export": "slidev export"
   },
@@ -14,5 +16,8 @@
     "slidev-addon-slide-quiz": "^0.3.2",
     "valibot": "^1.0.0",
     "vue": "^3.5.13"
+  },
+  "devDependencies": {
+    "netlify-cli": "^26.1.0"
   }
 }

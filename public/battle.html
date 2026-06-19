@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>AI Battle — join</title>
+  <style>
+    :root {
+      --bg: #0b1020; --panel: #151b30; --ink: #f4f6fb; --soft: #9aa6c4;
+      --cool: #00a2df; --warm: #fcc003; --good: #29c46a; --line: #283150;
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { margin: 0; height: 100%; }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: radial-gradient(120% 100% at 50% 0%, #182238 0%, var(--bg) 60%), var(--bg);
+      color: var(--ink); display: flex; flex-direction: column; min-height: 100%;
+    }
+    .wrap { flex: 1; display: flex; flex-direction: column; justify-content: center;
+            padding: 24px 20px; max-width: 560px; margin: 0 auto; width: 100%; }
+    .brand { text-align: center; font-weight: 800; letter-spacing: .14em;
+             font-size: .8rem; color: var(--warm); text-transform: uppercase; margin-bottom: 6px; }
+    h1 { text-align: center; font-size: 1.5rem; margin: 0 0 22px; line-height: 1.2; }
+    .card { background: var(--panel); border: 1px solid var(--line); border-radius: 16px;
+            padding: 22px; box-shadow: 0 20px 50px rgba(0,0,0,.4); }
+    label { display: block; font-size: .82rem; color: var(--soft); margin-bottom: 8px; }
+    input { width: 100%; font-size: 1.15rem; padding: 14px 16px; border-radius: 12px;
+            border: 1px solid var(--line); background: #0e1426; color: var(--ink); outline: none; }
+    input:focus { border-color: var(--cool); }
+    button { width: 100%; margin-top: 16px; font-size: 1.1rem; font-weight: 700;
+             padding: 15px; border: 0; border-radius: 12px; background: var(--warm);
+             color: #1a1300; cursor: pointer; transition: transform .08s ease, opacity .2s; }
+    button:active { transform: scale(.98); }
+    button:disabled { opacity: .45; cursor: default; }
+    .status { text-align: center; color: var(--soft); font-size: .9rem; margin-top: 14px; min-height: 1.2em; }
+    .me { text-align: center; margin-bottom: 16px; }
+    .me .nm { font-weight: 800; font-size: 1.25rem; }
+    .me .sc { color: var(--warm); font-weight: 700; }
+    .q { font-size: 1.3rem; font-weight: 700; text-align: center; margin: 0 0 20px; line-height: 1.3; }
+    .opts { display: grid; gap: 12px; }
+    .opt { display: flex; align-items: center; gap: 14px; text-align: left;
+           background: var(--panel); border: 1px solid var(--line); color: var(--ink);
+           font-size: 1.1rem; padding: 16px; border-radius: 14px; margin: 0; }
+    .opt .lab { width: 30px; height: 30px; border-radius: 8px; background: var(--cool);
+                color: #001722; font-weight: 800; display: grid; place-items: center; flex: none; }
+    .opt:disabled { opacity: 1; }
+    .opt.picked { border-color: var(--warm); box-shadow: 0 0 0 2px var(--warm) inset; }
+    .big { text-align: center; }
+    .big .emoji { font-size: 3.2rem; }
+    .big .line { font-size: 1.3rem; font-weight: 700; margin-top: 10px; }
+    .big .sub { color: var(--soft); margin-top: 6px; }
+    .rank { font-size: 2.4rem; font-weight: 900; color: var(--warm); }
+    .podium { display: grid; gap: 10px; margin-top: 8px; }
+    .prow { display: flex; align-items: center; gap: 12px; background: var(--panel);
+            border: 1px solid var(--line); padding: 12px 14px; border-radius: 12px; }
+    .prow .pos { font-weight: 900; width: 28px; }
+    .prow .pn { flex: 1; font-weight: 700; }
+    .prow .ps { color: var(--warm); font-weight: 800; }
+    .prow.gold { border-color: var(--warm); }
+    .err { color: #ff8080; }
+    .foot { text-align: center; color: var(--soft); font-size: .72rem; padding: 12px; opacity: .7; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="brand">⚔️ AI Battle</div>
+    <div id="app" class="card">
+      <div class="status">Connecting…</div>
+    </div>
+  </div>
+  <div class="foot" id="foot"></div>
+
+  <script type="module">
+    import { createCable } from 'https://cdn.jsdelivr.net/npm/@anycable/web@1.1.1/+esm';
+
+    const params = new URLSearchParams(location.search);
+    const wsUrl = params.get('wsUrl');
+    const groupId = params.get('groupId') || params.get('quizGroupId') || 'genai-battle';
+    const app = document.getElementById('app');
+    document.getElementById('foot').textContent = groupId;
+
+    if (!wsUrl) {
+      app.innerHTML = '<div class="status err">Missing connection info. Re-scan the QR code from the screen.</div>';
+      throw new Error('no wsUrl');
+    }
+
+    // Stable per-tab identity.
+    const SKEY = `battle-session-${groupId}`;
+    let sessionId = sessionStorage.getItem(SKEY);
+    if (!sessionId) { sessionId = crypto.randomUUID(); sessionStorage.setItem(SKEY, sessionId); }
+    const NKEY = `battle-name-${groupId}`;
+    let myName = sessionStorage.getItem(NKEY) || '';
+
+    const ep = {
+      join: '/.netlify/functions/battle-join',
+      answer: '/.netlify/functions/battle-answer',
+    };
+    async function post(url, body) {
+      try {
+        const r = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+        return r.ok;
+      } catch { return false; }
+    }
+
+    let lastState = null;   // latest host state
+    let answeredFor = null; // quizId we've already answered
+    let pickedLabel = null;
+
+    const cable = createCable(wsUrl, { protocol: 'actioncable-v1-ext-json' });
+    const stateCh = cable.streamFrom(`battle:${groupId}:state`);
+    stateCh.on('message', (msg) => { lastState = msg; render(); });
+
+    // --- joining ---
+    function showJoin(msg) {
+      app.innerHTML = `
+        <label for="nm">Your name (shows on the leaderboard)</label>
+        <input id="nm" maxlength="24" autocomplete="off" autocapitalize="words"
+               placeholder="e.g. Victor" value="${escapeAttr(myName)}" />
+        <button id="go">Join the battle</button>
+        <div class="status ${msg ? 'err' : ''}">${msg || ''}</div>`;
+      const input = document.getElementById('nm');
+      const btn = document.getElementById('go');
+      input.focus();
+      const submit = async () => {
+        const name = input.value.trim();
+        if (!name) { input.focus(); return; }
+        btn.disabled = true; btn.textContent = 'Joining…';
+        myName = name; sessionStorage.setItem(NKEY, name);
+        const ok = await post(ep.join, { name, sessionId, groupId });
+        if (!ok) { showJoin('Could not join — check signal and retry.'); return; }
+        joined = true;
+        render();
+      };
+      btn.onclick = submit;
+      input.onkeydown = (e) => { if (e.key === 'Enter') submit(); };
+    }
+
+    let joined = !!myName; // if we already named ourselves this tab, skip the form
+
+    function meFromState() {
+      if (!lastState || !Array.isArray(lastState.players)) return null;
+      return lastState.players.find(p => p.sessionId === sessionId) || null;
+    }
+
+    function render() {
+      // Not joined yet → always the name form (unless we have a stored name).
+      if (!joined) { showJoin(); return; }
+
+      const s = lastState;
+      if (!s) {
+        app.innerHTML = `<div class="me"><div class="nm">${escapeHtml(myName)}</div></div>
+          <div class="status">You're in. Waiting for the host…</div>`;
+        return;
+      }
+
+      const me = meFromState();
+      const score = me ? me.score : 0;
+      const meHeader = `<div class="me"><div class="nm">${escapeHtml(myName)}</div>
+        <div class="sc">${score} pts${me && me.rank ? ` · #${me.rank}` : ''}</div></div>`;
+
+      if (s.phase === 'lobby') {
+        app.innerHTML = meHeader +
+          `<div class="big"><div class="emoji">🟢</div>
+           <div class="line">You're in!</div>
+           <div class="sub">${(s.playerCount ?? 0)} players ready · waiting for the first question</div></div>`;
+        return;
+      }
+
+      if (s.phase === 'question' && s.question) {
+        const qid = s.question.quizId;
+        const alreadyAnswered = answeredFor === qid;
+        if (qid !== answeredFor) pickedLabel = pickedLabel && answeredFor === qid ? pickedLabel : null;
+        const opts = (s.question.options || []).map(o => {
+          const picked = alreadyAnswered && pickedLabel === o.label;
+          return `<button class="opt ${picked ? 'picked' : ''}" data-label="${escapeAttr(o.label)}" ${alreadyAnswered ? 'disabled' : ''}>
+            <span class="lab">${escapeHtml(o.label)}</span><span>${escapeHtml(o.text)}</span></button>`;
+        }).join('');
+        app.innerHTML = meHeader +
+          `<p class="q">${escapeHtml(s.question.question)}</p>
+           <div class="opts">${opts}</div>
+           <div class="status">${alreadyAnswered ? 'Locked in ✓ — hang tight' : 'Tap your answer — faster = more points'}</div>`;
+        if (!alreadyAnswered) {
+          app.querySelectorAll('.opt').forEach(b => {
+            b.onclick = async () => {
+              const label = b.getAttribute('data-label');
+              pickedLabel = label; answeredFor = qid;
+              app.querySelectorAll('.opt').forEach(x => { x.disabled = true; if (x === b) x.classList.add('picked'); });
+              app.querySelector('.status').textContent = 'Locked in ✓ — hang tight';
+              await post(ep.answer, { sessionId, name: myName, quizId: qid, answer: label, groupId });
+            };
+          });
+        }
+        return;
+      }
+
+      if (s.phase === 'locked') {
+        app.innerHTML = meHeader +
+          `<div class="big"><div class="emoji">🔒</div>
+           <div class="line">Answers locked</div>
+           <div class="sub">Look up at the screen 👀</div></div>`;
+        return;
+      }
+
+      if (s.phase === 'reveal' || s.phase === 'scores') {
+        const moved = me && typeof me.rank === 'number';
+        app.innerHTML = meHeader +
+          `<div class="big"><div class="rank">${moved ? '#' + me.rank : '—'}</div>
+           <div class="sub">of ${s.playerCount ?? '?'} players</div></div>`;
+        return;
+      }
+
+      if (s.phase === 'final') {
+        const top = (s.leaderboard || []).slice(0, 3);
+        const rows = top.map((p, i) => {
+          const medal = ['🥇','🥈','🥉'][i] || '';
+          return `<div class="prow ${i === 0 ? 'gold' : ''}"><span class="pos">${medal}</span>
+            <span class="pn">${escapeHtml(p.name)}</span><span class="ps">${p.score}</span></div>`;
+        }).join('');
+        const mine = me ? `<div class="status">You finished #${me.rank ?? '—'} with ${me.score ?? 0} pts. GG!</div>` : '';
+        app.innerHTML = `<div class="me"><div class="nm">🏆 Final results</div></div>
+          <div class="podium">${rows || '<div class="status">No scores</div>'}</div>${mine}`;
+        return;
+      }
+
+      // Unknown phase — keep the header.
+      app.innerHTML = meHeader + `<div class="status">…</div>`;
+    }
+
+    function escapeHtml(s) { return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c])); }
+    function escapeAttr(s) { return escapeHtml(s); }
+
+    render();
+  </script>
+</body>
+</html>

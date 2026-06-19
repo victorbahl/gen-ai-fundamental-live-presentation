@@ -76,5 +76,9 @@ src: ./slides/05-act-agents.md
 ---
 
 ---
+src: ./slides/battle.md
+---
+
+---
 src: ./slides/06-close.md
 ---
