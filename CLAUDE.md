@@ -41,12 +41,16 @@ Every rule the user gives is recorded here and must be respected on every slide.
   per user: "start with a quiz; we might add more at the end later." (Questions still cover later
   concepts — flagged to improve later; not a blocker.) Architecture: the DECK is the scoring authority
   — it holds the answer key + scores and is the only place that knows who's right; phones
-  (`public/battle.html`) only get the question (text+options, NO `correct`), live "answered" counts,
-  and their OWN rank. Reuses the AnyCable + Netlify infra. Pieces: `components/battle/useBattle.ts`
-  (engine: listen players/answers, score, push state). SCORING is deliberately SIMPLE + bulletproof
-  (user: "simplify, no timer"): correct = 1000 pts FIXED, wrong = 0 — no speed bonus, no countdown, no
-  cross-device clock (`POINTS` const; the old BASE+SPEED+timestamp model + `seconds`/`questionStartedAt`
-  were removed 2026-06-19). SYNC RELIABILITY: state is pushed immediately on change AND re-broadcast on
+  (`public/battle.html`) only get the question (text+options, NO `correct`) + live "answered" counts.
+  PHONES NEVER SHOW RANK during play (user: "they need to wait the leaderboard") — the live header
+  shows only the running score, and the reveal screen says "👀 look up — standings come at the end";
+  rank appears ONLY on the final podium screen (which coincides with the on-screen leaderboard, so
+  it's the payoff, not a live tease). Reuses the AnyCable + Netlify infra. Pieces:
+  `components/battle/useBattle.ts` (engine: listen players/answers, score, push state). SCORING is
+  deliberately SIMPLE + bulletproof (user: "simplify, no timer"): correct = **10 pts FIXED** (`POINTS`
+  const — was 1000, dropped to 10 for readable scores 2026-06-19), wrong = 0 — no speed bonus, no
+  countdown, no cross-device clock (the old BASE+SPEED+timestamp model + `seconds`/`questionStartedAt`
+  were removed 2026-06-19; the dead `seconds:` config fields were also deleted). SYNC RELIABILITY: state is pushed immediately on change AND re-broadcast on
   a 2s HEARTBEAT (`HEARTBEAT_MS`, started in `connect()`, cleared in `disconnect()`). The heartbeat is
   the key fix for "move slide → phone didn't update": a phone that missed a one-shot broadcast (signal
   blip, backgrounded tab, late join, reconnect) self-heals within ~2s, AND the steady traffic keeps the
@@ -57,9 +61,16 @@ Every rule the user gives is recorded here and must be respected on every slide.
   here, and `battleGroupId()` — the ROOM: `?groupId=<id>` in the deck URL forces a fixed shareable room,
   else a FRESH random room generated once + kept stable for the browser session via sessionStorage, so
   every run starts clean and never collides with old scores; SSR-safe, falls back to `genai-battle` at
-  build time). `BattleLobby.vue` (QR + live names; copy is "Scan. Name yourself. Play."),
-  `BattleQuestion.vue` (clicks:2 — open→lock→reveal, shows OPEN/LOCKED not a timer; reuses the addon's
-  `SlideQuizQR.vue`), `BattleLeaderboard.vue` (clicks:3 — podium reveals 3rd→2nd→1st). PHONE
+  build time). `BattleLobby.vue` (QR + live names; copy is "Scan. Name yourself. Play."; carries the
+  COVER BRAND LOCKUP for consistency — MuleSoft+Informatica logos top-right in a white pill so they
+  read on both themes, + kicker "⚔️ AI Battle · Hackathon AI · SE French Team"; the player grid is
+  sized to hold ~40 names without scroll: compact chips, ellipsis on long names, multi-column wrap),
+  `BattleQuestion.vue` (clicks:2 — open→lock→reveal, shows OPEN/LOCKED not a timer; the reveal beat
+  shows a COUNT of correct players "N players got it ✓", NOT names — user: "just the number of people
+  who scored"; reuses the addon's `SlideQuizQR.vue`), `BattleLeaderboard.vue` (clicks:3 — podium
+  reveals 3rd→2nd→1st; the 👑 CROWN sits on EVERY top-score player via `isWinner()`, not just column 1
+  — fixed 10-pt scoring makes top-score TIES common — and is guarded so it never floats over an
+  empty/all-zero podium). PHONE
   (`public/battle.html`): incoming state never re-renders the join form (the heartbeat was wiping a
   half-typed name + stealing focus); a render-SIGNATURE guard skips no-op heartbeats (no flicker, never
   interrupts a tap). Functions: `netlify/functions/battle-{shared,join,answer,state}.mts` (3 streams:
@@ -247,11 +258,14 @@ tool output is big). Both use striped cells (45° gradient) for the compressed/o
 
 - **Build compiles clean** (`slidev build`, verified 2026-06-19 after the quiz→battle rework).
 - **BATTLE — live sync VERIFIED end-to-end against prod 2026-06-19** (heartbeat resync + fixed-point
-  scoring + onSlideEnter timing; public-streams AnyCable). Follow-ups (user-flagged, not blockers):
-  (1) the opener questions still test concepts taught later in the deck — improve them to be fair as an
-  icebreaker; (2) may add MORE quiz rounds at the END later; (3) the Battle is theme-aware — do a visual
-  QA pass in BOTH light and dark (built dark-only originally; check QR panel, option cards, podium rank
-  numbers, accent legibility on the light canvas). Functions only run on the deployed site (lesson 9).
+  scoring + onSlideEnter timing; public-streams AnyCable; re-verified after the 10-pt/rank/crown/brand
+  tweaks via `/tmp/battle-flow.mjs`). DECIDED 2026-06-19: KEEP the open→locked→reveal flow (the LOCK
+  click is the explicit "pencils down" with no timer; user chose to keep it over a 1-click open→reveal).
+  Follow-ups (user-flagged, not blockers): (1) the opener questions still test concepts taught later in
+  the deck — improve them to be fair as an icebreaker; (2) may add MORE quiz rounds at the END later;
+  (3) the Battle is theme-aware — do a visual QA pass in BOTH light and dark (built dark-only originally;
+  check QR panel, option cards, podium rank numbers, the new brand-logo pill + 40-player chip grid,
+  accent legibility on the light canvas). Functions only run on the deployed site (lesson 9).
 - **KNOWN MINOR (fix later, do NOT block):** `ToolRoundtrip`'s right-hand column (two stacked cards)
   sits a touch tall — its lower card slightly kisses the payoff band at real canvas res (980×551);
   stage height was mid-adjustment (currently 330px). Do a click-by-click pass on
