@@ -12,46 +12,48 @@ Every rule the user gives is recorded here and must be respected on every slide.
   that acts). ~45 min, English. Neutral/unbranded. Running example: "order status across systems".
 - Entry point: `slides.md`. Custom components in `components/` (auto-imported).
 - Global theme/tokens in `styles/index.css`.
-- RUN LOCALLY:
-  - `npm run dev` — Slidev only (localhost:3030). Fast for editing SLIDES, but the live quiz/battle
-    functions 404, so votes can't relay. Use for everything EXCEPT testing the interactive features.
-  - `npm run dev:netlify` — **`netlify dev`**: runs Slidev AND the serverless functions together on
-    **localhost:8888** (the proxy port — NOT 3030; open :8888 so `/.netlify/functions/*` resolve).
-    Required to test the quiz/battle locally. Reads secrets from a gitignored `.env` (see below).
-    Both bind a port → must run OUTSIDE the sandbox.
-  - LOCAL SECRETS: `netlify dev` loads `.env` (gitignored) into the function runtime — NOT the site's
-    dashboard env vars (those only reach the runtime when DEPLOYED). So `.env` MUST hold
-    `ANYCABLE_BROADCAST_URL` + `ANYCABLE_BROADCAST_KEY` or every broadcast 502s (`ECONNREFUSED
-    127.0.0.1:8090`, the localhost fallback in `shared.mts`). Template: `.env.example` (committed).
+- RUN LOCALLY (slides only — by design):
+  - `npm run dev` — Slidev (localhost:3030). This is the ONLY local workflow. It serves the SLIDES;
+    the live Battle's serverless functions 404 locally, so phones can't relay answers. That's fine —
+    we edit + preview slides locally and test the Battle end-to-end on the DEPLOYED site (below).
+    Binds a port → run OUTSIDE the sandbox.
+  - NO local-functions workflow anymore (the old `npm run dev:netlify` / `netlify dev` path + the
+    `netlify-cli` devDep + `.env`/`.env.example` were removed 2026-06-19, per user: "keep locally only
+    the slides; to test the quiz, push so Netlify does the job"). To test the Battle: push to `main`,
+    Netlify auto-deploys, the functions run there. Local secrets are gone; prod secrets live ONLY in
+    the Netlify dashboard env vars (see DEPLOY).
 - DEPLOY: **Netlify**, **auto-deploys on every push to `main`** (site is GitHub-linked: provider
   github, allowed_branches [main]). Replaced GitHub Pages 2026-06-18 (`.github/workflows/deploy.yml`
   removed). Config in `netlify.toml`: `npm run build` → publish `dist/`, functions in
   `netlify/functions/`, served at site ROOT (no `--base /repo/` sub-path). Manual deploy still works:
   `npx netlify deploy --build` (draft) / `--prod`. Live site: `vb-gen-ai.netlify.app`. Pages was
-  dropped because the live quiz/battle need serverless functions, which Pages can't run.
-- LIVE QUIZ: `slidev-addon-slide-quiz` (MIT, AnyCable-powered) wired in `slides.md` frontmatter
-  (`addons:` + `slideQuiz:` block). Audience scans a QR on a `layout: quiz` slide, votes from their
-  phone, live bar-chart/word-cloud on the `layout: quiz-results` slide (same `quizId`). Sample lives
-  in `slides/quiz-llm-limits.md` (end of Part 2 — "which is NOT a real LLM limit?", bridges to Agents).
-  Pieces: `netlify/functions/{shared,quiz-answer,quiz-sync}.mts` (copied verbatim from the addon, relay
-  votes to AnyCable) + `public/quiz.html` (audience page). NEEDS, before it goes live: (1) a real
-  AnyCable app WebSocket URL in `slideQuiz.wsUrl` (currently the shared `wss://demo.anycable.io/cable`
-  — fine for local rehearsal, NOT the talk); (2) `ANYCABLE_BROADCAST_URL` (+ key if required) set in
-  the Netlify dashboard env vars; (3) the deck DEPLOYED (audience connects remotely — won't work from
-  localhost). Default mode = public/unauthenticated AnyCable streams (signed streams "coming soon").
-- LIVE BATTLE (custom-built — NOT the poll addon): a named, scored, Kahoot-style competition, the
-  deck FINALE (`slides/battle.md`, before the close). The poll addon is anonymous + shows the
-  distribution; this one has NAMES, HIDES the distribution, scores by SPEED, and crowns a TOP-3 podium
-  (user's actual ask all along). Architecture: the DECK is the scoring authority — it holds the answer
-  key + scores and is the only place that knows who's right; phones (`public/battle.html`) only get the
-  question (text+options, NO `correct`), live "answered" counts, and their OWN rank. Reuses the AnyCable
-  + Netlify infra. Pieces: `components/battle/useBattle.ts` (engine: listen players/answers, score
-  BASE 500 + SPEED 500*remaining-fraction, push state), `battleConfig.ts` (questions + answer key +
-  shared singleton `battle()`; `BATTLE_WS_URL`/`BATTLE_GROUP_ID` here — use a groupId DISTINCT from the
-  poll, bump it for a clean room), `BattleLobby.vue` (QR + live names), `BattleQuestion.vue` (clicks:2 —
-  open→lock→reveal; reuses the addon's `SlideQuizQR.vue`), `BattleLeaderboard.vue` (clicks:3 — podium
-  reveals 3rd→2nd→1st). Functions: `netlify/functions/battle-{shared,join,answer,state}.mts` (3 streams:
-  players/answers/state). Battle slides force a dark canvas via `.battle-slide` in `styles/index.css`.
+  dropped because the live Battle needs serverless functions, which Pages can't run. Prod env vars
+  (`ANYCABLE_BROADCAST_URL` + `ANYCABLE_BROADCAST_KEY`) live ONLY in the Netlify dashboard.
+- OLD LIVE QUIZ — REMOVED (2026-06-19). The `slidev-addon-slide-quiz` POLL (anonymous, aggregate
+  bar-chart; `layout: quiz`/`quiz-results`) was the wrong tool (Engineering lesson 10) and is gone:
+  deleted `slides/quiz-llm-limits.md`, `public/quiz.html`, `netlify/functions/quiz-answer.mts` +
+  `quiz-sync.mts`, the poll-only schemas in `shared.mts`, and the `addons:`/`slideQuiz:` frontmatter
+  in `slides.md`. Do NOT resurrect it — the Battle is the one and only audience interaction.
+  (The `slidev-addon-slide-quiz` PACKAGE stays installed: `BattleLobby.vue` reuses its `SlideQuizQR.vue`
+  for the QR. It's just no longer registered as a Slidev addon.)
+- LIVE BATTLE (custom-built — the one audience interaction): a named, scored, Kahoot-style competition.
+  Now the deck OPENER — `slides/battle.md` is included right after `01-intro.md` (humility + agenda),
+  per user: "start with a quiz; we might add more at the end later." (Questions still cover later
+  concepts — flagged to improve later; not a blocker.) Architecture: the DECK is the scoring authority
+  — it holds the answer key + scores and is the only place that knows who's right; phones
+  (`public/battle.html`) only get the question (text+options, NO `correct`), live "answered" counts,
+  and their OWN rank. Reuses the AnyCable + Netlify infra. Pieces: `components/battle/useBattle.ts`
+  (engine: listen players/answers, score BASE 500 + SPEED 500*remaining-fraction, push state),
+  `battleConfig.ts` (questions + answer key + shared singleton `battle()`; `BATTLE_WS_URL` here, and
+  `battleGroupId()` — the ROOM: `?groupId=<id>` in the deck URL forces a fixed shareable room, else a
+  FRESH random room generated once + kept stable for the browser session via sessionStorage, so every
+  run starts clean and never collides with old scores; SSR-safe, falls back to `genai-battle` at build
+  time). `BattleLobby.vue` (QR + live names; copy is "Scan. Name yourself. Play."), `BattleQuestion.vue`
+  (clicks:2 — open→lock→reveal; reuses the addon's `SlideQuizQR.vue`), `BattleLeaderboard.vue`
+  (clicks:3 — podium reveals 3rd→2nd→1st). Functions: `netlify/functions/battle-{shared,join,answer,
+  state}.mts` (3 streams: players/answers/state). THEME: Battle slides are NORMAL themed slides — they
+  read the standard tokens and follow Slidev's day/night toggle (the old forced-dark `.battle-slide`
+  override was removed 2026-06-19); only `.battle-slide { padding: 0 }` remains, for full-bleed.
   Scoring + the "no `correct` in the broadcast payload" invariant were verified (Node test + grep).
 - SPINE HISTORY: the original "Compute → Reason → Act" triad was retired for **AI → LLMs → Agents**.
   Do NOT resurrect the two dead part-opener heroes ("Seventy years in one breath", "It predicts the
@@ -59,7 +61,8 @@ Every rule the user gives is recorded here and must be respected on every slide.
 
 ## Deck structure (3 parts)
 
-Cover · Humility · Roadmap (AI · LLMs · Agents) ·
+Cover · Humility · Roadmap (AI · LLMs · Agents) · **AI Battle** (opener icebreaker — `slides/battle.md`,
+included right after `01-intro.md`; see LIVE BATTLE above) ·
 **1 — AI** (`02-reason-history.md`): PartOpener / "GenAI is a small box" zoom / Timeline /
 "Prediction→reasoning" claim ·
 **2 — LLMs** (`03-reason-llm.md`): PartOpener / NextTokenPredictor / AttentionFlip /
@@ -222,7 +225,12 @@ tool output is big). Both use striped cells (45° gradient) for the compressed/o
 
 ## Open / current state
 
-- **Build compiles clean** (`slidev build`).
+- **Build compiles clean** (`slidev build`, verified 2026-06-19 after the quiz→battle rework).
+- **BATTLE follow-ups (user-flagged, not blockers):** (1) the opener questions still test concepts
+  taught later in the deck — improve them to be fair as an icebreaker; (2) may add MORE quiz rounds at
+  the END later; (3) the Battle is now theme-aware — do a visual QA pass in BOTH light and dark (it was
+  built dark-only, so check the QR panel, option cards, podium rank numbers, and accent legibility on
+  the light canvas). Functions can only be exercised on the deployed site (Engineering lesson 9).
 - **KNOWN MINOR (fix later, do NOT block):** `ToolRoundtrip`'s right-hand column (two stacked cards)
   sits a touch tall — its lower card slightly kisses the payoff band at real canvas res (980×551);
   stage height was mid-adjustment (currently 330px). Do a click-by-click pass on
@@ -279,9 +287,12 @@ tool output is big). Both use striped cells (45° gradient) for the compressed/o
    include file starting with `---`; put the header comment AFTER the first frontmatter (the pattern
    `06-close.md` uses).
 
-9. **`netlify dev` ≠ `slidev dev`.** Functions only run under `npm run dev:netlify` (proxy on :8888,
-   NOT :3030). And `netlify dev` injects the function-runtime env from a gitignored **`.env`**, NOT the
-   site dashboard vars — without `.env` every broadcast 502s (`ECONNREFUSED 127.0.0.1:8090`).
+9. **No local functions — test the Battle by deploying.** The local-functions workflow (`netlify dev`
+   / `npm run dev:netlify` / local `.env`) was removed 2026-06-19. `npm run dev` serves SLIDES only;
+   the Battle's serverless functions only run on the DEPLOYED Netlify site (prod env vars
+   `ANYCABLE_BROADCAST_URL`/`ANYCABLE_BROADCAST_KEY` live in the dashboard). So to test the Battle
+   end-to-end: push to `main` → Netlify auto-deploys → exercise it on `vb-gen-ai.netlify.app`. Don't
+   re-add a local-functions path unless the user asks.
 
 10. **CONFIRM THE TOOL FITS THE NEED BEFORE BUILDING ON IT.** User asked for Kahoot/Menti (named,
     scored, hidden-answer battle) from the START; I anchored on `slidev-addon-slide-quiz` and even

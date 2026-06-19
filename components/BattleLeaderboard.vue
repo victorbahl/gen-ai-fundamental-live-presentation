@@ -76,7 +76,7 @@ const third = computed(() => top3.value[2]);
 .battle-stage.lb { position: absolute; inset: 0; display: flex; flex-direction: column;
   align-items: center; padding: 40px 64px; }
 .lb-kicker { font-weight: 800; letter-spacing: .14em; text-transform: uppercase;
-  color: var(--warm); font-size: .9rem; }
+  color: var(--warm-bright); font-size: .9rem; }
 .lb-title { font-size: 2.4rem; margin: 6px 0 28px; }
 
 .podium { display: flex; align-items: flex-end; justify-content: center; gap: 22px;
@@ -87,7 +87,7 @@ const third = computed(() => top3.value[2]);
 .col .who { display: flex; flex-direction: column; align-items: center; margin-bottom: 10px; }
 .col .medal { font-size: 1.8rem; }
 .col .nm { font-weight: 800; font-size: 1.25rem; }
-.col .sc { color: var(--warm); font-weight: 800; }
+.col .sc { color: var(--warm-bright); font-weight: 800; }
 .col .bar { width: 100%; border-radius: 12px 12px 0 0; display: grid; place-items: start center;
   padding-top: 10px; }
 .col .rk { font-size: 1.6rem; font-weight: 900; color: rgba(255,255,255,.55); }
@@ -100,10 +100,10 @@ const third = computed(() => top3.value[2]);
 .crown { font-size: 2rem; margin-bottom: 2px; }
 
 .rest { margin-top: 26px; width: 100%; max-width: 560px; display: grid; gap: 8px; }
-.rrow { display: flex; align-items: center; gap: 14px; background: rgba(255,255,255,.04);
-  border: 1px solid rgba(255,255,255,.1); border-radius: 10px; padding: 9px 16px; }
+.rrow { display: flex; align-items: center; gap: 14px; background: var(--bg-panel);
+  border: 1px solid var(--hair); border-radius: 10px; padding: 9px 16px; box-shadow: var(--elev); }
 .rrow .pos { width: 26px; font-weight: 800; color: var(--ink-soft); }
 .rrow .pn { flex: 1; font-weight: 600; }
-.rrow .ps { color: var(--warm); font-weight: 700; }
+.rrow .ps { color: var(--warm-bright); font-weight: 700; }
 .empty { color: var(--ink-soft); margin-top: 40px; font-style: italic; }
 </style>

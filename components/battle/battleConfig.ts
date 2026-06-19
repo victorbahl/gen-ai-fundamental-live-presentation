@@ -5,14 +5,64 @@
  * sent to phones (useBattle strips it before broadcasting). Edit the questions
  * below to change the battle.
  *
- * wsUrl/groupId: the WebSocket URL is the same public AnyCable URL the poll uses.
- * Use a DISTINCT groupId from the poll so the two never cross-talk, and bump it
- * (e.g. genai-battle-2) for a clean room when rehearsing.
+ * wsUrl: the public AnyCable URL the audience's phones connect to.
+ *
+ * groupId (the "room"): resolved at runtime by `battleGroupId()`:
+ *   - `?groupId=<id>` in the deck URL  → that exact room (share the link to rejoin it).
+ *   - otherwise                        → a FRESH random room, generated once and kept
+ *     stable for this browser session, so every rehearsal/run starts clean automatically
+ *     and never collides with a previous run's scores.
+ * The lobby bakes whatever we resolve into the phone join URL, so phones always
+ * land in the same room as the deck — no manual sync.
  */
 import { useBattle, type BattleQuestion } from "./useBattle";
 
 export const BATTLE_WS_URL = "wss://vb-cable-4vsc.fly.dev/cable";
-export const BATTLE_GROUP_ID = "genai-battle";
+
+// SSR placeholder (slidev build runs this in Node, where there's no window and
+// nothing actually connects). The real room is resolved in the browser below.
+const SSR_GROUP_ID = "genai-battle";
+const ROOM_KEY = "battle-room-id";
+
+let _groupId: string | null = null;
+
+function freshRoom(): string {
+  // Browser-only (guarded by the caller). crypto.randomUUID needs a secure
+  // context — Netlify is HTTPS, localhost counts too. Fall back defensively.
+  try {
+    if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+      return "room-" + crypto.randomUUID().slice(0, 8);
+    }
+    if (typeof crypto !== "undefined" && typeof crypto.getRandomValues === "function") {
+      const a = new Uint32Array(2);
+      crypto.getRandomValues(a);
+      return "room-" + a[0].toString(36) + a[1].toString(36);
+    }
+  } catch { /* fall through */ }
+  return SSR_GROUP_ID;
+}
+
+/**
+ * The active battle room. Cached after first resolution so the deck and the QR
+ * always agree, and slide navigation never switches rooms mid-game.
+ */
+export function battleGroupId(): string {
+  if (_groupId) return _groupId;
+  if (typeof window === "undefined") return SSR_GROUP_ID; // build/SSR
+
+  const forced = new URLSearchParams(window.location.search).get("groupId");
+  if (forced) { _groupId = forced; return _groupId; }
+
+  try {
+    const stored = sessionStorage.getItem(ROOM_KEY);
+    if (stored) { _groupId = stored; return _groupId; }
+  } catch { /* private mode — fall through to a non-persisted room */ }
+
+  const room = freshRoom();
+  try { sessionStorage.setItem(ROOM_KEY, room); } catch { /* ignore */ }
+  _groupId = room;
+  return _groupId;
+}
 
 export const BATTLE_QUESTIONS: BattleQuestion[] = [
   {
@@ -85,7 +135,7 @@ export function battle() {
   if (!_engine) {
     _engine = useBattle({
       wsUrl: BATTLE_WS_URL,
-      groupId: BATTLE_GROUP_ID,
+      groupId: battleGroupId(),
       questions: BATTLE_QUESTIONS,
     });
     _engine.connect();

@@ -1,6 +1,6 @@
 # Netlify deploy config for the GenAI Fundamentals Slidev deck.
 # Replaces the old GitHub Pages workflow: Netlify serves the static build
-# AND runs the serverless functions that relay live-quiz votes to AnyCable.
+# AND runs the serverless functions that relay live-battle events to AnyCable.
 #
 # Required env vars (set in Netlify dashboard > Site settings > Environment variables,
 # NEVER in code):
@@ -18,21 +18,16 @@
 [build.environment]
   NODE_VERSION = "22"
 
-# Local dev: `npm run dev:netlify` runs Slidev AND the serverless functions
-# together so the live quiz / battle work locally (plain `npm run dev` serves
-# the slides only — functions 404, so votes can't relay).
-[dev]
-  command = "npm run dev"   # Slidev dev server (localhost:3030)
-  targetPort = 3030         # the port Slidev binds
-  framework = "#custom"
-  autoLaunch = false
+# NB: there is no local-functions workflow. `npm run dev` serves the SLIDES only
+# (the live battle's serverless functions 404 locally, so votes can't relay).
+# To test the battle end-to-end, push to `main` — Netlify auto-deploys and the
+# functions run there. See CLAUDE.md "RUN LOCALLY" / "DEPLOY".
 
-# Audience voting page is a real static file; everything else falls back to the
-# Slidev SPA. (The addon also ships these rules via public/_redirects; kept here
-# so the intent is visible in one place.)
+# Battle audience page (public/battle.html) is a real static file; everything
+# else falls back to the Slidev SPA.
 [[redirects]]
-  from = "/quiz.html"
-  to = "/quiz.html"
+  from = "/battle.html"
+  to = "/battle.html"
   status = 200
 
 [[redirects]]

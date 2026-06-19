@@ -97,31 +97,31 @@ const movers = computed(() =>
 .battle-stage.q { position: absolute; inset: 0; display: flex; flex-direction: column;
   padding: 44px 64px; }
 .bq-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-.bq-num { font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--warm); }
+.bq-num { font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--warm-bright); }
 .bq-meta { display: flex; gap: 18px; align-items: center; }
 .bq-answered { color: var(--ink-soft); font-weight: 700; font-size: 1.1rem; }
 .bq-answered .of { color: var(--ink-faint); font-weight: 600; }
 .bq-timer { font-weight: 900; font-size: 1.3rem; min-width: 4ch; text-align: right;
-  color: var(--cool); }
+  color: var(--cool-bright); }
 .bq-timer.low { color: var(--bad); }
 .bq-timer.done { color: var(--ink-faint); font-size: 1rem; letter-spacing: .1em; }
 
 .bq-q { font-size: 2.3rem; line-height: 1.15; margin: 10px 0 26px; }
 .bq-opts { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.bq-opt { display: flex; align-items: center; gap: 16px; background: rgba(255,255,255,.04);
-  border: 2px solid rgba(255,255,255,.12); border-radius: 16px; padding: 18px 20px;
-  font-size: 1.3rem; transition: all .3s cubic-bezier(0.22, 1, 0.36, 1); }
+.bq-opt { display: flex; align-items: center; gap: 16px; background: var(--bg-panel);
+  border: 2px solid var(--hair); border-radius: 16px; padding: 18px 20px;
+  font-size: 1.3rem; box-shadow: var(--elev); transition: all .3s cubic-bezier(0.22, 1, 0.36, 1); }
 .bq-opt .lab { width: 38px; height: 38px; flex: none; border-radius: 10px; background: var(--cool);
   color: #001722; font-weight: 900; display: grid; place-items: center; }
 .bq-opt .txt { flex: 1; }
 .bq-opt .tick { color: var(--good); font-weight: 900; font-size: 1.6rem; }
-.bq-opt.correct { border-color: var(--good); background: rgba(41,196,106,.14); }
+.bq-opt.correct { border-color: var(--good); background: rgba(46,132,74,.14); }
 .bq-opt.correct .lab { background: var(--good); }
 .bq-opt.dim { opacity: .4; }
 
 .bq-reveal { margin-top: 24px; font-size: 1.2rem; }
 .bq-reveal .lead { color: var(--ink-soft); margin-right: 10px; }
-.bq-reveal .mv b { color: var(--warm); }
+.bq-reveal .mv b { color: var(--warm-bright); }
 .bq-reveal .none { color: var(--ink-soft); }
 
 .fade-enter-active { transition: opacity .4s ease; }

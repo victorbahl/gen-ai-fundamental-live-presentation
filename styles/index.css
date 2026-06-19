@@ -250,20 +250,9 @@ html.dark {
 
 /* ===========================================================
    AI BATTLE — live Kahoot-style competition slides (slides/battle.md)
-   Forced dark, immersive canvas so the game stage pops regardless of
-   the day/night toggle. Components inside use the shared --ink/--cool/
-   --warm/--good/--bad tokens, plus their own dark panel fills.
+   These are NORMAL themed slides: they read the standard --ink/--bg/
+   --cool/--warm tokens and follow the day/night toggle like every other
+   slide. The only battle-specific rule is full-bleed: each component is
+   position:absolute; inset:0, so we drop the layout's default padding.
    =========================================================== */
-.battle-slide.slidev-layout {
-  --ink: #f4f6fb;
-  --ink-soft: #9aa6c4;
-  --ink-faint: #5b6480;
-  background:
-    radial-gradient(120% 90% at 50% -10%, #19213a 0%, rgba(11,16,32,0) 55%),
-    linear-gradient(180deg, #0c1020 0%, #090c18 100%);
-  color: var(--ink);
-  padding: 0;
-}
-.battle-slide.slidev-layout h2 { color: var(--ink); }
-.battle-slide .grad-warm { color: var(--warm); }
-.battle-slide.slidev-layout::after { opacity: 0.18; }
+.battle-slide.slidev-layout { padding: 0; }

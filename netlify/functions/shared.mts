@@ -1,6 +1,8 @@
 /**
- * Shared utilities for quiz serverless functions.
- * Copied from slidev-addon-slide-quiz (functions/netlify/shared.mts) — MIT.
+ * Shared utilities for the live-battle serverless functions.
+ * The AnyCable broadcaster + handle()/jsonResponse() helpers, originally
+ * adapted from slidev-addon-slide-quiz (functions/netlify/shared.mts) — MIT.
+ * The battle defines its own valibot schemas in battle-shared.mts.
  */
 import { broadcaster } from "@anycable/serverless-js";
 import * as v from "valibot";
@@ -25,47 +27,6 @@ export function jsonResponse(
     status,
     headers: { "Content-Type": "application/json", ...CORS_HEADERS },
   });
-}
-
-// ── Valibot Schemas ──
-
-export const AnswerSchema = v.object({
-  quizId: v.pipe(v.string(), v.minLength(1)),
-  answer: v.pipe(v.string(), v.minLength(1)),
-  sessionId: v.pipe(v.string(), v.minLength(1)),
-  quizGroupId: v.pipe(v.string(), v.minLength(1)),
-});
-
-const VoteStateSchema = v.object({
-  votes: v.record(v.string(), v.number()),
-  total: v.number(),
-});
-
-const QuestionPayloadSchema = v.object({
-  quizId: v.string(),
-  question: v.string(),
-  type: v.optional(v.picklist(["choice", "text"]), "choice"),
-  options: v.optional(v.array(v.object({ label: v.string(), text: v.string() })), []),
-});
-
-export const SyncSchema = v.object({
-  activeQuestionId: v.nullable(v.string()),
-  sessionId: v.pipe(v.string(), v.minLength(1)),
-  quizGroupId: v.pipe(v.string(), v.minLength(1)),
-  results: v.record(v.string(), VoteStateSchema),
-  question: v.optional(QuestionPayloadSchema),
-  questionIndex: v.optional(v.number()),
-  totalCount: v.optional(v.number()),
-});
-
-// ── Stream name builders ──
-
-export function resultsStream(quizGroupId: string): string {
-  return `quiz:${quizGroupId}:results`;
-}
-
-export function syncStream(quizGroupId: string): string {
-  return `quiz:${quizGroupId}:sync`;
 }
 
 // ── handle() decorator ──
