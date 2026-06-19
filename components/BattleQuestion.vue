@@ -1,14 +1,14 @@
 <script setup lang="ts">
 /**
  * One battle question, on screen. The host drives phases by CLICK:
- *   c0  question + options visible, answers OPEN, live "answered" counter
- *   c1  LOCK answers (no more scoring)
- *   c2  REVEAL the correct option + who scored
+ *   c0  question + options visible, answers open, live "answered" counter
+ *   c1  REVEAL the correct option + how many scored
  * Players answer on their phones; we never show the per-option distribution —
- * only how many have locked in. The correct answer is revealed on the last click.
- * No timer: scoring is fixed-points (correct = POINTS, wrong = 0).
+ * only how many have answered. No timer, no lock step: scoring is fixed-points
+ * (correct = POINTS, wrong = 0) and closes the moment we leave the 'question'
+ * phase (i.e. on reveal), so a separate "lock" click adds nothing.
  *
- * Slide usage:  <BattleQuestion :index="0" /> with `clicks: 2`
+ * Slide usage:  <BattleQuestion :index="0" /> with `clicks: 1`
  */
 import { computed, watch } from "vue";
 import { useSlideContext, onSlideEnter } from "@slidev/client";
@@ -28,13 +28,12 @@ const total = computed(() => b.players().length);
 // so binding to onMounted could push a phase for a slide that isn't on screen yet.
 function syncPhase() {
   if (c.value <= 0) b.startQuestion(props.index);
-  else if (c.value === 1) b.lock();
   else b.reveal();
 }
 onSlideEnter(syncPhase);
 watch(c, syncPhase);
 
-const revealed = computed(() => c.value >= 2);
+const revealed = computed(() => c.value >= 1);
 // How many got it right this round (we don't name them — just the count).
 const scoredCount = computed(() => b.players().filter((p) => p.lastDelta > 0).length);
 </script>
@@ -44,10 +43,7 @@ const scoredCount = computed(() => b.players().filter((p) => p.lastDelta > 0).le
     <div class="bq-head">
       <div class="bq-num">Q{{ index + 1 }} / {{ BATTLE_QUESTIONS.length }}</div>
       <div class="bq-meta">
-        <span class="bq-answered">{{ answered }}<span class="of">/{{ total }}</span> locked in</span>
-        <span class="bq-status" :class="{ open: c === 0, locked: c >= 1 }">
-          {{ c === 0 ? 'OPEN' : 'LOCKED' }}
-        </span>
+        <span class="bq-answered">{{ answered }}<span class="of">/{{ total }}</span> answered</span>
       </div>
     </div>
 
@@ -81,9 +77,6 @@ const scoredCount = computed(() => b.players().filter((p) => p.lastDelta > 0).le
 .bq-meta { display: flex; gap: 18px; align-items: center; }
 .bq-answered { color: var(--ink-soft); font-weight: 700; font-size: 1.1rem; }
 .bq-answered .of { color: var(--ink-faint); font-weight: 600; }
-.bq-status { font-weight: 900; font-size: 1rem; letter-spacing: .12em; text-align: right; }
-.bq-status.open { color: var(--cool-bright); }
-.bq-status.locked { color: var(--ink-faint); }
 
 .bq-q { font-size: 2.3rem; line-height: 1.15; margin: 10px 0 26px; }
 .bq-opts { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }

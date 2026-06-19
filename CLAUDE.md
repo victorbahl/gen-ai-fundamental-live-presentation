@@ -64,9 +64,13 @@ Every rule the user gives is recorded here and must be respected on every slide.
   build time). `BattleLobby.vue` (QR + live names; copy is "Scan. Name yourself. Play."; the player
   grid is sized to hold ~40 names without scroll: compact chips, ellipsis on long names, multi-column
   wrap),
-  `BattleQuestion.vue` (clicks:2 — open→lock→reveal, shows OPEN/LOCKED not a timer; the reveal beat
-  shows a COUNT of correct players "N players got it ✓", NOT names — user: "just the number of people
-  who scored"; reuses the addon's `SlideQuizQR.vue`), `BattleLeaderboard.vue` (clicks:3 — podium
+  `BattleQuestion.vue` (clicks:1 — open→reveal, ONE click; the old open→lock→reveal LOCK step was
+  removed 2026-06-19, user: "remove the whole locked/open, it doesn't bring anything" — with no timer
+  it was a dead click; reveal also closes scoring since it leaves the `question` phase, so the engine's
+  `lock()`/`"locked"` phase + the phone's locked screen + the OPEN/LOCKED badge are all gone; the head
+  now just shows "N/total answered"; the reveal beat shows a COUNT of correct players "N players got
+  it ✓", NOT names — user: "just the number of people who scored"; reuses the addon's `SlideQuizQR.vue`),
+  `BattleLeaderboard.vue` (clicks:3 — podium
   reveals 3rd→2nd→1st; the 👑 CROWN sits on EVERY top-score player via `isWinner()`, not just column 1
   — fixed 10-pt scoring makes top-score TIES common — and is guarded so it never floats over an
   empty/all-zero podium). PHONE
@@ -262,8 +266,9 @@ tool output is big). Both use striped cells (45° gradient) for the compressed/o
 - **Build compiles clean** (`slidev build`, verified 2026-06-19 after the quiz→battle rework).
 - **BATTLE — live sync VERIFIED end-to-end against prod 2026-06-19** (heartbeat resync + fixed-point
   scoring + onSlideEnter timing; public-streams AnyCable; re-verified after the 10-pt/rank/crown/brand
-  tweaks via `/tmp/battle-flow.mjs`). DECIDED 2026-06-19: KEEP the open→locked→reveal flow (the LOCK
-  click is the explicit "pencils down" with no timer; user chose to keep it over a 1-click open→reveal).
+  tweaks via `/tmp/battle-flow.mjs`). REVERSED 2026-06-19: the lock step was first kept, then REMOVED
+  same day (user: "remove the whole locked/open, it doesn't bring anything"). Each question is now a
+  single open→reveal click — do NOT re-add a lock phase.
   Follow-ups (user-flagged, not blockers): (1) the opener questions still test concepts taught later in
   the deck — improve them to be fair as an icebreaker; (2) may add MORE quiz rounds at the END later;
   (3) the Battle is theme-aware — do a visual QA pass in BOTH light and dark (built dark-only originally;

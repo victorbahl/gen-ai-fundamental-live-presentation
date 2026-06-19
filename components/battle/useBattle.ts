@@ -10,7 +10,7 @@
  *   - listen:    battle:<group>:players , battle:<group>:answers   (createCable.streamFrom)
  *   - broadcast: battle:<group>:state                              (battle-state function)
  *
- * Phases: lobby → question → locked → reveal → (next question…) → final
+ * Phases: lobby → question → reveal → (next question…) → final
  * Scoring: deliberately SIMPLE + bulletproof — correct = POINTS (fixed), wrong = 0.
  * No timer, no speed bonus, no cross-device clock dependency.
  *
@@ -42,7 +42,7 @@ export interface Player {
 const POINTS = 10;            // points for a correct answer (fixed — no speed bonus)
 const HEARTBEAT_MS = 2000;    // re-broadcast current state this often (resync safety net)
 
-type Phase = "lobby" | "question" | "locked" | "reveal" | "final";
+type Phase = "lobby" | "question" | "reveal" | "final";
 
 export function useBattle(opts: {
   wsUrl: string;
@@ -155,7 +155,7 @@ export function useBattle(opts: {
       answeredCount: state.answeredCount,
       players: roster,
     };
-    if (q && (state.phase === "question" || state.phase === "locked")) {
+    if (q && state.phase === "question") {
       payload.question = {
         quizId: q.quizId,
         question: q.question,
@@ -188,7 +188,6 @@ export function useBattle(opts: {
     for (const p of state.players.values()) { p.answeredQuiz = null; p.lastDelta = 0; p.correctLast = false; }
     pushState();
   }
-  function lock() { if (state.phase === "question") { state.phase = "locked"; pushState(); } }
   function reveal() { state.phase = "reveal"; pushState(); }
   function final() { state.phase = "final"; pushState(); }
 
@@ -201,6 +200,6 @@ export function useBattle(opts: {
     leaderboard,
     currentQ,
     // controls
-    toLobby, startQuestion, lock, reveal, final,
+    toLobby, startQuestion, reveal, final,
   };
 }

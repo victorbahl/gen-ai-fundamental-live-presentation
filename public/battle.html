@@ -228,14 +228,6 @@
         return;
       }
 
-      if (s.phase === 'locked') {
-        app.innerHTML = meHeader +
-          `<div class="big"><div class="emoji">🔒</div>
-           <div class="line">Answers locked</div>
-           <div class="sub">Look up at the screen 👀</div></div>`;
-        return;
-      }
-
       if (s.phase === 'reveal' || s.phase === 'scores') {
         // Show their running score, never their rank — standings are saved for
         // the final podium so there's a reveal to wait for.
