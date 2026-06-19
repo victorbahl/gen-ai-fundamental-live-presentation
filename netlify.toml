@@ -1,0 +1,30 @@
+# Netlify deploy config for the GenAI Fundamentals Slidev deck.
+# Replaces the old GitHub Pages workflow: Netlify serves the static build
+# AND runs the serverless functions that relay live-quiz votes to AnyCable.
+#
+# Required env vars (set in Netlify dashboard > Site settings > Environment variables,
+# NEVER in code):
+#   ANYCABLE_BROADCAST_URL  — AnyCable HTTP broadcast endpoint (from AnyCable Plus dashboard)
+#   ANYCABLE_BROADCAST_KEY  — AnyCable broadcast key (if your app requires one)
+
+[build]
+  # Slidev builds to ./dist. No --base sub-path: served at the site root on Netlify.
+  command = "npm run build"
+  publish = "dist"
+  functions = "netlify/functions"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# Audience voting page is a real static file; everything else falls back to the
+# Slidev SPA. (The addon also ships these rules via public/_redirects; kept here
+# so the intent is visible in one place.)
+[[redirects]]
+  from = "/quiz.html"
+  to = "/quiz.html"
+  status = 200
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

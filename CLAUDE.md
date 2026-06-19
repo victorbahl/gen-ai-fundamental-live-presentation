@@ -13,6 +13,20 @@ Every rule the user gives is recorded here and must be respected on every slide.
 - Entry point: `slides.md`. Custom components in `components/` (auto-imported).
 - Global theme/tokens in `styles/index.css`.
 - Run: `npm run dev` (the dev server must run outside the sandbox — it binds a port).
+- DEPLOY: **Netlify** (replaced GitHub Pages 2026-06-18 — the old `.github/workflows/deploy.yml`
+  was removed). Config in `netlify.toml`: `npm run build` → publish `dist/`, functions in
+  `netlify/functions/`, served at site ROOT (no `--base /repo/` sub-path anymore). Pages was dropped
+  because the live quiz (below) needs serverless functions, which Pages can't run.
+- LIVE QUIZ: `slidev-addon-slide-quiz` (MIT, AnyCable-powered) wired in `slides.md` frontmatter
+  (`addons:` + `slideQuiz:` block). Audience scans a QR on a `layout: quiz` slide, votes from their
+  phone, live bar-chart/word-cloud on the `layout: quiz-results` slide (same `quizId`). Sample lives
+  in `slides/quiz-llm-limits.md` (end of Part 2 — "which is NOT a real LLM limit?", bridges to Agents).
+  Pieces: `netlify/functions/{shared,quiz-answer,quiz-sync}.mts` (copied verbatim from the addon, relay
+  votes to AnyCable) + `public/quiz.html` (audience page). NEEDS, before it goes live: (1) a real
+  AnyCable app WebSocket URL in `slideQuiz.wsUrl` (currently the shared `wss://demo.anycable.io/cable`
+  — fine for local rehearsal, NOT the talk); (2) `ANYCABLE_BROADCAST_URL` (+ key if required) set in
+  the Netlify dashboard env vars; (3) the deck DEPLOYED (audience connects remotely — won't work from
+  localhost). Default mode = public/unauthenticated AnyCable streams (signed streams "coming soon").
 - SPINE HISTORY: the original "Compute → Reason → Act" triad was retired for **AI → LLMs → Agents**.
   Do NOT resurrect the two dead part-opener heroes ("Seventy years in one breath", "It predicts the
   next word. That's it."). Tools/MCP + agents are ONE part (Part 3 "Agents").

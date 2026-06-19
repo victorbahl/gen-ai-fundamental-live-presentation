@@ -11,6 +11,17 @@ transition: fade
 mdc: true
 fonts:
   provider: none
+addons:
+  - slidev-addon-slide-quiz
+# Live audience quiz (slidev-addon-slide-quiz, powered by AnyCable).
+# wsUrl is PUBLIC (the audience's browser connects to it) — safe to commit.
+# The Broadcast URL + Broadcast key are SECRETS — set them as Netlify env vars
+# (ANYCABLE_BROADCAST_URL / ANYCABLE_BROADCAST_KEY), NEVER in this file. See netlify.toml.
+slideQuiz:
+  wsUrl: wss://vb-cable-4vsc.fly.dev/cable
+  quizGroupId: genai-fundamentals
+  quizUrl: /quiz.html
+  titleText: Pop quiz!
 ---
 
 <!-- ============================================================
@@ -50,6 +61,10 @@ src: ./slides/02-reason-history.md
 
 ---
 src: ./slides/03-reason-llm.md
+---
+
+---
+src: ./slides/quiz-llm-limits.md
 ---
 
 ---

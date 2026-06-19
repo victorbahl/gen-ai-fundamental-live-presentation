@@ -17,3 +17,6 @@ scripts/_candidates/
 # logs & os cruft
 *.log
 .DS_Store
+
+# Local Netlify folder
+.netlify
