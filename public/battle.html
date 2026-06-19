@@ -177,7 +177,8 @@
         s0?.playerCount ?? 0,
         s0?.question?.quizId ?? null,
         answeredFor,
-        s0?.phase === 'final' ? (s0.leaderboard || []).map(p => [p.name, p.score]) : null,
+        s0?.phase === 'final' ? !!s0.revealed : null,
+        s0?.phase === 'final' && s0.revealed ? (s0.leaderboard || []).map(p => [p.name, p.score]) : null,
       ]);
       if (sig === lastSig) return;
       lastSig = sig;
@@ -241,6 +242,16 @@
       }
 
       if (s.phase === 'final') {
+        // SPOILER GUARD: the host withholds standings (and ranks) until the
+        // podium is revealed on the big screen. Until then, hold on a teaser so
+        // nobody learns they won on their phone before the room sees it.
+        if (!s.revealed) {
+          app.innerHTML = meHeader +
+            `<div class="big"><div class="emoji">🥁</div>
+             <div class="line">Results coming up…</div>
+             <div class="sub">Eyes on the screen — the podium is about to drop</div></div>`;
+          return;
+        }
         const top = (s.leaderboard || []).slice(0, 3);
         const rows = top.map((p, i) => {
           const medal = ['🥇','🥈','🥉'][i] || '';

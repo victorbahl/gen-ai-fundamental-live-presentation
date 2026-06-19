@@ -71,14 +71,24 @@ Every rule the user gives is recorded here and must be respected on every slide.
   now just shows "N/total answered"; the reveal beat shows a COUNT of correct players "N players got
   it ✓", NOT names — user: "just the number of people who scored"; reuses the addon's `SlideQuizQR.vue`),
   `BattleLeaderboard.vue` (clicks:3 — podium
-  reveals 3rd→2nd→1st; the 👑 CROWN sits on EVERY top-score player via `isWinner()`, not just column 1
-  — fixed 10-pt scoring makes top-score TIES common — and is guarded so it never floats over an
-  empty/all-zero podium). PHONE
+  reveals 3rd-slot→2nd-slot→1st-slot; the 👑 CROWN sits on EVERY top-score player via `isWinner()`,
+  not just column 1, and is guarded so it never floats over an empty/all-zero podium. EX-AEQUO is
+  handled (user-flagged): a `ranked` computed assigns COMPETITION RANK (equal scores share a rank
+  1,1,3…), and medals/bar-heights/rank-numbers/the runners-up list are driven off that rank (CSS
+  `.rank-1/2/3`), NOT array order — so tied players render as true equals (same medal + same height).
+  Bar heights were also REDUCED (180/135/100, podium box 320px) so the winner's column + crown can't
+  grow UP into the title (user: "the crown is overlapping the title"). SPOILER GUARD (user: "on mobile
+  I see I'm the winner before the slide — not okay"): the slide calls `b.final(c>=3)`, so the engine
+  only sets `finalRevealed` (and only then sends the leaderboard + ranks to phones) once the host has
+  revealed 1st place on screen; before that phones get a roster with NO ranks + a "🥁 results coming
+  up" teaser. The phone's render-signature includes `revealed` so the heartbeat repaints on the flip.)
+  PHONE
   (`public/battle.html`): self-contained dark-themed page (NOT Slidev — its own CSS vars). Carries the
   BRAND LOCKUP at the top (user: "the design of the ui on the MOBILE" — the logos/Hackathon/SE-French
   bits go on the PHONE, not the slide): MuleSoft+Informatica logos (`/img/*.svg`, served at site root,
-  copied into `dist/img/`) in a white pill + "⚔️ AI Battle" brand + "Hackathon AI · SE French Team"
-  teamline. Incoming state never re-renders the join form (the heartbeat was wiping a half-typed name +
+  copied into `dist/img/`) directly on the dark page (NO background pill — user: "remove the weird white
+  background"; forced pure white via `filter: brightness(0) invert(1)` since the MuleSoft mark is navy
+  in the SVG + would vanish on dark) + "⚔️ AI Battle" brand + "Hackathon AI · SE French Team" teamline. Incoming state never re-renders the join form (the heartbeat was wiping a half-typed name +
   stealing focus); a render-SIGNATURE guard skips no-op heartbeats (no flicker, never interrupts a tap).
   Functions: `netlify/functions/battle-{shared,join,answer,state}.mts` (3 streams:
   players/answers/state). THEME: Battle slides are NORMAL themed slides — they read the standard tokens

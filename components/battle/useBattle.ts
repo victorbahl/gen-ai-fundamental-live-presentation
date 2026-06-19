@@ -55,6 +55,7 @@ export function useBattle(opts: {
     players: new Map<string, Player>(),
     answeredCount: 0,
     connected: false,
+    finalRevealed: false,   // in `final`, has the host revealed the podium yet?
   });
 
   const answer = opts.questions; // alias for brevity
@@ -163,7 +164,18 @@ export function useBattle(opts: {
       };
     }
     if (state.phase === "final") {
-      payload.leaderboard = roster.slice(0, 10);
+      payload.revealed = state.finalRevealed;
+      if (state.finalRevealed) {
+        // host has revealed the podium on screen → phones may show standings.
+        payload.leaderboard = roster.slice(0, 10);
+      } else {
+        // SPOILER GUARD: before the on-screen reveal, send NO standings and
+        // STRIP ranks from the roster, so no phone can learn it won (or its
+        // final position) before the audience sees it on the big screen.
+        payload.players = roster.map((p) => ({
+          sessionId: p.sessionId, name: p.name, score: p.score,
+        }));
+      }
     }
     try {
       await fetch("/.netlify/functions/battle-state", {
@@ -189,7 +201,9 @@ export function useBattle(opts: {
     pushState();
   }
   function reveal() { state.phase = "reveal"; pushState(); }
-  function final() { state.phase = "final"; pushState(); }
+  // `final(revealed)` — revealed=false on arrival (phones held on a teaser, no
+  // ranks), flips to true once the host reveals 1st place on screen (c>=3).
+  function final(revealed = false) { state.phase = "final"; state.finalRevealed = revealed; pushState(); }
 
   return {
     state: readonly(state),
