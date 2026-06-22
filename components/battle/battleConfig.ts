@@ -66,6 +66,19 @@ export function battleGroupId(): string {
 
 export const BATTLE_QUESTIONS: BattleQuestion[] = [
   {
+    // Light icebreaker opener — no tech, just to warm the room up.
+    quizId: "b0",
+    question:
+      "“You know nothing, Jon Snow.” — who keeps telling Jon this?",
+    options: [
+      { label: "A", text: "Ygritte" },
+      { label: "B", text: "Daenerys Targaryen" },
+      { label: "C", text: "Arya Stark" },
+      { label: "D", text: "Lila Dorato" },
+    ],
+    correct: "A",
+  },
+  {
     quizId: "b1",
     question:
       "The 2017 “Transformer” behind today's LLMs improved on earlier models mainly by…",
