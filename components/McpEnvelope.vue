@@ -10,7 +10,7 @@ import { useSlideContext } from '@slidev/client'
   Right : the SAME request our app sends to an MCP server — same host shape,
           same Bearer auth, same JSON over HTTP. Only the BODY differs (JSON-RPC).
   A policy band drives the payoff: because it's HTTP, the gateway
-  policies we run (OAuth / rate-limit / audit / WAF) wrap it unchanged.
+  policies we run (OAuth / rate-limit / log) wrap it unchanged.
 
   PHYSICAL-PAGE RULE (Rule 4): both cards, the middle band and the policy
   strip own fixed slots from the start. Cards are equal fixed height; the
@@ -88,8 +88,7 @@ const c = computed(() => $clicks.value)
       <span class="pills">
         <span class="pill">OAuth</span>
         <span class="pill">Rate limit</span>
-        <span class="pill">Audit log</span>
-        <span class="pill">WAF</span>
+        <span class="pill">Log</span>
       </span>
     </div>
   </div>

@@ -22,10 +22,21 @@ layout: default
   sub="where GenAI fits · a short history" />
 
 <!--
-Part one — AI. Before we touch a single model, a quick map of the whole field: seventy years of it,
-in a couple of minutes, just so we can place GenAI on the map and see how small the box we actually
-care about is. Then we zoom all the way in.
+◀ **IN** · move one of three — AI, the big picture, before we open any model.
+
+🧭 **SPINE** · part 1 of AI → LLMs → Agents. Goal: place GenAI on the map. Keep it short — this is the warm-up.
+
+**SET-UP** (part opener on screen)
+
+- part one — AI
+- before we touch a single model, a quick map of the whole field
+- seventy years of AI, in two minutes — just enough to place GenAI on it
+- and to see how small the box we really care about is
+- then in part 2 we zoom all the way in
+
+▶ **OUT** · first, let's kill one common myth — that "AI" and "GenAI" are the same thing → small box.
 -->
+
 
 ---
 layout: default
@@ -86,12 +97,50 @@ clicks: 3
 </style>
 
 <!--
-One myth to kill before the history.
-[click] Everyone says "AI". AI is huge: seventy years of rules, search, planning, robotics, vision.
-[click] Machine learning is one slice of that — systems that learn from data instead of hand-written rules.
-[click] And generative AI — the LLMs and agents this whole talk is about — is a small box inside THAT.
-When people say "AI" today, they almost always mean this little gold box.
+◀ **IN** · part one opens with a myth to kill: "AI" is not one thing.
+
+**SET-UP** (title on screen, boxes hidden)
+
+- people use "AI" and "GenAI" as if they were the same — they are not
+- watch the boxes get smaller, from the whole field down to our topic
+
+[click] **① Artificial Intelligence** — the big outer box
+
+- the term is from 1956 (the Dartmouth workshop) — AI is ~70 years old, older than most of us
+- definition: any machine doing a task that normally needs human intelligence — that is very wide
+- it covers things that are NOT learning at all: rules, search, planning, robotics, computer vision
+- the early branch was "symbolic AI": the machine SEARCHES or REASONS over many options, even if the pieces are hand-written rules
+- famous examples: Deep Blue beating Kasparov at chess (1997), or a GPS finding the shortest route — pure search, zero learning, but still AI
+- ★ key idea: most of this big box is hand-built logic + search, not a model that learned
+- (note for later) Deep Blue is 1997 but it lives HERE, in symbolic AI — not in the machine-learning era on the next slide; it searched, it never learned
+
+- (if asked "is a plain if/then really AI?") honest answer: usually no, and experts still argue about it. a fixed script (a form check, a thermostat) is just a PROGRAM. it earns the name "AI" when it SEARCHES, infers, or plans over many options — not from a single if/then. the boundary has always been fuzzy: there is even a saying, "AI is whatever computers can't do yet" — once it works, we rename it "just an algorithm". what is NOT fuzzy is the small gold box, generative AI.
+
+- (if asked "what do SEARCH and INFER mean?") both = the machine finds an answer the programmer never wrote down:
+- SEARCH = explore many options to find a good one. chess: from one position ~30 moves, then ~30 replies… billions of futures. Deep Blue scored millions per second and picked the best. nobody coded "if this move, play that" — it searched the tree. same for GPS: it explores a road network for the shortest route.
+- INFER (reason) = chain known facts + rules into a NEW conclusion. medical rules: "fever + bacteria X → infection Y", "infection Y → antibiotic Z" → it concludes "give Z". nobody wrote "this patient → Z"; it followed the chain.
+- the three modes, simplest to richest: (1) plain PROGRAM — the human wrote the answer (if/then); (2) symbolic AI — the human wrote the rules + goal, the machine SEARCHES / INFERS the answer; (3) ML & GenAI — the human writes neither, the machine LEARNS the patterns from data.
+- fair caveat: search and infer are still 100% deterministic code — so "it's just algorithms" is fair too; "intelligence" here just labels behaviour that LOOKS like human problem-solving (trying options, reasoning), not anything magical.
+
+[click] **② Machine Learning** — one slice inside AI
+
+- the shift: instead of US writing the rules, we show the machine examples and it finds the patterns
+- example: to detect spam, we do not list bad words by hand — we give it 100,000 emails marked "spam / not spam" and it learns
+- it needs DATA to learn from — no data, no machine learning
+- this is most of the "AI" running in business today: fraud detection, product recommendations (Netflix, Amazon), credit scoring, demand forecasting
+- still not generative: these models CLASSIFY or PREDICT a number/label — they do not create new text or images
+
+[click] **③ Generative AI** — a small box inside ML
+
+- "generative" = it CREATES new content: text, images, code, audio — not just a yes/no or a score
+- the examples everyone knows: ChatGPT and Claude (text), Midjourney / DALL·E (images), GitHub Copilot (code)
+- LLMs and agents — this whole talk — live only in this small gold box
+- ★ the point: when people say "AI" today, they almost always mean only this small box
+- so "we use AI" has been true for decades; what is NEW since ~2022 is this generative part finally working well
+
+▶ **OUT** · so how did we get from the big box to this small one? a very short history → timeline.
 -->
+
 
 ---
 layout: default
@@ -117,10 +166,48 @@ clicks: 4
 </style>
 
 <!--
-On screen already — the 50s: rules and logic, we hand-write every if/then. Brittle.
-[click] 90s: machine learning — stop writing rules, learn patterns from data.
-[click] 2012: deep learning — neural nets crack vision and speech.
-[click] 2017: the hinge. The Transformer — "attention is all you need". Architecture behind every modern LLM.
-[click] 2022: the ChatGPT moment. Nothing new in principle — but scale made it feel like a step change.
-The pattern: we stopped telling machines the rules, and started letting them predict.
+◀ **IN** · we placed GenAI in its small box — now, how we got there, in five steps.
+
+🧭 **SPINE** · one story across the whole timeline: we slowly stopped WRITING the rules and let machines LEARN and PREDICT them.
+
+**SET-UP** (first milestone on screen — 1950s)
+
+- on screen already — the 1950s–80s: symbolic AI, "rules & logic"
+- we hand-write every if/then; the machine only follows our rules
+- the big idea of that era: "expert systems" — capture an expert's rules in code (e.g. MYCIN, 1970s, suggested antibiotics from rules)
+- it worked in narrow cases, but it was brittle: thousands of rules, and it broke on anything we did not foresee
+- and it could not LEARN — a human had to add every new rule by hand
+- this caused the "AI winters" — hype, then funding dried up when the rules hit their limit
+
+[click] **② 1990s — Machine Learning**
+
+- the shift: stop writing rules, let the machine learn patterns from data
+- real landmark of the era: machines learning to READ handwritten zip codes and bank cheques (neural nets, deployed by postal services and banks in the 90s) — learned from examples, not rules
+- this era gave us spam filters, recommendation engines, fraud detection — much of it still runs today
+- the catch: it needed humans to choose the useful features (e.g. "count these words") — the machine learned, but we still pointed at what mattered
+- (careful — common confusion) 1997 Deep Blue beating Kasparov happened in this decade, but it was NOT machine learning: pure search, zero learning — it belongs in the outer AI box. the chess/Go landmark that DID learn is AlphaGo, 2016.
+
+[click] **③ 2012 — Deep Learning** (the first big jump)
+
+- the trigger event: AlexNet wins the ImageNet image contest by a HUGE margin, using a deep neural network on GPUs
+- "deep" = many layers; the network now learns the features ITSELF — no more hand-picking
+- suddenly machines could SEE and HEAR: this is the tech behind photo tagging, Siri/Alexa, self-driving vision
+- why now and not before? three things lined up: big data (the internet), big compute (GPUs), better methods
+
+[click] **④ 2017 — the Transformer** (the hinge of the whole talk)
+
+- one Google paper, "Attention Is All You Need" — arguably the most important AI paper of the decade
+- before it, models read text word-by-word and forgot the start of long sentences; the Transformer reads it ALL at once
+- ★ this is the architecture behind every modern LLM — the "T" in GPT literally means Transformer
+- remember the word "attention" — it is the next slide in part 2, and the reason these models finally understood context
+
+[click] **⑤ 2022 — the ChatGPT moment**
+
+- ChatGPT launched Nov 2022 and hit 100 million users in ~2 months — the fastest-growing app in history at the time
+- ★ nothing new in principle here — same Transformer idea as 2017, just much bigger and trained on far more text
+- so the "revolution" is less a NEW idea, more an old idea finally big enough to work — 2017 → 2022 is only 5 years of scaling
+- this is the moment AI left the lab and landed on everyone's phone — which is why we are all in this room today
+
+▶ **OUT** · the pattern across the whole line — from "tell the machine the rules" to "let it predict them". That ends the map; now we open the box and meet the model itself → part two.
 -->
+

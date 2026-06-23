@@ -18,17 +18,17 @@ import { useSlideContext } from '@slidev/client'
     ② OUR code runs it against the real Order API (our auth, our governance)
     ③ the JSON result is folded back into the model's next payload → it answers
 
-  PHYSICAL-PAGE RULE (4): the model card, the boundary, the two right-side
-  cards and the payoff band own fixed slots from the start; the return arrow
-  has a reserved slot too. Clicks only toggle opacity / lit-state — no reflow.
+  PHYSICAL-PAGE RULE (4): the model card, the boundary and the two right-side
+  cards own fixed slots from the start; the return arrow has a reserved slot
+  too. Clicks only toggle opacity / lit-state — no reflow.
   Rule 8: lands with the title + the model's request already showing.
   Rule 7: model = warm (the AI), our side = cool (integration), result = good.
 
-  Beats (clicks: 3):
+  Beats (clicks: 2):
     c=0  model card + its tool_use request (the ask)
     c=1  request crosses the boundary → OUR code runs the real API
     c=2  result returns, folded into the next payload (the model can now answer)
-    c=3  payoff band — the model never touches our systems
+  (The "model never touches our systems" payoff is spoken, not on the slide.)
 */
 
 const { $clicks } = useSlideContext()
@@ -69,11 +69,11 @@ const op = (from) => (c.value >= from ? 1 : 0)
             <path d="M0,0 L9,4.5 L0,9 Z" fill="var(--good)" />
           </marker>
         </defs>
-        <!-- request → (c1) -->
-        <line x1="6" y1="118" x2="112" y2="118" class="wire cool" marker-end="url(#tr-cool)"
+        <!-- request → (c1) — lowered to sit under the lifted cards -->
+        <line x1="6" y1="150" x2="112" y2="150" class="wire cool" marker-end="url(#tr-cool)"
           :style="{ opacity: op(1) }" />
         <!-- ← result (c2) -->
-        <line x1="114" y1="182" x2="8" y2="182" class="wire good" marker-end="url(#tr-good)"
+        <line x1="114" y1="210" x2="8" y2="210" class="wire good" marker-end="url(#tr-good)"
           :style="{ opacity: op(2) }" />
       </svg>
 
@@ -83,7 +83,8 @@ const op = (from) => (c.value >= from ? 1 : 0)
           <div class="c-head"><span class="dot cool" />Our code runs it</div>
           <div class="c-sub">our auth · our governance</div>
           <div class="json">
-            <div class="jl"><span class="v">GET</span> api.acme.com/orders/<span class="s">7788</span></div>
+            <div class="jl"><span class="v">POST</span> tools.acme.com/mcp</div>
+            <div class="jl"><span class="dim">tools/call →</span> <span class="s">get_order_status</span></div>
             <div class="jl auth"><span class="dim">Authorization:</span> Bearer •••</div>
           </div>
           <div class="tag cool">② we execute</div>
@@ -100,26 +101,21 @@ const op = (from) => (c.value >= from ? 1 : 0)
         </div>
       </div>
     </div>
-
-    <!-- payoff band -->
-    <div class="band" :style="{ opacity: op(3) }">
-      <span class="b-lead">The model never touches our systems.</span>
-      It only <strong>requests</strong>; our code holds the credentials and stays in control of execution.
-    </div>
   </div>
 </template>
 
 <style scoped>
-.tr { display: flex; flex-direction: column; align-items: center; gap: 0.9rem; width: 100%; }
+.tr { display: flex; flex-direction: column; align-items: center; gap: 0.75rem; width: 100%; }
 
 .stage {
-  position: relative; width: 880px; height: 330px;
+  position: relative; width: 880px; height: 300px;
   display: grid; grid-template-columns: 1fr 120px 1fr; align-items: center;
 }
 
-/* trust boundary */
+/* trust boundary — sits a touch LOWER than the cards (line + arrows below,
+   cards lifted above, so the two read as distinct layers) */
 .boundary {
-  position: absolute; left: 50%; top: 0; bottom: 0; width: 0;
+  position: absolute; left: 50%; top: 30px; bottom: 0; width: 0;
   border-left: 2px dashed var(--hair); transform: translateX(-50%);
   transition: border-color 0.45s ease;
 }
@@ -131,7 +127,8 @@ const op = (from) => (c.value >= from ? 1 : 0)
 .b-lab.model-side { right: 0.6rem; }
 .b-lab.our-side { left: 0.6rem; }
 
-.col { display: flex; flex-direction: column; gap: 0.6rem; }
+/* cards lifted slightly above the grid centre line */
+.col { display: flex; flex-direction: column; gap: 0.5rem; transform: translateY(-22px); }
 .left { grid-column: 1; }
 .right { grid-column: 3; }
 
@@ -177,14 +174,4 @@ const op = (from) => (c.value >= from ? 1 : 0)
 .wire { stroke-width: 2.5; transition: opacity 0.5s ease; }
 .wire.cool { stroke: var(--cool); }
 .wire.good { stroke: var(--good); }
-
-/* payoff band */
-.band {
-  width: 100%; max-width: 820px; text-align: center; font-size: 0.95rem; color: var(--ink-soft);
-  line-height: 1.5; padding: 0.8rem 1.3rem; border-radius: 12px;
-  background: var(--sunken); border: 1px solid var(--sunken-border);
-  transition: opacity 0.5s ease;
-}
-.band .b-lead { color: var(--cool-bright); font-weight: 700; }
-.band strong { color: var(--ink); font-weight: 700; }
 </style>

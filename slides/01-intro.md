@@ -7,11 +7,21 @@ layout: default
 </Hero>
 
 <!--
-A quick reset before we dive in. (Background — yes, that's Ygritte: "You know nothing, Jon Snow.")
-It's easy to feel like we already know AI — we use it every day now. But this field rewrites itself
-every few months, and the honest posture is humility. The more you learn here, the more you see how
-much is still open. That's not discouraging — it's the fun part. Stay curious, stay a beginner.
+◀ **IN** · I promised a clear map — but first, an honest word about the field itself.
+
+**SET-UP** (quote on screen)
+
+- a quick reset before we start
+- the background is a joke for the fans: Ygritte to Jon Snow — "You know nothing, Jon Snow" — that is all of us with AI
+- it is easy to feel we already know AI — we use it every day now
+- but the field changes every few months; the honest posture is to stay humble
+- even the people who BUILD these models say the same — nobody fully understands them yet
+- the more we learn here, the more we see how much is still open — and that is the fun part
+- so: stay curious, stay a beginner — me included
+
+▶ **OUT** · with that mindset, here is the map for the next 45 minutes → roadmap.
 -->
+
 
 ---
 layout: default
@@ -75,9 +85,29 @@ clicks: 3
 </style>
 
 <!--
-Here's the shape of the next 45 minutes — three moves, and they're the spine of the whole talk:
-AI, LLMs, Agents.
-[click] One — AI. A quick map of the field: just enough to place GenAI on it.
-[click] Two — LLMs. We zoom into a single model — tokens, attention, and why it remembers nothing.
-[click] Three — Agents. We give the model hands: tools, MCP, agents. Most of our time lives in two and three.
+◀ **IN** · we agreed to stay humble — now here is the simple map to follow.
+
+🧭 **SPINE** · this is the spine of the whole talk: **AI → LLMs → Agents**. Every later slide sits on one of these three. Plant it now; I will point back to it at each part.
+
+**SET-UP** (title on screen, cards hidden)
+
+- the shape of the next 45 minutes — three moves
+- they build on each other: each part needs the one before
+
+[click] **① AI** — a quick map of the field
+
+- just enough history to place GenAI on the map and see how small its box is
+
+[click] **② LLMs** — how one model really works
+
+- we zoom into a single model: tokens, attention, and why it remembers nothing
+
+[click] **③ Agents** — from answers to actions
+
+- we give the model hands: tools, MCP, the loop
+- most of our time lives in parts two and three — part 1 is short and light, we go slow where the value is
+- and they build up: agents sit on top of everything in part 2, so part 2 is not optional
+
+▶ **OUT** · let's start wide — part one, the big picture of AI → part opener.
 -->
+

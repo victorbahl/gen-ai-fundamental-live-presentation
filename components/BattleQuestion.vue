@@ -36,6 +36,11 @@ watch(c, syncPhase);
 const revealed = computed(() => c.value >= 1);
 // How many got it right this round (we don't name them — just the count).
 const scoredCount = computed(() => b.players().filter((p) => p.lastDelta > 0).length);
+
+// Long-option questions (e.g. the embeddings one) overflow at the default size,
+// so shrink the option text when the longest option runs past a threshold.
+const tight = computed(() =>
+  Math.max(...q.value.options.map((o) => o.text.length)) > 70);
 </script>
 
 <template>
@@ -49,7 +54,7 @@ const scoredCount = computed(() => b.players().filter((p) => p.lastDelta > 0).le
 
     <h2 class="bq-q">{{ q.question }}</h2>
 
-    <div class="bq-opts">
+    <div class="bq-opts" :class="{ tight }">
       <div v-for="o in q.options" :key="o.label" class="bq-opt"
            :class="{ correct: revealed && o.label === q.correct, dim: revealed && o.label !== q.correct }">
         <span class="lab">{{ o.label }}</span>
@@ -90,6 +95,9 @@ const scoredCount = computed(() => b.players().filter((p) => p.lastDelta > 0).le
 .bq-opt.correct { border-color: var(--good); background: rgba(46,132,74,.14); }
 .bq-opt.correct .lab { background: var(--good); }
 .bq-opt.dim { opacity: .4; }
+
+/* Long-option questions: shrink text + line-height so nothing runs off-page. */
+.bq-opts.tight .bq-opt { font-size: 1.15rem; padding: 14px 16px; line-height: 1.25; }
 
 .bq-reveal { margin-top: 24px; font-size: 1.2rem; }
 .bq-reveal .lead { color: var(--ink-soft); margin-right: 10px; }

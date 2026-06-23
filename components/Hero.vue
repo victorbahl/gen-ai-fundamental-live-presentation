@@ -18,6 +18,10 @@ const props = defineProps({
   align: { type: String, default: 'left' },  // 'left' | 'center'
   size: { type: String, default: 'lg' },     // 'lg' | 'sm'
   logos: { type: Array, default: () => [] },  // filenames under public/img/, shown top-right
+  // optional presenter byline (small avatar + name + title), pinned bottom-left
+  presenter: { type: String, default: '' },        // name
+  presenterTitle: { type: String, default: '' },   // role/title
+  presenterPhoto: { type: String, default: '' },   // filename under public/img/
 })
 
 // Prepend Vite's BASE_URL (trailing-slash) so images resolve under a
@@ -30,6 +34,7 @@ const logoUrls = props.logos.map((f) => ({
   src: `${base}img/${f}`,
   name: f.split('/').pop().replace(/\.[^.]+$/, ''),
 }))
+const presenterPhotoUrl = props.presenterPhoto ? `${base}img/${props.presenterPhoto}` : ''
 </script>
 
 <template>
@@ -52,6 +57,13 @@ const logoUrls = props.logos.map((f) => ({
       <div v-if="kicker" class="kicker">{{ kicker }}</div>
       <h1 class="display" :class="{ sm: size === 'sm' }"><slot /></h1>
       <div v-if="$slots.subtitle" class="subtitle"><slot name="subtitle" /></div>
+    </div>
+    <div v-if="presenter" class="presenter">
+      <img v-if="presenterPhotoUrl" :src="presenterPhotoUrl" alt="" class="presenter-photo" />
+      <div class="presenter-meta">
+        <div class="presenter-name">{{ presenter }}</div>
+        <div v-if="presenterTitle" class="presenter-title">{{ presenterTitle }}</div>
+      </div>
     </div>
   </div>
 </template>
@@ -111,4 +123,36 @@ const logoUrls = props.logos.map((f) => ({
   text-shadow: 0 1px 10px rgba(0,0,0,0.7);
 }
 .al-center .subtitle { margin-inline: auto; }
+
+/* presenter byline — small avatar + name/title, pinned bottom-left, on the image */
+.presenter {
+  position: absolute;
+  left: 6%;
+  bottom: 2.2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+.al-center .presenter { left: 50%; transform: translateX(-50%); }
+.presenter-photo {
+  width: 2.7rem;
+  height: 2.7rem;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1.5px solid rgba(255, 255, 255, 0.75);
+  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.55);
+}
+.presenter-meta { line-height: 1.2; }
+.presenter-name {
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.92rem;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.7);
+}
+.presenter-title {
+  color: #e7ebf2;
+  font-weight: 400;
+  font-size: 0.78rem;
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.75);
+}
 </style>

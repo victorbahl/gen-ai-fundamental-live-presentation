@@ -130,7 +130,9 @@ celebrate → deflate → name the limits → show the fix → bridge into Part 
 **3 — Agents** (`04-act-tools.md` + `05-act-agents.md`, ONE part, TOP-DOWN order): PartOpener /
 AgentRuntime ("what is an agent" — UP FRONT) / ToolRoundtrip (tools) / McpEnvelope / McpHandshake /
 ToolsVsSkills (skills — after tools+MCP) / AgentLoop (live worked trace) / AgentContextWindow /
-A2A (protocol-technical, Agent Cards) · Close (hackathon CTA).
+KeyTakeaways (5-line whole-deck recap) · Close (hackathon CTA). A2A was REMOVED 2026-06-22 (user:
+"remove the A2A slide, it's too much") — the `A2A.vue` file stays on disk but is unreferenced; do
+NOT resurrect the slide.
 Within Part 2, STATELESS comes BEFORE the context window (no-memory truth motivates "so how much
 fits in one call?" → the window → bridges into agents).
 
@@ -138,7 +140,7 @@ PART OPENERS: each part opens with a `PartOpener.vue` hero showing a SPINE PROGR
 "AI › LLMs › Agents" spine with the current part lit (accent underline), others dimmed — over a bg
 photo, then the part number + headline + a sub-line of TAGS mapping to that part's contents:
 Part 1 = "where GenAI fits · a short history · prediction at scale"; Part 2 = "tokens · attention ·
-stateless · the context window"; Part 3 = "tools · MCP · the agent loop · A2A". Part 1 = cool/azure
+stateless · the context window"; Part 3 = "what an agent is · tools · MCP · skills · the loop". Part 1 = cool/azure
 (`accent="cool"`, `bg="part-1.jpg"`); Parts 2 & 3 = warm/gold (`part-2.jpg`, `part-3.jpg`). Same
 placeholder/text-shadow rules as `Hero.vue` (Rules 2/3) and token-driven accents (Rule 7).
 
@@ -157,7 +159,8 @@ spectrum explorations. `part-2b.jpg`/`part-4.jpg` placeholders are no longer ref
 `Hero.vue` (Archetype A), `PartOpener.vue` (part-opener hero w/ spine bar), `Timeline.vue`,
 `NextTokenPredictor.vue`, `AttentionFlip.vue`, `ContextWindow.vue`, `AgentContextWindow.vue`,
 `StatelessReplay.vue`, `McpEnvelope.vue`, `McpHandshake.vue`, `AgentRuntime.vue`, `ToolRoundtrip.vue`,
-`ToolsVsSkills.vue`, `AgentLoop.vue`, `A2A.vue`, `Hallucination.vue`, `Grounding.vue`.
+`ToolsVsSkills.vue`, `AgentLoop.vue`, `KeyTakeaways.vue`, `Hallucination.vue`, `Grounding.vue`.
+(`A2A.vue` still on disk but UNREFERENCED — its slide was cut 2026-06-22.)
 
 ### Part 1 (AI)
 - **"Small box" zoom** (inline in `02-reason-history.md`): nested AI ⊃ ML ⊃ GenAI boxes. The gold
@@ -221,24 +224,46 @@ spectrum explorations. `part-2b.jpg`/`part-4.jpg` placeholders are no longer ref
   nuance that must stay. HONEST CAVEAT: grounding cuts hallucination on covered facts, never to zero.
 
 ### Part 3 (Agents)
-- **`AgentRuntime.vue`** (`clicks:4`) — "WHAT IS AN AGENT", defined UP FRONT. Engine+attachments diagram
-  on a fixed 780×300px stage (SVG wire layer 1:1 to px, AgentLoop-style; HTML nodes on top, Rule 4).
-  c0 bare LLM core ("on its own it only reasons"); c1 +GOAL in +LOOP arc +dashed AGENT boundary ("decides
-  its own next step"); c2 +TOOLS docked; c3 +MEMORY docked; c4 +ANSWER out +payoff band ("an agent is the
-  LLM, wrapped to act: a loop + goal + tools + memory — nothing new"). Colours (Rule 7): core/loop/memory
-  warm, tools cool, goal/answer good. Example matches the loop: "When will order #7788 arrive?" → "Shipped
-  — arriving Jun 20."
+- **`AgentRuntime.vue`** (`clicks:6`) — "WHAT IS AN AGENT", defined UP FRONT, as the WHOLE PICTURE with
+  NO worked example (user 2026-06-23: "start with the whole picture, a model in a loop; no example on the
+  slide — we do the whole loop later in AgentLoop"). Built **OUTSIDE-IN** (user 2026-06-23): the empty
+  AGENT/code box lands FIRST (the dashed boundary, on screen from arrival), then we FILL it. REVEAL ORDER
+  (user 2026-06-23, exact): box (c0) → **LLM** (c1) → **memory** (c2) → **tools** (c3) → **goal** (c4) →
+  **loop arc** over the model w/ "picks its own next step" (c5) → **result** out on the right (c6, + payoff
+  band). GOAL + RESULT pills are GENERIC (no order #7788): GOAL = "the job to get done", RESULT = "the job,
+  done" — the running, worked trace is AgentLoop's job. FRAMING: an agent is **a PIECE OF CODE with, at its
+  heart, an LLM + Memory + Tools, run in a LOOP toward a GOAL** — NOT a new kind of model. Dashed boundary
+  labelled "AGENT · code" — just "code", NOT "our code" (user 2026-06-23; agent-DEFINITION framing only —
+  ToolRoundtrip/MCP slides still correctly say "our code/auth/gateway" per Rule 9). Slide headline "A piece
+  of CODE, with a model at its heart" (user 2026-06-23: "improve the title", lead with code-not-model).
+  Payoff band SHORTENED (user 2026-06-23: "make the paragraph shorter, remove ', not a new model' and 'The
+  rest … piece.'"): now just "An agent is a piece of code: an LLM at its heart, wired to tools and memory,
+  looping toward a goal." Engine+attachments diagram on a fixed 780×**310**px stage (heightened 300→310 +
+  boundary h=262 so the docked tools/memory cards sit fully INSIDE the box — user 2026-06-23: "the box is a
+  bit too small, tools and memory not completely in"); SVG wire layer 1:1 to px (AgentLoop-style), HTML
+  nodes on top (Rule 4). Layout: boundary x=168 w=384 h=262; core left=260 top=98; memory dock left=366,
+  tools dock left=222 (both top=206, h=84, INSIDE the box); GOAL pill left=8, RESULT pill left=564 (both
+  outside, feeding in/out). Colours (Rule 7): core/loop/memory warm, tools cool, goal/result good. ORAL
+  FRAMING in notes (user's Q, 2026-06-23): Claude Code IS an agent by this definition (LLM + tools + memory
+  + loop toward a goal) — given as a concrete known example, IN the flow; Claude/ChatGPT the PRODUCTS are
+  real apps wrapped around a model too, not the bare model; the line that makes it AGENTIC is the autonomous
+  loop (chat = answer once, human in the loop; agent = picks its own next step until done).
 - **`ToolRoundtrip.vue`** (`clicks:3`) — TOOLS, request→execute→return round-trip across a TRUST BOUNDARY.
   A dashed centre line splits "the model · text only" (left, warm) from "our side · executes" (right, cool);
-  real artefacts (a `tool_use` JSON request → our `GET …/orders/7788` with Bearer → the `{status,eta}`
-  result). c0 model's request; c1 crosses boundary, our code runs it; c2 result folded back; c3 payoff
-  ("the model never touches our systems — it requests, we execute").
+  real artefacts (a `tool_use` JSON request → our `POST tools.acme.com/mcp · tools/call → get_order_status`
+  with Bearer → the `{status,eta}` result). The "our code runs it" card shows a COMPACT MCP call (not a
+  plain GET, not the full JSON-RPC body — user 2026-06-22: "do an MCP call, not a GET"; kept compact so it
+  foreshadows MCP without pre-empting `McpEnvelope`'s full envelope). c0 model's request; c1 crosses
+  boundary, our code runs it; c2 result folded back; c3 payoff ("the model never touches our systems — it
+  requests, we execute"). Stage height 300px + col gap 0.5rem so the payoff band clears the right column's
+  two stacked cards (the 3-line MCP card made the old overlap tighter, hence the trim).
 - **`McpEnvelope.vue` + `McpHandshake.vue`** — the MCP pair, both `clicks:3`. ENVELOPE: REST (left) vs MCP
   server (right) as TWO HTTP requests with the SAME Bearer auth + JSON content type — only the body differs
   (REST = intent in URL; MCP = a JSON-RPC 2.0 `tools/call` object with `jsonrpc`/`id`/`method`/`params`).
   Title "A standard API any AI app can consume". Beat 2 lights the shared envelope + highlights the
-  differing body; beat 3 = policy band (OAuth / rate-limit / audit / WAF) — "it's just HTTP, so our gateway
-  policies wrap it unchanged." HANDSHAKE (replaced the old Mermaid sequence): three fixed-height rows
+  differing body; beat 3 = policy band (OAuth / Rate limit / Log — WAF + "audit" dropped 2026-06-22, user) — "it's just HTTP, so our gateway
+  policies wrap it unchanged." HANDSHAKE (replaced the old Mermaid sequence): title is just "Three
+  standard calls" (the "— every time" tail was dropped 2026-06-22, user). Three fixed-height rows
   `initialize → tools/list → tools/call`, each a `POST /mcp` with Bearer, response fades in per beat,
   first row active on arrival. ACCURACY: the MCP **consumer is our AI app — the MCP client inside the host
   — NOT the model**. The model only decides which tool + args; our client speaks the protocol and makes the
@@ -252,19 +277,33 @@ spectrum explorations. `part-2b.jpg`/`part-4.jpg` placeholders are no longer ref
 - **`AgentLoop.vue`** (`clicks:5`) — a LIVE WORKED TRACE, not a static ring. The loop ACTUALLY RUNS on
   "When will order #7788 arrive?", accumulating like a transcript: ① THINK→ACT `get_order_status(7788)`→OBS
   `{status:"shipped", eta:null, tracking:"1Z…"}`; ② THINK (the KEY beat — the model CHOOSES its next step
-  FROM the observation: "no ETA but a tracking number, follow it", highlighted "↑ chosen from what it just
-  saw")→ACT `get_tracking`→OBS ETA; ③ goal met → DONE. Right-side legend shows the one think→act→observe
+  FROM the observation: "no ETA but a tracking number, follow it", with a "↑ chosen from what it just
+  saw" note on its OWN reserved line UNDER the THINK text — `.from-line`, indented 3.8rem to sit under the
+  text, opacity-gated, NOT absolute-positioned over it; the old absolute `.from` overlapped "…I'll follow
+  it." and was moved 2026-06-22, user)→ACT `get_tracking`→OBS ETA; ③ goal met → DONE. Right-side legend shows the one think→act→observe
   loop. THE POINT (payoff band + notes): we orchestrated nothing between steps — the model picked step ②
   itself and decided when to stop; THAT is the agentic loop. c0 goal+① THINK; c1 ① ACT+OBS; c2 ② THINK
   (causal link lit); c3 ② ACT+OBS; c4 ③ done; c5 payoff.
 - **`AgentContextWindow.vue`** (`clicks:4`) — see PAIR note below.
-- **`A2A.vue`** (`clicks:3`) — protocol-technical, a deliberate MIRROR of the MCP pair ("discover the
-  agent, then delegate a task" = MCP's "discover the menu, then call"). Two agents (Orchestrator warm /
-  Orders specialist cool) + three exchange rows like the handshake: ① DISCOVER `GET /.well-known/agent.json`
-  → the Agent Card {name, skills, url}; ② DELEGATE `POST message/send` → a Task; ③ RETURN a
-  `Task {state:"completed", result}`. c0–c2 walk the rows; c3 payoff ("same Bearer-over-HTTP envelope as
-  MCP → same gateway policies"). A2A spec shape light but accurate (Agent Card at /.well-known/agent.json;
-  Task lifecycle submitted→working→completed).
+- **`KeyTakeaways.vue`** (`clicks:4`) — the WHOLE-DECK RECAP, last content slot before the close CTA
+  (replaced A2A 2026-06-22, user: "rework the key learnings — do 5"). Five numbered rows spanning the
+  AI → LLMs → Agents arc, each a durable mental model with a one-line gloss: ① LLM = a stateless text
+  function (text in → text out, no memory); ② it predicts, it can't check (frozen public model → feed it
+  facts as context); ③ **agent = code + an LLM, looping toward a goal** (formula style — user 2026-06-23;
+  sub: "with memory and tools wired in, it picks its own next step until done"); ④ the model asks, **the
+  APP executes** (NOT "we" — Rule 9 exception; the model never touches our systems); ⑤ MCP is a
+  standardized HTTP API (sub names the three calls: initialize, tools/list, tools/call — over the same
+  host/auth/JSON). COLOUR (user 2026-06-23): ALL five rows are the SAME colour — COOL/blue (the old
+  warm-vs-cool "what the model is / how we use it" split read as an unexplained code, so it's GONE; do
+  NOT reintroduce per-row accents). The per-row TAG chips (LLM/AGENT/TOOLS/MCP) were also REMOVED (user:
+  "useless"). Fixed-slot list, all five rows present from the start at opacity 0.34; row 1 lit on arrival
+  (Rule 8), clicks light rows 2–5 (lift opacity + colour the number/left-border cool) — no reflow. The
+  gloss sits TIGHT under its head (`margin-top:0.04rem`, user 2026-06-23: "make the subline closer to the
+  title"). Slide title "Five things worth keeping" (accent "keeping"), kicker "To remember". User-given
+  framings to PRESERVE: LLM = stateless text→text; MCP = standardized HTTP API; agent = code + LLM + loop.
+- **`A2A.vue`** — UNREFERENCED since 2026-06-22 (its slide was cut, user: "too much"). File kept on disk
+  but not included by any slide; do NOT re-add the slide. (Was: protocol-technical MCP-pair mirror —
+  Agent Card discovery + task delegation.)
 
 ### Context-window PAIR (`ContextWindow.vue` + `AgentContextWindow.vue`)
 Same fixed-space, colour-coded grid shown twice. The lean Part-2 one (system · history · current ·
@@ -295,9 +334,10 @@ tool output is big). Both use striped cells (45° gradient) for the compressed/o
   check QR panel, option cards, podium rank numbers, the new brand-logo pill + 40-player chip grid,
   accent legibility on the light canvas). Functions only run on the deployed site (lesson 9).
 - **KNOWN MINOR (fix later, do NOT block):** `ToolRoundtrip`'s right-hand column (two stacked cards)
-  sits a touch tall — its lower card slightly kisses the payoff band at real canvas res (980×551);
-  stage height was mid-adjustment (currently 330px). Do a click-by-click pass on
-  `AgentLoop`/`A2A`/`ToolsVsSkills` at real res to confirm no row/band overlap.
+  sat a touch tall and kissed the payoff band at real canvas res (980×551). Tightened 2026-06-22 (stage
+  330→300px, col gap 0.6→0.5rem) when the "our code runs it" card grew to 3 lines (the compact MCP call).
+  Do a click-by-click pass on `ToolRoundtrip`/`AgentLoop`/`ToolsVsSkills`/`KeyTakeaways` at real res to
+  confirm no row/band overlap.
 - **Photos.** Hero backgrounds are gradient placeholders until a real file is dropped at the path
   (no code change needed). REAL: `but-limits.jpg` (dark foggy forest path, "can't see ahead"). Still
   placeholders: `cover.jpg`, `part-1/2/3.jpg`, `prediction-at-scale.jpg` (wants rocket/liftoff),
@@ -446,3 +486,46 @@ tool output is big). Both use striped cells (45° gradient) for the compressed/o
    On slides AND in speaker notes, say **"we"/"our"** (the systems we run, the APIs we ship) — never
    "you"/"your" addressed to the room. (Neutral generic-impersonal "you" is fine when unavoidable,
    but prefer "we".) Applies to all new/edited copy.
+   - **EXCEPTION — tool execution actor is "the app", NOT "we"** (user 2026-06-23): in the
+     model-asks / something-executes narrative, the executor is the AGENT/APP/our code — say
+     **"the model asks, the app executes"**, NOT "we execute". "We" is for the team that BUILDS and
+     RUNS the systems (the APIs we ship, the gateway we own), not for the runtime act of calling a
+     tool. So: "the app holds the credentials and makes the call", "our code runs it" — never "WE
+     execute" as if the humans run the call.
+
+10. **Speaker notes = a bullet-point teleprompter with a fil rouge** (reworked 2026-06-23, user:
+    "improve drastically the presenter notes"). Every slide's `<!-- … -->` note follows ONE fixed
+    template so the presenter can scan it live and glide slide→slide and click→click. The reference
+    implementation is the predictor slide ("How a prompt becomes a prediction") — match it. Rules:
+    - **B1 English.** Audience is international, NOT native speakers. Short simple sentences, common
+      words, no idioms/phrasal-verb soup. (Slides themselves keep their existing copy; this is about
+      the NOTES.) Still all-English (Rule 1), still "we" not "you" (Rule 9).
+    - **Bullet points, not prose.** Info in short lines; ONE point per line (Markdown `- ` bullets) so
+      the Slidev presenter pane renders each on its own line. NOT long paragraphs.
+    - **Sync to clicks with the OFFICIAL Slidev marker.** Use a literal `[click]` line before each
+      beat's bullets — Slidev highlights the matching note block as the host advances. (Do NOT invent
+      `[click 1 — X]` text markers; the bare `[click]` is what Slidev tracks. The first beat / SET-UP
+      has no `[click]` — it's the on-arrival state.) Beat count must match the slide's `clicks:`.
+    - **Fil rouge markers** (keep the symbols — they scan well; just put each on its own line):
+      `◀ **IN** ·` = one line bridging FROM the previous slide (pick up the hook it left hanging);
+      `▶ **OUT** ·` = one line bridging INTO the next slide. These two MUST chain: a slide's OUT sets
+      up the next slide's IN. Optional `🧭 **SPINE** ·` = one line on why this slide matters in the
+      whole AI→LLMs→Agents arc (only where it earns it). `★` inline = the one beat not to skip under
+      time pressure.
+    - **Be generous with oral-only value — IN THE FLOW.** The slide is just a support, so notes SHOULD
+      add facts NOT on the slide that are worth saying out loud (e.g. EOS/stopping, temperature, billing,
+      analogies, anticipated audience questions). But these go INSIDE the beat they belong to, as extra
+      bullets in the relevant `[click]` block (or SET-UP / OUT) — NOT in a separate "Say orally" /
+      "Q&A nuggets" section at the end (user 2026-06-23: "add it in the text flow, no separate label").
+      For something that's only worth saying if the room asks, fold it in with an inline `(if asked: …)`
+      so it stays in context but reads as optional.
+    - **Structure, top to bottom:** `◀ IN` → optional `🧭 SPINE` → `**SET-UP**` (on-arrival state) →
+      one `[click]` block per beat (`**① LABEL**` + bullets, oral-only asides folded into the right
+      beat) → `▶ OUT`. No trailing oral-only block.
+
+11. **Battle answers must not be tell-able by LENGTH** (user 2026-06-23: "make the other answer a
+    bit longer so it doesn't feel like the right answer straight away"). In `battleConfig.ts`, the
+    `correct` option must NOT be the conspicuously longest/most-detailed/most-qualified one — that's a
+    giveaway before anyone reasons. Keep all four options roughly the same length and specificity;
+    when the right answer needs more words, pad the distractors to match. (Insider in-jokes are fine —
+    e.g. the GoT icebreaker's option D "Lila Dorato" is our boss, a deliberate plant.)

@@ -1,42 +1,24 @@
 <script setup lang="ts">
 /**
- * Battle finale — the top-3 podium + runners-up. Reveals by click:
- *   c0  runners-up visible, podium empty
- *   c1  3rd-place column   c2  2nd-place column   c3  1st-place column
+ * PREVIEW-ONLY clone of BattleLeaderboard, fed STATIC data via props so we can
+ * eyeball edge cases (ties, 30 players) without running a live battle.
  *
- * SPOILER GUARD: the engine only pushes standings to phones once the host has
- * revealed 1st place (c>=3). Before that phones see "results coming up".
- *
- * TIES (ex-aequo) — the podium is organised by SCORE TIER, not by array slot:
- * EVERY player sharing the top score sits TOGETHER in the middle column
- * (position 1), the next distinct score fills the left column (position 2), the
- * third fills the right (position 3). So 4 players tied for 1st all stand in the
- * centre — never split into stair-stepped columns. Positions are dense (1,2,3,…
- * by distinct score), so the runners-up continue 4,5,6… with no gaps.
- *
- * OVERFLOW: the podium caps names per column (rest → "+N more"), and the
- * runners-up are a compact wrapping grid capped to fit the slide (tail → a
- * "+N more" chip) — nothing runs off the bottom edge.
- *
- * Slide usage:  <BattleLeaderboard /> with `clicks: 3`
+ * Logic + styles are COPIED VERBATIM from BattleLeaderboard.vue (full real size),
+ * so what shows here is exactly what the room sees. Only the data source changes
+ * (a `players` prop instead of the live engine) and it renders fully-revealed.
+ * Throwaway demo aid — delete with its slide once reviewed.
  */
-import { computed, watch } from "vue";
-import { useSlideContext, onSlideEnter } from "@slidev/client";
-import { battle } from "./battle/battleConfig";
+import { computed } from "vue";
 
-const b = battle();
-const { $clicks } = useSlideContext();
-const c = computed(() => $clicks.value);
+const props = defineProps<{
+  players: { name: string; score: number }[];
+}>();
 
-// Push `final`, but only let phones SEE standings once 1st is revealed (c>=3).
-function syncFinal() { b.final(c.value >= 3); }
-onSlideEnter(syncFinal);
-watch(c, syncFinal);
+const board = computed(() =>
+  [...props.players].map((p, i) => ({ ...p, sessionId: "s" + i }))
+    .sort((a, b) => b.score - a.score));
 
-const board = computed(() => b.leaderboard()); // players, desc by score
-
-// Group into PODIUM TIERS by distinct score (dense ranking). Players sharing a
-// score share a position and a column — ties are grouped, never split.
+// Group into PODIUM TIERS by distinct score (dense ranking).
 const tiers = computed(() => {
   const order: number[] = [];
   const byScore = new Map<number, typeof board.value>();
@@ -47,41 +29,30 @@ const tiers = computed(() => {
   return order.map((score, i) => ({ pos: i + 1, score, players: byScore.get(score)! }));
 });
 
-const MAX_PODIUM_NAMES = 3;  // names shown per podium column; rest → "+N more"
-const MAX_REST = 21;         // runners-up chips shown; tail → a "+N more" chip
+const MAX_PODIUM_NAMES = 3;
+const MAX_REST = 21;
 
-const first = computed(() => tiers.value[0]);   // middle column
-const second = computed(() => tiers.value[1]);   // left column
-const third = computed(() => tiers.value[2]);    // right column
+const first = computed(() => tiers.value[0]);
+const second = computed(() => tiers.value[1]);
+const third = computed(() => tiers.value[2]);
 
-// Left→right physical order is 2nd · 1st · 3rd, so the winner sits in the middle.
 const slots = computed(() => [
   { key: "second" as const, pos: 2, tier: second.value },
   { key: "first" as const, pos: 1, tier: first.value },
   { key: "third" as const, pos: 3, tier: third.value },
 ]);
 
-// Runners-up = every tier below the top 3, flattened with their (dense) position.
 const restAll = computed(() =>
   tiers.value.slice(3).flatMap((t) => t.players.map((p) => ({ ...p, pos: t.pos }))));
 const rest = computed(() => restAll.value.slice(0, MAX_REST));
 const restMore = computed(() => Math.max(0, restAll.value.length - rest.value.length));
 
-// Crown the whole top tier (>0 guard: no crown on an empty/all-zero board).
 const topScore = computed(() => (board.value.length ? board.value[0].score : 0));
 function isWinner(tier: any) { return !!tier && topScore.value > 0 && tier.score === topScore.value; }
 
 const MEDALS: Record<number, string> = { 1: "🥇", 2: "🥈", 3: "🥉" };
 function names(tier: any) { return tier ? tier.players.slice(0, MAX_PODIUM_NAMES) : []; }
 function nameMore(tier: any) { return tier ? Math.max(0, tier.players.length - MAX_PODIUM_NAMES) : 0; }
-
-// Reveal order is by physical slot (3rd first), independent of who's there.
-function shown(key: "first" | "second" | "third") {
-  if (key === "third") return c.value >= 1;
-  if (key === "second") return c.value >= 2;
-  if (key === "first") return c.value >= 3;
-  return false;
-}
 </script>
 
 <template>
@@ -90,8 +61,7 @@ function shown(key: "first" | "second" | "third") {
     <h2 class="lb-title">The <span class="grad-warm">winners</span></h2>
 
     <div class="podium">
-      <div v-for="s in slots" :key="s.key"
-           class="col" :class="[`rank-${s.pos}`, { in: shown(s.key) }]">
+      <div v-for="s in slots" :key="s.key" class="col" :class="[`rank-${s.pos}`, 'in']">
         <template v-if="s.tier">
           <div class="crown" v-if="isWinner(s.tier)">👑</div>
           <div class="who">
@@ -126,8 +96,6 @@ function shown(key: "first" | "second" | "third") {
   color: var(--warm-bright); font-size: .85rem; }
 .lb-title { font-size: 2rem; margin: 4px 0 14px; }
 
-/* The podium reserves its full height so a tall winner column can't grow up
-   into the title; columns are equal width and only differ by bar height. */
 .podium { display: flex; align-items: flex-end; justify-content: center; gap: 20px;
   height: 250px; width: 100%; max-width: 720px; }
 .col { display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
@@ -144,7 +112,6 @@ function shown(key: "first" | "second" | "third") {
 .col .bar { width: 100%; border-radius: 10px 10px 0 0; display: grid; place-items: start center;
   padding-top: 8px; }
 .col .rk { font-size: 1.4rem; font-weight: 900; color: rgba(255,255,255,.55); }
-/* Heights/colours by POSITION, not slot — tied players in a column are equal. */
 .rank-1 .bar { height: 116px; background: linear-gradient(180deg, var(--warm), rgba(252,192,3,.35)); }
 .rank-1 .rk { color: #5a4500; }
 .rank-2 .bar { height: 88px; background: linear-gradient(180deg, #cfd6e6, rgba(207,214,230,.3)); }
@@ -152,7 +119,6 @@ function shown(key: "first" | "second" | "third") {
 .rank-3 .bar { height: 64px; background: linear-gradient(180deg, #d99a5b, rgba(217,154,91,.3)); }
 .rank-3 .rk { color: #5a3a18; }
 
-/* Runners-up: a compact wrapping grid that fits the slide; never a clipped list. */
 .rest { margin-top: 16px; width: 100%; max-width: 840px; display: flex; flex-wrap: wrap;
   gap: 6px; justify-content: center; align-content: flex-start; }
 .rrow { display: flex; align-items: center; gap: 8px; background: var(--bg-panel);

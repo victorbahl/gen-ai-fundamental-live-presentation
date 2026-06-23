@@ -81,7 +81,9 @@ const op = (from) => (c.value >= from ? 1 : 0)
           <div class="ln think decided" :class="{ lit: c >= 2 }" :style="{ opacity: op(2) }">
             <span class="lab warm">THINK</span>
             <span class="txt">No ETA — but there's a tracking number. I'll follow it.</span>
-            <span class="from" :style="{ opacity: op(2) }">↑ chosen from what it just saw</span>
+          </div>
+          <div class="from-line" :style="{ opacity: op(2) }">
+            <span class="from">↑ chosen from what it just saw</span>
           </div>
           <div class="ln act" :style="{ opacity: op(3) }">
             <span class="lab cool">ACT</span>
@@ -189,10 +191,14 @@ const op = (from) => (c.value >= from ? 1 : 0)
 /* step ②'s think — the self-directed decision, gets a highlight + a "from" note */
 .ln.decided { border-radius: 7px; padding: 0.15rem 0.4rem; margin: 0 -0.4rem; transition: opacity 0.45s ease, background 0.45s ease; }
 .ln.decided.lit { background: rgba(252,192,3,0.08); box-shadow: inset 0 0 0 1px rgba(252,192,3,0.3); }
-.from {
-  position: absolute; right: 0.4rem; top: 50%; transform: translateY(-50%);
-  font-family: var(--mono); font-size: 0.58rem; font-style: italic; color: var(--warm-bright);
+/* the "chosen from what it saw" note — its own reserved line under the THINK text
+   (Rule 4: opacity-gated, indented to clear the 3.2rem label so it sits under the text) */
+.from-line {
+  padding-left: 3.8rem; margin-top: 0.05rem; height: 0.95rem;
   transition: opacity 0.45s ease;
+}
+.from {
+  font-family: var(--mono); font-size: 0.58rem; font-style: italic; color: var(--warm-bright);
 }
 
 .done-ln { margin-top: 0.1rem; }

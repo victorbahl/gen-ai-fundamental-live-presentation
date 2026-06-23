@@ -22,7 +22,7 @@ fonts:
      without touching the same file. Edit section content THERE,
      not here. Keep this file to the cover + the include list. -->
 
-<Hero bg="cover.jpg" kicker="Hackathon AI · SE French Team" :logos="['mulesoft.svg', 'informatica.svg']">
+<Hero bg="cover.jpg" kicker="Hackathon AI · SE French Team" :logos="['mulesoft.svg', 'informatica.svg']" presenter="Victor BAHL" presenter-title="Solution Engineer" presenter-photo="victor-bahl.jpg">
   The GenAI refresher<br>you <span class="grad-warm">didn't ask for</span>
   <template #subtitle>
     ...but might enjoy anyway 😊
@@ -32,13 +32,26 @@ fonts:
 </Hero>
 
 <!--
-Welcome. One promise for the next 45 minutes: by the end, this "AI revolution" should feel
-less like magic and more like a system you could have designed.
+◀ **IN** · the very start — welcome the room, set the tone, make one promise.
 
-Three moves: AI, then LLMs, then Agents. First a quick map of the field, then how a single
-model actually works, then what we build on top of it that can act. The title on screen is
-the hook; I'll come back to it at the very end.
+**SET-UP** (cover on screen)
+
+- welcome — this is a refresher, light and visual, ~45 minutes
+- quick about me: name, role (Solution Engineer), why this topic — keep it to 20 seconds
+- one promise: by the end, this "AI revolution" should feel less like magic, more like a system we could build ourselves
+- three moves, and they are the spine of the whole talk: **AI → LLMs → Agents**
+- AI = a quick map of the field · LLMs = how one model really works · Agents = what we build on top that can act
+- the title is a small joke — "the refresher you didn't ask for"; I will come back to it at the very end
+- set expectations: stop me with questions; there is also a small live quiz to wake us up
+- note for this room: we are technical, integration people — so I will use API and integration words we already know
+
+▶ **OUT** · before we start, one honest word about this field — how fast it moves, and why we should stay humble → next slide.
 -->
+
+
+---
+src: ./slides/_preview-leaderboard.md
+---
 
 ---
 src: ./slides/01-intro.md

@@ -71,12 +71,12 @@ export const BATTLE_QUESTIONS: BattleQuestion[] = [
     question:
       "“You know nothing, Jon Snow.” — who keeps telling Jon this?",
     options: [
-      { label: "A", text: "Ygritte" },
-      { label: "B", text: "Daenerys Targaryen" },
+      { label: "A", text: "Daenerys Targaryen" },
+      { label: "B", text: "Ygritte" },
       { label: "C", text: "Arya Stark" },
       { label: "D", text: "Lila Dorato" },
     ],
-    correct: "A",
+    correct: "B",
   },
   {
     quizId: "b1",
@@ -94,10 +94,10 @@ export const BATTLE_QUESTIONS: BattleQuestion[] = [
     quizId: "b2",
     question: "Inside an LLM, the “meaning” of a word is represented as…",
     options: [
-      { label: "A", text: "a pointer to the closest word in its vocabulary" },
-      { label: "B", text: "every sentence it appeared in during training" },
-      { label: "C", text: "a definition from a dictionary built into the model" },
-      { label: "D", text: "a list of numbers placing it in a space of meaning" },
+      { label: "A", text: "a pointer to the single closest matching word in its built-in vocabulary" },
+      { label: "B", text: "a stored list of every sentence it saw that word appear in during training" },
+      { label: "C", text: "a plain-language definition looked up from a dictionary built into the model" },
+      { label: "D", text: "a mathematical vector in a high-dimensional space, where similar concepts sit close together" },
     ],
     correct: "D",
   },
@@ -140,7 +140,7 @@ export const BATTLE_QUESTIONS: BattleQuestion[] = [
     question: "The underlying reason an LLM “hallucinates” is that…",
     options: [
       { label: "A", text: "its training data held errors it memorised and repeats" },
-      { label: "B", text: "its context window overflowed and corrupted the output" },
+      { label: "B", text: "it ran past its context window, so earlier facts were dropped" },
       { label: "C", text: "it generates plausible text but can't check the facts" },
       { label: "D", text: "it was asked about a language it never learned" },
     ],

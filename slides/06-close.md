@@ -17,12 +17,19 @@ layout: default
 </Hero>
 
 <!--
-That's the mechanism, end to end: it predicts the next token, over a fixed window, with no memory —
-and everything else, tools, MCP, skills, the loop, A2A, is scaffolding we build around it, all of it
-rhyming with what we already do.
-But here's the honest truth: you will NOT actually understand any of it from these slides. Nobody
-does. You get it by building — by wiring up a tool, watching the loop do something dumb, and fixing
-it. That is exactly what the next hours are for. So close the laptop on this deck, open a blank one,
-pick the smallest idea that excites you, and make it act. Break things. Ask questions. Have fun.
-Go build. Thank you!
+◀ **IN** · the five lines are the theory. Here is the only homework that matters.
+
+**SET-UP** (CTA on screen)
+
+- recap in one breath: it predicts the next token, over a fixed window, with no memory
+- everything else — tools, MCP, skills, the loop — is scaffolding we build around it, all of it like work we already do
+- callback to the title: "the refresher you didn't ask for" — hopefully it was worth it
+- ★ the honest truth: we do NOT really understand this from slides — nobody does; we get it by BUILDING: wire up a tool, watch the loop do something dumb, fix it
+- that is exactly what the next hours are for
+- so: pick the smallest idea that excites you, and make it act — smallest useful tool + one clear goal + let it loop is already a working agent
+- callback to humility (slide 2): the experts are still figuring this out too, so we are all beginners here — perfect for a hackathon
+- break things, ask questions, have fun
+
+▶ **OUT** · that's the talk — thank the room, say where to find help during the hackathon, then open the floor for questions.
 -->
+

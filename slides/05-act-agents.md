@@ -4,14 +4,15 @@ clicks: 3
 ---
 
 <!-- ============================================================
-     PART 3 (continued) — skills · the loop · context · A2A
+     PART 3 (continued) — skills · the loop · context · key takeaways
      ============================================================
-     Same part as 04-act-tools.md. ORDER (reworked 2026-06-18, user):
+     Same part as 04-act-tools.md. ORDER (reworked 2026-06-22, user):
        Tools vs Skills (after tools+MCP) → the loop RUNNING (live trace)
-       → agent context window → A2A (protocol-technical, Agent Cards).
+       → agent context window → KEY TAKEAWAYS (5-point whole-deck recap).
      The old "Anatomy of an agent" recap slide was REMOVED — its job is
      done up front by AgentRuntime.vue ("what is an agent"). The dead
-     "When the model drives." pivot hero stays CUT.
+     "When the model drives." pivot hero stays CUT. A2A was REMOVED
+     2026-06-22 (user: "too much") — do NOT resurrect it.
      NB: this header comment sits AFTER the frontmatter on purpose — a
      comment BEFORE the first `---` renders as a stray blank slide.
 
@@ -27,18 +28,34 @@ clicks: 3
 </div>
 
 <!--
-Quick but important distinction, now that we know what a tool is. On the left, the tool — a single
-callable action. get_order_status(id) returns JSON. It's a verb the model invokes; it's what the
-agent CAN do.
-[click] On the right, a skill. A skill isn't one call — it's a packaged PLAYBOOK for a whole job:
-instructions plus the resources to do it well. "Handle a refund" ships as a SKILL.md of steps, the
-policy that governs it, maybe a script — and the agent loads it ON DEMAND, only when the task
-matches, so we don't bloat every prompt with everything.
-[click] And a skill USES tools — it orchestrates several tool calls plus the know-how to sequence
-them toward an outcome.
-[click] So: tools are what an agent can do; skills are HOW to do something well. But notice — both
-are just context we hand the model. It still only decides; we still execute. Same trust boundary.
+◀ **IN** · we know a tool = one action. People mix it up with "skill", so let's separate them.
+
+**SET-UP** (the tool card on the left)
+
+- a quick but important distinction, now that we know what a tool is
+- **① Tool** — a single callable action: get_order_status(id) returns JSON
+- a verb the model invokes; it is what the agent CAN do
+
+[click] **② Skill** — a packaged PLAYBOOK for a whole job
+
+- not one call — instructions plus the resources to do the job well
+- "handle a refund" ships as a SKILL.md of steps + the policy + maybe a script
+- the agent loads it ON DEMAND, only when the task matches — so we do not bloat every prompt with everything
+
+[click] **③ A skill USES tools**
+
+- it orchestrates several tool calls, plus the know-how to put them in the right order toward an outcome
+
+[click] **④ The split** — tools = what an agent CAN do · skills = HOW to do it well
+
+- ★ but both are just CONTEXT we hand the model — same trust boundary: it still only decides, we still execute
+- simple analogy: a tool is one kitchen tool (a knife); a skill is the recipe that says which tools to use, in what order
+- "loaded on demand" matters for the window from part 2: we do not pay tokens for skills we are not using right now
+- skills are how teams package and share expertise — write the refund playbook once, every agent follows it the same way
+
+▶ **OUT** · enough pieces — let's start the engine and watch the loop actually run → the loop.
 -->
+
 
 ---
 layout: default
@@ -57,19 +74,44 @@ clicks: 5
 </div>
 
 <!--
-Now the loop — not as a diagram, but actually running. We've given the model a goal: "when will
-order #7788 arrive?" Watch it work. Step one, it THINKS: I need the status first.
-[click] It ACTS — calls get_order_status — and OBSERVES the result: shipped, but the ETA is null…
-and there's a tracking number. Hold that thought.
-[click] Step two, it THINKS again — and here's the whole point. WE did not script this. The model
-chose its next move FROM what it just observed: no ETA, but a tracking number, so go follow it.
-That self-directed next step is what makes it an agent.
-[click] It ACTS on its own decision — get_tracking — and OBSERVES the ETA: June 20th.
-[click] Step three: it has the ETA, the goal is met, so it STOPS and answers. The model decided when
-it was done — no human stepping through the turns.
-[click] That's the agentic loop: we orchestrated nothing between steps. Think, act, observe, repeat —
-the model drives, and it knows when to quit. Now — what does running this loop do to the window?
+◀ **IN** · we have all the pieces. Now we put them together and watch one real agent run, live.
+
+🧭 **SPINE** · this is the payoff of the whole "agents" idea: the model picks its own next step. Everything before this slide was setup for this moment.
+
+**SET-UP** (goal + step ① THINK on screen)
+
+- the loop — not a diagram, but actually running
+- the goal we gave it: "when will order #7788 arrive?"
+- step one, it THINKS: I need the status first
+
+[click] **① ACT + OBSERVE** — it calls get_order_status
+
+- result: shipped, but the ETA is empty (null)… and there is a tracking number
+- hold that thought
+
+[click] **② THINK again** — the whole point of the talk
+
+- ★ WE did not script this. the model chose its next move FROM what it just saw: "no ETA, but a tracking number → follow it"
+- that self-chosen next step is what makes it an agent (not a chatbot)
+
+[click] **③ ACT + OBSERVE** — it acts on its own decision: get_tracking
+
+- and observes the ETA: June 20th
+
+[click] **④ DONE** — it has the ETA, the goal is met, so it STOPS and answers
+
+- the model decided when it was finished — no human stepping through the turns
+
+[click] **⑤ The agentic loop** — we orchestrated nothing between steps
+
+- think → act → observe → repeat; the model drives, and it knows when to quit
+- the contrast: a chatbot answers once; an agent keeps going until the job is done — same model, different control flow
+- nobody wrote "if no ETA, check tracking" — the model reasoned it from the data; that flexibility is the power AND the risk
+- it is also where agents go wrong: a bad observation leads to a bad next step — so good tools and clear results matter a lot
+
+▶ **OUT** · every one of those observations went somewhere — back into the window. What does that do to it? → the agent window.
 -->
+
 
 ---
 layout: default
@@ -87,55 +129,93 @@ clicks: 4
 </div>
 
 <!--
-Callback to the context window from Part 2 — but now through the agent loop we just watched. Same
-fixed space; watch how fast it fills.
+◀ **IN** · every observation in that loop went back into the window from part 2 — now watch it fill, fast.
 
-SET-UP (before any click): the grid already shows BLUE — the system prompt PLUS the schema of every
-tool the agent may call. "An agent carries its whole toolbox description on every single call, before
-it does anything."
+🧭 **SPINE** · this closes the circle: the "memory" box from the runtime slide, made concrete. Same window as part 2, but an agent fills it far faster.
 
-[click] The goal goes in — green, set once: the order question we just ran.
-[click] First loop: it thinks, calls get_order_status, and the API's JSON response is folded straight back
-into the window — the amber "tool data". Point out the scale jumped: each cell here is ~2k tokens.
-[click] Another loop, another Observe, another blob of data. Make the key point: it's tool OUTPUT,
-not your prose, that fills an agent's window — and it grows every single step. We're nearly full
-after just a few loops.
-[click] So the agent OFFLOADS. It writes a compact note to external memory (the striped blue cells —
-kept OUTSIDE the window), drops the raw JSON blobs, and pulls the note back only when it needs it.
-Room reopens; the loop continues without losing the thread.
+**SET-UP** (BLUE cells already on screen)
 
-Land it: this is the MEMORY piece from the runtime slide, made concrete. The model keeps no state
-and the window fills in a few loops — so the agent has to decide what to summarise, what to offload,
-and what to drop. That deciding IS memory.
+- callback to the context window from part 2 — but now through the agent loop we just watched
+- on arrival, blue = the system prompt PLUS the schema of every tool the agent may call
+- ★ an agent carries its whole toolbox description on EVERY call, before it does anything
+
+[click] **① The goal goes in** — green, set once
+
+- the order question we just ran
+
+[click] **② First loop** — it thinks, calls get_order_status
+
+- the API's JSON answer is folded straight back into the window — the amber "tool data"
+- note the scale jumped: each cell here is ~2k tokens (tool output is big)
+
+[click] **③ Another loop, another blob of data**
+
+- ★ the key point: it is tool OUTPUT, not our text, that fills an agent's window — and it grows every step
+- nearly full after just a few loops
+
+[click] **④ The agent OFFLOADS** — it writes a short note to external memory (striped blue, OUTSIDE the window)
+
+- drops the raw JSON blobs, pulls the note back only when needed
+- room reopens; the loop continues without losing the thread
+- ★ this is the "memory" box from the runtime slide, made concrete — the model keeps no state, so the agent must DECIDE what to keep, summarise, or offload; that deciding IS its memory
+- practical lesson: tools that return huge JSON can fill the window fast — so we design tools to return only what matters
+
+▶ **OUT** · that is all five pieces of an agent, running. Let's zoom back out to the whole talk → five takeaways.
 -->
+
 
 ---
 layout: default
-clicks: 3
+clicks: 4
 ---
 
-<!-- A2A — protocol-technical: Agent Card discovery + task delegation.
-     Mirrors the MCP pair. Title on arrival; clicks walk discover → delegate → return. -->
+<!-- KEY TAKEAWAYS — the whole-deck recap (replaced A2A 2026-06-22, user).
+     Five durable mental models spanning AI → LLMs → Agents; warm rows =
+     what the model IS, cool rows = how we put it to work. Title on
+     arrival with row 1 lit; clicks light rows 2–5. See KeyTakeaways.vue. -->
 
 <div class="demo-stage">
   <div class="demo-head">
-    <div class="kicker">When one agent isn't enough</div>
-    <h2>Agents calling <span class="grad-warm">agents</span> — A2A</h2>
+    <div class="kicker">To remember</div>
+    <h2>Five things worth <span class="grad-cool">keeping</span></h2>
   </div>
-  <A2A />
+  <KeyTakeaways />
 </div>
 
 <!--
-Last piece. One agent is powerful; a team is more — an orchestrator that owns the goal, delegating to
-specialists. A2A — agent-to-agent — is just the protocol for that, and notice it's the SAME shape as
-MCP, one level up. On arrival: step one, DISCOVER. The orchestrator does a GET on the specialist's
-/.well-known/agent.json and gets back its Agent Card — who it is, what skills it offers, where to
-reach it. That's the A2A version of tools/list.
-[click] Step two, DELEGATE: it POSTs a Task — "get status for order #7788". The specialist agent
-then runs its OWN loop, with its own tools — exactly the loop we just watched.
-[click] Step three, RETURN: the specialist replies with a Task in state "completed" and the result,
-folded back to the orchestrator.
-[click] Discover the agent, then delegate the task — same Bearer-over-HTTP envelope as MCP, so the
-same gateway policies apply. If you run an integration platform, this is your world: discovery,
-contracts, routing, governance — applied to a new kind of consumer.
+◀ **IN** · we have done the whole arc. Let's compress it into five things worth keeping.
+
+🧭 **SPINE** · this IS the spine, one last time: rows 1–3 = what the model IS (AI/LLMs), rows 4–5 = how WE put it to work (Agents). If they forget everything else, these five lines remain.
+
+**SET-UP** (row ① lit, rows 2–5 dim)
+
+- the whole talk in five lines
+- **① an LLM is a stateless text function** — text in, text out, no memory between calls
+- everything else is scaffolding we build around that
+
+[click] **② it predicts, it cannot check**
+
+- a frozen, public model guessing the next token
+- so when we need OUR facts, or fresh facts, we FEED them in as context
+
+[click] **③ an agent = code + an LLM, looping toward a goal**
+
+- a piece of code with an LLM at its heart, memory and tools wired in
+- given a goal, it loops and picks its own next step until the job is done — nothing exotic
+
+[click] **④ the model only asks — the APP executes**
+
+- the model emits a request; the app holds the credentials and makes the call
+- the model never touches our systems — that is the governance story
+
+[click] **⑤ MCP is a standardized HTTP API**
+
+- three standard calls — initialize, tools/list, tools/call — over the same host, auth, and JSON
+- ★ the punchline of the whole deck: new capability, sitting on plumbing we already own
+- if someone took a phone call and missed everything, read them these five lines — that is the talk
+- tie it back to the opener: this "revolution" is now a SYSTEM we could design — prediction + a loop + our own APIs
+- reassuring message for an integration team: AI is not replacing our world; it is a new, well-behaved consumer OF our world
+
+▶ **OUT** · so the only thing left is to use it. Enough slides → close.
 -->
+
