@@ -145,14 +145,14 @@ const steps = [
   background: var(--bg-panel); border: 1px solid var(--hair); box-shadow: var(--elev);
   transition: opacity 0.45s ease, border-color 0.45s ease, box-shadow 0.45s ease;
 }
-.row.on { border-color: var(--warm); box-shadow: 0 0 18px rgba(252,192,3,0.16); }
+.row.on { border-color: var(--warm); box-shadow: 0 0 18px rgba(var(--warm-rgb),0.16); }
 .row.res.on { border-color: var(--good); box-shadow: 0 0 18px rgba(46,132,74,0.14); }
 
 .num {
   width: 28px; height: 28px; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
   font-family: var(--serif); font-weight: 700; font-size: 0.95rem;
-  color: var(--warm-bright); background: rgba(252,192,3,0.14); border: 1px solid rgba(252,192,3,0.4);
+  color: var(--warm-bright); background: rgba(var(--warm-rgb),0.14); border: 1px solid rgba(var(--warm-rgb),0.4);
 }
 .row.res .num { color: var(--good); background: rgba(46,132,74,0.10); border-color: rgba(46,132,74,0.3); }
 
@@ -162,14 +162,14 @@ const steps = [
   font-family: var(--mono); font-weight: 700; font-size: 0.58rem; letter-spacing: 0.08em;
   padding: 0.1rem 0.4rem; border-radius: 5px;
 }
-.dir-lab.cool { color: var(--cool-bright); background: rgba(1,118,211,0.10); }
+.dir-lab.cool { color: var(--cool-bright); background: rgba(var(--cool-rgb),0.10); }
 .dir-lab.good { color: var(--good); background: rgba(46,132,74,0.10); }
 .verb { font-family: var(--mono); font-weight: 700; font-size: 0.74rem; color: var(--cool-bright); }
 .verb.ret { color: var(--good); }
 .path { font-family: var(--mono); font-size: 0.74rem; color: var(--ink); }
 .auth {
   font-family: var(--mono); font-size: 0.56rem; color: var(--cool-bright);
-  background: rgba(1,118,211,0.10); border: 1px solid rgba(1,118,211,0.28);
+  background: rgba(var(--cool-rgb),0.10); border: 1px solid rgba(var(--cool-rgb),0.28);
   border-radius: 999px; padding: 0.04rem 0.4rem; margin-left: auto;
 }
 .purpose { font-size: 0.68rem; color: var(--ink-soft); margin-top: 0.1rem; }

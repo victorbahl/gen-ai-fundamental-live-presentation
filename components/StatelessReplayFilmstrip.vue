@@ -142,8 +142,8 @@ const maxTok = computed(() => envelopes.value[envelopes.value.length - 1].tok)
 .msg.replay { color: var(--ink-faint); }
 .msg.replay .k, .msg.replay .s { color: var(--ink-faint); }
 .msg.new {
-  background: rgba(252,192,3,0.12);
-  box-shadow: inset 0 0 0 1px rgba(252,192,3,0.45);
+  background: rgba(var(--warm-rgb),0.12);
+  box-shadow: inset 0 0 0 1px rgba(var(--warm-rgb),0.45);
 }
 .msg.new .s { color: var(--ink); font-weight: 500; }
 .msg.new .k { color: var(--warm-bright); }
@@ -162,5 +162,5 @@ const maxTok = computed(() => envelopes.value[envelopes.value.length - 1].tok)
 .key { display: inline-flex; align-items: center; gap: 0.4rem; }
 .sw { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
 .sw.replay { background: var(--bg-soft); border: 1px solid var(--hair); }
-.sw.new { background: rgba(252,192,3,0.25); border: 1px solid rgba(252,192,3,0.55); }
+.sw.new { background: rgba(var(--warm-rgb),0.25); border: 1px solid rgba(var(--warm-rgb),0.55); }
 </style>

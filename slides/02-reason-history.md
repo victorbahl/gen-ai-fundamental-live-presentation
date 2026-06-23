@@ -16,7 +16,6 @@ layout: default
 <PartOpener
   bg="part-1.jpg"
   :active="1"
-  accent="cool"
   num="01"
   headline="A quick map of the field"
   sub="where GenAI fits · a short history" />
@@ -89,7 +88,7 @@ clicks: 3
 .nbox.ml  { inset: 42px 34px 34px 34px; background: var(--nest-mid); }
 .nbox.gen {
   inset: 120px 236px 54px 236px;
-  border-color: var(--warm); background: rgba(252,192,3,0.14);
+  border-color: var(--warm); background: rgba(var(--warm-rgb),0.14);
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.1rem;
 }
 .nbox.gen .nlabel { position: static; color: var(--warm-bright); font-size: 0.6rem; }

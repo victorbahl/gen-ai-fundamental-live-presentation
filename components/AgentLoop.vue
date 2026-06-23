@@ -15,9 +15,9 @@ import { useSlideContext } from '@slidev/client'
       OBS   ← shipped — but no ETA, and a tracking number
     ② THINK  shipped, no ETA — but I have a tracking number, so go get it
       ACT   → get_tracking("1Z…")
-      OBS   ← arriving 2026-06-20
+      OBS   ← arriving 2026-06-25
     ③ THINK  I have the ETA — goal met
-      DONE  "Order #7788 shipped via UPS — arriving Jun 20."
+      DONE  "Order #7788 shipped via UPS — arriving Jun 25."
 
   THE POINT: step ② is NOT scripted by us. The model CHOSE it from what it
   OBSERVED in step ① (status had no ETA, but did carry a tracking number).
@@ -91,7 +91,7 @@ const op = (from) => (c.value >= from ? 1 : 0)
           </div>
           <div class="ln obs" :style="{ opacity: op(3) }">
             <span class="lab good">OBS</span>
-            <span class="txt"><span class="ar">←</span> { <span class="k">state</span>: <span class="s">"in transit"</span>, <span class="k">eta</span>: <span class="s">"2026-06-20"</span> }</span>
+            <span class="txt"><span class="ar">←</span> { <span class="k">state</span>: <span class="s">"in transit"</span>, <span class="k">eta</span>: <span class="s">"2026-06-25"</span> }</span>
           </div>
         </div>
       </div>
@@ -105,7 +105,7 @@ const op = (from) => (c.value >= from ? 1 : 0)
             <span class="txt">I have the ETA — the goal is met. Stop.</span>
           </div>
           <div class="ln done-ln" :style="{ opacity: op(4) }">
-            <span class="done-pill">✓ Order #7788 — shipped, arriving Jun 20</span>
+            <span class="done-pill">✓ Order #7788 — shipped, arriving Jun 25</span>
           </div>
         </div>
       </div>
@@ -178,8 +178,8 @@ const op = (from) => (c.value >= from ? 1 : 0)
   flex: none; width: 3.2rem; font-weight: 700; font-size: 0.6rem; letter-spacing: 0.1em;
   padding: 0.1rem 0; text-align: center; border-radius: 5px;
 }
-.lab.warm { color: var(--warm-bright); background: rgba(252,192,3,0.12); }
-.lab.cool { color: var(--cool-bright); background: rgba(1,118,211,0.10); }
+.lab.warm { color: var(--warm-bright); background: rgba(var(--warm-rgb),0.12); }
+.lab.cool { color: var(--cool-bright); background: rgba(var(--cool-rgb),0.10); }
 .lab.good { color: var(--good); background: rgba(46,132,74,0.10); }
 .txt { color: var(--ink); }
 .ar { color: var(--ink-faint); font-weight: 700; }
@@ -190,7 +190,7 @@ const op = (from) => (c.value >= from ? 1 : 0)
 
 /* step ②'s think — the self-directed decision, gets a highlight + a "from" note */
 .ln.decided { border-radius: 7px; padding: 0.15rem 0.4rem; margin: 0 -0.4rem; transition: opacity 0.45s ease, background 0.45s ease; }
-.ln.decided.lit { background: rgba(252,192,3,0.08); box-shadow: inset 0 0 0 1px rgba(252,192,3,0.3); }
+.ln.decided.lit { background: rgba(var(--warm-rgb),0.08); box-shadow: inset 0 0 0 1px rgba(var(--warm-rgb),0.3); }
 /* the "chosen from what it saw" note — its own reserved line under the THINK text
    (Rule 4: opacity-gated, indented to clear the 3.2rem label so it sits under the text) */
 .from-line {

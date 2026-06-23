@@ -1,91 +1,119 @@
 /* ============================================================
-   GenAI Fundamentals — global theme
-   Editorial base: serif display, sans body, MuleSoft brand accents —
-   one cool accent (MuleSoft azure/cloud-blue) + one warm accent
-   (MuleSoft gold). Sourced from MuleSoft's own palette so the deck
-   reads as MuleSoft, not Anthropic.
-   DAY/NIGHT: tokens below default to the LIGHT (day) scheme in
-   :root; Slidev toggles `.dark` on <html> for the NIGHT scheme,
-   which re-defines the same tokens. Everything downstream reads
-   the tokens, so both modes follow the standard Slidev toggle.
-   Per-slide archetypes layer on top of this.
+   GenAI Fundamentals — "INFERENCE" theme
+   The deck rendered in the model's own grammar: a prediction
+   spectrum. The two load-bearing accents ARE the cool→hot scale of
+   token probability — COOL (pine-teal) = the structured side: our
+   systems, the grid, what is committed; WARM (coral) = the model
+   side: the predicted token, the live guess. A true complementary
+   pair, so the semantic split reads at a glance.
+   Type: Spectral (display serif) · Hanken Grotesk (body) ·
+   IBM Plex Mono (token chips / code / data).
+   Signature: the AI›LLMs›Agents spine as TOKEN-CHIPS + a blinking
+   caret as the deck's cursor — the fil rouge in the model's own form.
+   DAY = greige paper · NIGHT = ink (for a dim room). Slidev toggles
+   `.dark` on <html>; both schemes re-define the same tokens, so all
+   downstream components just follow.
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Hanken+Grotesk:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap');
 
 :root {
-  /* ---- DAY scheme (default) ---- */
-  /* canvas — lightness order mirrors dark mode: bg (back) is the light-gray
-     canvas, bg-soft is a recessed surface, bg-panel (front) is white so
-     raised cards pop. */
-  --bg: #f6f8fc;
-  --bg-soft: #eceff5;
+  /* ---- DAY scheme (default) — warm ivory ---- */
+  /* canvas — a light, warm ivory (paper-like, NOT a grey greige): bg (back)
+     is the ivory, bg-soft a faintly recessed surface, bg-panel (front) is
+     pure white so raised cards pop crisply. Lightness order mirrors dark. */
+  --bg: #f7f5f0;
+  --bg-soft: #efece3;
   --bg-panel: #ffffff;
-  --ink: #1a1f2b;
-  --ink-soft: #4a5364;
-  --ink-faint: #8a93a6;
-  --hair: #dde2eb;
+  --ink: #20231d;
+  --ink-soft: #56605a;
+  --ink-faint: #918f86;
+  --hair: #e4e0d6;
 
-  /* accents — MuleSoft brand. Cool = signature azure / cloud-blue (the
-     "API / integration" accent); warm = MuleSoft gold (the "AI / model"
-     accent). `-bright` is the stronger, AA-contrast shade for text/links
-     on the light canvas (so in day mode it reads DARKER than the base). */
-  --cool: #00a2df;       /* MuleSoft azure — signature accent (fills/strokes) */
-  --cool-bright: #0176d3; /* cloud blue — text/links on white */
-  --warm: #fcc003;       /* MuleSoft gold — the "AI / model" accent (fills) */
-  --warm-bright: #b26b00; /* deep amber-gold — text on white */
-  --good: #2e844a;
-  --bad: #ba0517;
+  /* accents — the PREDICTION SPECTRUM. Cool = pine-teal (the structured
+     side: our systems / grid / committed); warm = coral (the model side:
+     the predicted token). A complementary pair. `-bright` is the stronger
+     AA-contrast shade for text/links on the light paper (reads DARKER in
+     day mode). */
+  --cool: #0e8a86;       /* pine-teal — signature cool accent (fills/strokes) */
+  --cool-bright: #0b5e57; /* deep teal — text/links on paper */
+  --warm: #f26b5b;       /* coral — the "model / predicted token" accent (fills) */
+  --warm-bright: #c0422f; /* deep coral — text on paper */
+  --good: #2f9e5b;
+  --bad: #d63b3b;
 
-  /* elevation: panels lift off the canvas with a soft shadow in day mode */
-  --elev: 0 1px 2px rgba(16,24,40,0.06), 0 4px 12px rgba(16,24,40,0.06);
+  /* GOLD — the MIDDLE of the cool→hot heat ramp (teal → gold → coral).
+     Used by the AI›LLMs›Agents spine to give each part its own hue (LLMs).
+     Scoped to the spine + part-openers; not a general-purpose accent. */
+  --gold: #e0a32e;       /* warm gold — fills/strokes */
+  --gold-bright: #9a6a06; /* deep gold — text on paper (AA) */
+
+  /* accent RGB triples — for low-opacity tints/glows in components, so a
+     palette swap propagates to every rgba() tint too. Use as
+     `rgba(var(--cool-rgb), 0.1)`. Keep in sync with --cool / --warm. */
+  --cool-rgb: 14, 138, 134;  /* pine-teal */
+  --warm-rgb: 242, 107, 91;  /* coral */
+  --gold-rgb: 224, 163, 46;  /* gold */
+
+  /* elevation: panels lift off the paper with a soft shadow in day mode */
+  --elev: 0 1px 2px rgba(28,36,33,0.05), 0 4px 14px rgba(28,36,33,0.07);
 
   /* component surfaces / tints (kept theme-aware so components follow) */
-  --sunken: #eef1f7;            /* recessed cell/track surface */
-  --sunken-border: #dde2eb;
-  --nest-mid: #eaeef6;          /* mid nesting box (slide 01) */
-  --bubble-user-bg: #dbeafe;    /* user chat bubble */
-  --bubble-user-ink: #1e3a5f;
-  --bubble-asst-bg: #fbe6d6;    /* assistant chat bubble */
-  --bubble-asst-ink: #7a3a18;
+  --sunken: #dfe1db;            /* recessed cell/track surface */
+  --sunken-border: #d0d3cc;
+  --nest-mid: #e0e2dc;          /* mid nesting box (slide 01) */
+  --bubble-user-bg: #cfe9e6;    /* user chat bubble — teal tint */
+  --bubble-user-ink: #0b3f3b;
+  --bubble-asst-bg: #fbded7;    /* assistant chat bubble — coral tint */
+  --bubble-asst-ink: #8a3325;
 
-  /* type */
-  --serif: 'Fraunces', 'Iowan Old Style', Georgia, serif;
-  --sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
-  --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+  /* type — Spectral display serif · Hanken Grotesk body · IBM Plex Mono */
+  --serif: 'Spectral', 'Iowan Old Style', Georgia, serif;
+  --sans: 'Hanken Grotesk', ui-sans-serif, system-ui, sans-serif;
+  --mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace;
 }
 
 /* ---- NIGHT scheme — Slidev adds .dark on <html> via the day/night toggle.
    Re-defines the same tokens; everything downstream just follows. ---- */
 html.dark {
-  /* canvas */
-  --bg: #0b0d12;
-  --bg-soft: #11141c;
-  --bg-panel: #161a24;
-  --ink: #eef1f6;
-  --ink-soft: #aab2c2;
-  --ink-faint: #6b7589;
-  --hair: #262c3a;
+  /* canvas — ink with a faint teal-green undertone (the dim-room mode) */
+  --bg: #0e1413;
+  --bg-soft: #131b19;
+  --bg-panel: #15201e;
+  --ink: #eaf0ec;
+  --ink-soft: #9fb1aa;
+  --ink-faint: #647069;
+  --hair: #25302d;
 
-  /* accents — MuleSoft brand, lifted for contrast on the dark canvas */
-  --cool: #1b96ff;       /* MuleSoft bright blue — fills/strokes on dark */
-  --cool-bright: #57c2ff; /* lighter azure — text/links on dark */
-  --warm: #fcc003;       /* MuleSoft gold — fills on dark */
-  --warm-bright: #ffd45e; /* lifted gold — text on dark */
+  /* accents — the prediction spectrum, lifted so teal+coral glow like a
+     heat-map on the ink canvas */
+  --cool: #2dd4bf;       /* bright teal — fills/strokes on ink */
+  --cool-bright: #5eead4; /* lifted aqua — text/links on ink */
+  --warm: #ff8473;       /* bright coral — fills on ink */
+  --warm-bright: #ffa99b; /* lifted coral — text on ink */
   --good: #34d399;
   --bad: #f87171;
+
+  /* GOLD — heat-ramp middle, lifted for the ink canvas (the spine's LLMs) */
+  --gold: #f5c451;       /* bright gold — fills/strokes on ink */
+  --gold-bright: #ffd97a; /* lifted gold — text on ink */
+
+  /* accent RGB triples — lifted to match the dark-mode --cool / --warm */
+  --cool-rgb: 45, 212, 191;   /* bright teal */
+  --warm-rgb: 255, 132, 115;  /* bright coral */
+  --gold-rgb: 245, 196, 81;   /* bright gold */
 
   /* no lift on dark — panels read by their own fill + hairline */
   --elev: none;
 
   /* component surfaces / tints */
-  --sunken: #11151d;
-  --sunken-border: #1c212c;
-  --nest-mid: #1a2030;
-  --bubble-user-bg: #1e3a5f;
-  --bubble-user-ink: #dbeafe;
-  --bubble-asst-bg: #2a2118;
-  --bubble-asst-ink: #fde7cf;
+  --sunken: #121a18;
+  --sunken-border: #1f2a27;
+  --nest-mid: #18231f;
+  --bubble-user-bg: #0c3a35;
+  --bubble-user-ink: #b6f0e8;
+  --bubble-asst-bg: #3a1f1a;
+  --bubble-asst-ink: #ffd9d0;
 }
 
 /* ---- base canvas ---------------------------------------------------- */
@@ -93,7 +121,6 @@ html.dark {
   background-color: var(--bg);
   color: var(--ink);
   font-family: var(--sans);
-  font-feature-settings: 'ss01', 'cv01';
   -webkit-font-smoothing: antialiased;
 }
 
@@ -114,15 +141,20 @@ html.dark {
 
 /* ---- reusable helpers ---------------------------------------------- */
 
-/* kicker: small uppercase label above a title */
+/* kicker: small mono label above a title — set in the deck's "code"
+   voice (IBM Plex Mono) so every content slide carries the token/stream
+   identity. A leading caret marks it as a prompt line; it does NOT blink —
+   the blinking caret is reserved for live "generating" moments (the spine's
+   predicted token, the predictor), so it keeps its meaning. */
 .kicker {
-  font-family: var(--sans);
-  font-weight: 600;
-  font-size: 0.8rem;
-  letter-spacing: 0.22em;
+  font-family: var(--mono);
+  font-weight: 500;
+  font-size: 0.76rem;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--warm-bright);
 }
+.kicker::before { content: '›'; margin-right: 0.45em; font-weight: 700; opacity: 0.95; }
 .kicker.cool { color: var(--cool-bright); }
 
 /* serif display question for hero/title slides */
@@ -150,14 +182,18 @@ html.dark {
 /* gradient text for the spine words */
 .grad-cool { color: var(--cool-bright); }
 .grad-warm { color: var(--warm-bright); }
+.grad-gold { color: var(--gold-bright); }
 
-/* On a hero (always over a DARK photo) the day-theme amber --warm-bright
-   (#b26b00) is illegible. Use the bright MuleSoft gold instead, with a shadow
-   so it reads on any image. Applies to every Hero/PartOpener accent word. */
+/* On a hero (always over a DARK photo) the day-theme --warm-bright
+   (#b45309 amber-700) is too dark to read. Use the bright amber (--warm)
+   instead, with a shadow so it reads on any image. Applies to every
+   Hero/PartOpener accent word. */
 .hero .grad-warm,
 .part-opener .grad-warm { color: var(--warm); text-shadow: 0 2px 22px rgba(0,0,0,0.6); }
 .hero .grad-cool,
-.part-opener .grad-cool { color: var(--cool-bright); text-shadow: 0 2px 22px rgba(0,0,0,0.6); }
+.part-opener .grad-cool { color: var(--cool); text-shadow: 0 2px 22px rgba(0,0,0,0.6); }
+.hero .grad-gold,
+.part-opener .grad-gold { color: var(--gold); text-shadow: 0 2px 22px rgba(0,0,0,0.6); }
 
 /* ===========================================================
    ARCHETYPE A — Hero / Question

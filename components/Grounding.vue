@@ -133,16 +133,16 @@ const c = computed(() => $clicks.value)
   transition: border-color 0.45s ease, box-shadow 0.45s ease, background 0.45s ease;
 }
 .path.weights.lit { border-color: var(--cool); }
-.path.context.lit { border-color: var(--warm); box-shadow: 0 0 22px rgba(252,192,3,0.14); }
+.path.context.lit { border-color: var(--warm); box-shadow: 0 0 22px rgba(var(--warm-rgb),0.14); }
 
 .p-head { display: grid; grid-template-columns: auto 1fr; grid-row-gap: 0.15rem; align-items: center; column-gap: 0.6rem; }
 .p-n {
   grid-row: span 2; width: 30px; height: 30px; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
   font-family: var(--serif); font-weight: 700; font-size: 1rem;
-  color: var(--cool-bright); background: rgba(1,118,211,0.10); border: 1px solid rgba(1,118,211,0.3);
+  color: var(--cool-bright); background: rgba(var(--cool-rgb),0.10); border: 1px solid rgba(var(--cool-rgb),0.3);
 }
-.p-n.warm { color: var(--warm-bright); background: rgba(252,192,3,0.14); border-color: rgba(252,192,3,0.4); }
+.p-n.warm { color: var(--warm-bright); background: rgba(var(--warm-rgb),0.14); border-color: rgba(var(--warm-rgb),0.4); }
 .p-t { font-family: var(--serif); font-size: 1.05rem; color: var(--ink); }
 .p-t strong { font-weight: 700; }
 .p-tag { font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.03em; }
@@ -155,7 +155,7 @@ const c = computed(() => $clicks.value)
   background: var(--bg-panel); border: 1px solid var(--hair);
   transition: opacity 0.45s ease;
 }
-.opt.hot { border-color: var(--warm); background: rgba(252,192,3,0.06); }
+.opt.hot { border-color: var(--warm); background: rgba(var(--warm-rgb),0.06); }
 .o-row { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
 .o-t { font-family: var(--sans); font-weight: 700; font-size: 0.92rem; color: var(--ink); }
 .o-d { font-size: 0.76rem; color: var(--ink-soft); line-height: 1.35; margin-top: 0.18rem; }
@@ -167,6 +167,6 @@ const c = computed(() => $clicks.value)
   font-family: var(--mono); font-size: 0.6rem; font-weight: 700; letter-spacing: 0.02em;
   padding: 0.14rem 0.5rem; border-radius: 999px; white-space: nowrap;
 }
-.use.cool { color: var(--cool-bright); background: rgba(1,118,211,0.10); }
-.use.warm { color: var(--warm-bright); background: rgba(252,192,3,0.14); }
+.use.cool { color: var(--cool-bright); background: rgba(var(--cool-rgb),0.10); }
+.use.warm { color: var(--warm-bright); background: rgba(var(--warm-rgb),0.14); }
 </style>

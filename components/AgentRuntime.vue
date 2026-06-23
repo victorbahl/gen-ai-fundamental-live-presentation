@@ -167,7 +167,7 @@ const op = (from) => (c.value >= from ? 1 : 0)
   background: var(--bg-panel); border: 1px solid var(--hair); border-top: 3px solid var(--warm);
   border-radius: 16px; box-shadow: var(--elev); text-align: center;
 }
-.core.agent { box-shadow: 0 0 28px rgba(252,192,3,0.16); }
+.core.agent { box-shadow: 0 0 28px rgba(var(--warm-rgb),0.16); }
 .n-ic { font-size: 1.6rem; line-height: 1; }
 .n-t { font-family: var(--serif); font-weight: 700; font-size: 1.2rem; margin-top: 0.15rem; }
 .n-s { font-family: var(--mono); font-size: 0.62rem; color: var(--ink-faint); margin-top: 0.2rem; }

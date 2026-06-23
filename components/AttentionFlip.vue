@@ -47,13 +47,14 @@ const MEAN_X = 716             // divider between sentence and meaning zone
 const FS = 28, GAP = 18, CHIP_PAD = 18
 const A_BASE = 152, B_BASE = 324   // sentence baselines (cards: 40-196 / 212-368)
 
-// rough per-glyph advance for Fraunces at FS=28 (no measuring API in SVG)
+// rough per-glyph advance for Spectral at FS=28 (no measuring API in SVG).
+// Spectral is a narrower serif than the old Fraunces, so these are tightened.
 const charW = (c) => {
-  if (c === ' ') return 8
-  if ('iIlj.,\'’!|'.includes(c)) return 8
-  if ('mwMW'.includes(c)) return 25
-  if ('Q@'.includes(c)) return 22
-  return 15.5
+  if (c === ' ') return 7
+  if ('iIlj.,\'’!|'.includes(c)) return 7
+  if ('mwMW'.includes(c)) return 23
+  if ('Q@'.includes(c)) return 20
+  return 14
 }
 const textW = (t) => [...t].reduce((s, c) => s + charW(c), 0)
 
@@ -188,8 +189,8 @@ const keyB = rowB.find((w) => w.key)
 
 /* focus CHIP — highlighted pill, bright accent text (visible from arrival) */
 .chip { stroke-width: 1.5; }
-.cool .chip { fill: rgba(1, 118, 211, 0.12); stroke: var(--cool); filter: drop-shadow(0 2px 8px rgba(1, 118, 211, 0.22)); }
-.warm .chip { fill: rgba(252, 192, 3, 0.16); stroke: var(--warm); filter: drop-shadow(0 2px 8px rgba(252, 192, 3, 0.28)); }
+.cool .chip { fill: rgba(var(--cool-rgb), 0.12); stroke: var(--cool); filter: drop-shadow(0 2px 8px rgba(var(--cool-rgb), 0.22)); }
+.warm .chip { fill: rgba(var(--warm-rgb), 0.16); stroke: var(--warm); filter: drop-shadow(0 2px 8px rgba(var(--warm-rgb), 0.28)); }
 .w.key { font-weight: 700; }
 .cool .w.key { fill: var(--cool-bright); }
 .warm .w.key { fill: var(--warm-bright); }

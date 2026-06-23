@@ -96,7 +96,7 @@ clicks: 5
 
 [click] **③ ACT + OBSERVE** — it acts on its own decision: get_tracking
 
-- and observes the ETA: June 20th
+- and observes the ETA: June 25th
 
 [click] **④ DONE** — it has the ETA, the goal is met, so it STOPS and answers
 
@@ -170,9 +170,10 @@ clicks: 4
 ---
 
 <!-- KEY TAKEAWAYS — the whole-deck recap (replaced A2A 2026-06-22, user).
-     Five durable mental models spanning AI → LLMs → Agents; warm rows =
-     what the model IS, cool rows = how we put it to work. Title on
-     arrival with row 1 lit; clicks light rows 2–5. See KeyTakeaways.vue. -->
+     Five durable mental models spanning AI → LLMs → Agents; ALL rows the
+     SAME colour (cool/blue) — the old warm/cool split was dropped (user
+     2026-06-23). Title on arrival with row 1 lit; clicks light rows 2–5.
+     See KeyTakeaways.vue. -->
 
 <div class="demo-stage">
   <div class="demo-head">

@@ -18,7 +18,6 @@ layout: default
 <PartOpener
   bg="part-2.jpg"
   :active="2"
-  accent="warm"
   num="02"
   headline="How the model actually works"
   sub="tokens · attention · stateless · the window · its limits" />
@@ -33,7 +32,7 @@ layout: default
 - part two — LLMs
 - we open the box and look at the one model inside
 - the plan on screen: tokens → attention → stateless → the window → its limits
-- four ideas, each its own slide; together they explain the whole machine
+- five ideas, each its own slide; together they explain the whole machine
 - this part has more detail than part 1 — on purpose; this is where the real understanding is
 - by the end we will know exactly why the model can sound brilliant and still be wrong — which sets up agents
 

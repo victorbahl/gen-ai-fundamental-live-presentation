@@ -83,13 +83,13 @@ const limits = [
 .card.lit {
   opacity: 1;
   border-top-color: var(--warm);
-  box-shadow: 0 0 26px rgba(252,192,3,0.14);
+  box-shadow: 0 0 26px rgba(var(--warm-rgb),0.14);
 }
 
 .badge {
   display: flex; align-items: center; justify-content: center;
   width: 48px; height: 48px; border-radius: 12px; font-size: 1.5rem;
-  background: rgba(252,192,3,0.12); border: 1px solid rgba(252,192,3,0.28);
+  background: rgba(var(--warm-rgb),0.12); border: 1px solid rgba(var(--warm-rgb),0.28);
 }
 .t { font-family: var(--serif); font-weight: 700; font-size: 1.24rem; color: var(--ink); line-height: 1.25; }
 

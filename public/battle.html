@@ -5,15 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>AI Battle — join</title>
   <style>
+    /* self-contained "Inference" theme — mirrors the deck's NIGHT tokens
+       (ink canvas, teal=structured, coral=the model) so phones + screen
+       read as one system. Not wired to Slidev; kept in sync by hand. */
     :root {
-      --bg: #0b1020; --panel: #151b30; --ink: #f4f6fb; --soft: #9aa6c4;
-      --cool: #00a2df; --warm: #fcc003; --good: #29c46a; --line: #283150;
+      --bg: #0e1413; --panel: #15201e; --ink: #eaf0ec; --soft: #9fb1aa;
+      --cool: #2dd4bf; --warm: #ff8473; --good: #34d399; --line: #25302d;
     }
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     html, body { margin: 0; height: 100%; }
     body {
       font-family: system-ui, -apple-system, sans-serif;
-      background: radial-gradient(120% 100% at 50% 0%, #182238 0%, var(--bg) 60%), var(--bg);
+      background: radial-gradient(120% 100% at 50% 0%, #16302b 0%, var(--bg) 60%), var(--bg);
       color: var(--ink); display: flex; flex-direction: column; min-height: 100%;
     }
     .wrap { flex: 1; display: flex; flex-direction: column; justify-content: center;
@@ -35,11 +38,11 @@
             padding: 22px; box-shadow: 0 20px 50px rgba(0,0,0,.4); }
     label { display: block; font-size: .82rem; color: var(--soft); margin-bottom: 8px; }
     input { width: 100%; font-size: 1.15rem; padding: 14px 16px; border-radius: 12px;
-            border: 1px solid var(--line); background: #0e1426; color: var(--ink); outline: none; }
+            border: 1px solid var(--line); background: #101a18; color: var(--ink); outline: none; }
     input:focus { border-color: var(--cool); }
     button { width: 100%; margin-top: 16px; font-size: 1.1rem; font-weight: 700;
              padding: 15px; border: 0; border-radius: 12px; background: var(--warm);
-             color: #1a1300; cursor: pointer; transition: transform .08s ease, opacity .2s; }
+             color: #3a0f08; cursor: pointer; transition: transform .08s ease, opacity .2s; }
     button:active { transform: scale(.98); }
     button:disabled { opacity: .45; cursor: default; }
     .status { text-align: center; color: var(--soft); font-size: .9rem; margin-top: 14px; min-height: 1.2em; }
@@ -52,7 +55,7 @@
            background: var(--panel); border: 1px solid var(--line); color: var(--ink);
            font-size: 1.1rem; padding: 16px; border-radius: 14px; margin: 0; }
     .opt .lab { width: 30px; height: 30px; border-radius: 8px; background: var(--cool);
-                color: #001722; font-weight: 800; display: grid; place-items: center; flex: none; }
+                color: #04221f; font-weight: 800; display: grid; place-items: center; flex: none; }
     .opt:disabled { opacity: 1; }
     .opt.picked { border-color: var(--warm); box-shadow: 0 0 0 2px var(--warm) inset; }
     .big { text-align: center; }

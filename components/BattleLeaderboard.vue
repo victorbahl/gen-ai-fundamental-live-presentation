@@ -149,7 +149,7 @@ function shown(key: "first" | "second" | "third") {
   padding-top: 8px; }
 .col .rk { font-size: 1.4rem; font-weight: 900; color: rgba(255,255,255,.55); }
 /* Heights/colours by POSITION, not slot — tied players in a column are equal. */
-.rank-1 .bar { height: 100px; background: linear-gradient(180deg, var(--warm), rgba(252,192,3,.35)); }
+.rank-1 .bar { height: 100px; background: linear-gradient(180deg, var(--warm), rgba(var(--warm-rgb),.35)); }
 .rank-1 .rk { color: #5a4500; }
 .rank-2 .bar { height: 76px; background: linear-gradient(180deg, #cfd6e6, rgba(207,214,230,.3)); }
 .rank-2 .rk { color: #3a4256; }

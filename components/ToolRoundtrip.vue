@@ -95,7 +95,7 @@ const op = (from) => (c.value >= from ? 1 : 0)
           <div class="c-sub">into the model's next payload → it answers</div>
           <div class="json">
             <div class="jl">{ <span class="k">"status"</span>: <span class="s">"shipped"</span>,</div>
-            <div class="jl ind">  <span class="k">"eta"</span>: <span class="s">"2026-06-20"</span> }</div>
+            <div class="jl ind">  <span class="k">"eta"</span>: <span class="s">"2026-06-25"</span> }</div>
           </div>
           <div class="tag good">③ now it can answer</div>
         </div>
@@ -166,8 +166,8 @@ const op = (from) => (c.value >= from ? 1 : 0)
   font-family: var(--mono); font-size: 0.62rem; font-weight: 700; letter-spacing: 0.02em;
   padding: 0.16rem 0.55rem; border-radius: 999px;
 }
-.tag.warm { color: var(--warm-bright); background: rgba(252,192,3,0.14); }
-.tag.cool { color: var(--cool-bright); background: rgba(1,118,211,0.10); }
+.tag.warm { color: var(--warm-bright); background: rgba(var(--warm-rgb),0.14); }
+.tag.cool { color: var(--cool-bright); background: rgba(var(--cool-rgb),0.10); }
 .tag.good { color: var(--good); background: rgba(46,132,74,0.10); }
 
 .cross { position: absolute; left: calc(50% - 60px); top: 0; width: 120px; height: 100%; pointer-events: none; }

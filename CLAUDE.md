@@ -108,13 +108,14 @@ Cover · Humility · Roadmap · **AI Battle** (opener icebreaker) ·
   AgentRuntime ("what is an agent" — UP FRONT) / ToolRoundtrip / McpEnvelope / McpHandshake /
   ToolsVsSkills / AgentLoop / AgentContextWindow / KeyTakeaways · Close (hackathon CTA).
 
-**PART OPENERS** — each part opens with a `PartOpener.vue` hero showing a SPINE PROGRESS bar (full
-"AI › LLMs › Agents" spine, current part lit/accent-underlined, others dimmed) over a bg photo, then
-the part number + headline + a sub-line of TAGS: Part 1 = "where GenAI fits · a short history ·
-prediction at scale"; Part 2 = "tokens · attention · stateless · the context window"; Part 3 = "what
-an agent is · tools · MCP · skills · the loop". Part 1 = cool/azure (`accent="cool"`, `bg="part-1.jpg"`);
-Parts 2 & 3 = warm/gold (`part-2.jpg`, `part-3.jpg`). Same placeholder/text-shadow rules as `Hero.vue`
-(Rules 2/3) and token-driven accents (Rule 7).
+**PART OPENERS** — each part opens with a `PartOpener.vue` hero showing the SPINE as a TOKEN STREAM
+(full "AI › LLMs › Agents" as mono token-chips on the heat ramp — current part lit with a blinking
+caret, others dim in their own hue; `pos NN / 03` read-out leads it — see Rule 7 SIGNATURE) over a bg
+photo, then the part number + headline + a sub-line of TAGS: Part 1 = "where GenAI fits · a short
+history"; Part 2 = "tokens · attention · stateless · the window · its limits"; Part 3 = "what an agent
+is · tools · MCP · skills · the loop". Each part's HUE is derived from `active` (no `accent` prop):
+Part 1 = teal, Part 2 = gold, Part 3 = coral; `bg="part-1/2/3.jpg"`. Same placeholder/text-shadow
+rules as `Hero.vue` (Rules 2/3) and token-driven accents (Rule 7).
 
 **A2A was REMOVED** — `A2A.vue` stays on disk but is UNREFERENCED; do NOT re-add the slide.
 
@@ -242,7 +243,7 @@ unreferenced.
   style; sub: "with memory and tools wired in, it picks its own next step until done"); ④ the model
   asks, **the APP executes** (NOT "we" — Rule 9 exception); ⑤ MCP is a standardized HTTP API (sub names
   initialize, tools/list, tools/call — same host/auth/JSON). COLOUR: ALL five rows the SAME colour
-  (COOL/blue) — do NOT reintroduce per-row accents or the per-row TAG chips. Fixed-slot list, all five
+  (the COOL accent — now teal) — do NOT reintroduce per-row accents or the per-row TAG chips. Fixed-slot list, all five
   present from start at opacity 0.34; row 1 lit on arrival, clicks light rows 2–5 (no reflow). Gloss
   sits TIGHT under its head (`margin-top:0.04rem`). Title "Five things worth keeping" (accent
   "keeping"), kicker "To remember". PRESERVE the framings: LLM = stateless text→text; MCP = standardized
@@ -254,7 +255,7 @@ summary · free) teaches "the window is one fixed space different things share, 
 APP acts — it compresses the oldest turns into a summary (striped cells) or starts a fresh session;
 the system prompt stays pinned." It sits LAST in Part 2. The Part-3 one reuses the mechanics and adds
 **tool defs** + **tool data** (the runaway space-hog — tool OUTPUT, not your prose, fills an agent's
-window); when full, the agent **offloads to external memory** (striped azure cells, kept OUTSIDE the
+window); when full, the agent **offloads to external memory** (striped cool/teal cells, kept OUTSIDE the
 window) — making concrete the "Memory" piece from `AgentRuntime`; goal-beat caption uses the loop's
 "#7788" example. NB: do NOT frame as money/"budget"/"rent" — it's about space and what fills it; do
 NOT show tokens just "falling out" — show the real resolution (compress / new session / offload).
@@ -275,9 +276,10 @@ gradient) for the compressed/offloaded segment.
 - **KNOWN MINOR (fix later):** at real canvas res (980×551), do a click-by-click pass on
   `ToolRoundtrip` / `AgentLoop` / `ToolsVsSkills` / `KeyTakeaways` to confirm no row/band overlap.
 - **Photos.** Hero backgrounds are gradient placeholders until a real file is dropped at the path (no
-  code change needed). REAL: `but-limits.jpg`. Still placeholders: `cover.jpg`, `part-1/2/3.jpg`,
-  `prediction-at-scale.jpg` (wants rocket/liftoff), `close.jpg`. `public/img/to-use/` is the untracked
-  candidate-photo staging folder.
+  code change needed). REAL (present on disk): `cover.jpg`, `humility.jpg`, `part-1.jpg`, `part-2.jpg`,
+  `part-3.jpg`, `prediction-at-scale.jpg` (rocket/liftoff), `but-limits.jpg`, `close.jpg`,
+  `victor-bahl.jpg`. No hero is on a placeholder anymore. (`part-2b.jpg`/`part-4.jpg` exist but are
+  unreferenced — cut slides.) `public/img/to-use/` is the untracked candidate-photo staging folder.
 - **Open:** full visual QA pass; PDF/PPTX export (needs `playwright-chromium`; browser download
   sandbox-blocked — install to `./.pw-browsers` with sandbox off, see Lesson 5).
 
@@ -348,16 +350,47 @@ gradient) for the compressed/offloaded segment.
    infinite ambient flow/pulse (the blinking "generating" caret is the one allowed loop). To REPLAY a
    one-shot animation on a later beat, bump a `:key` to remount. Still obeys Rule 4 — animate INTO a
    reserved slot; nothing reflows.
-7. **Brand palette = MuleSoft (NOT Anthropic).** Drive colour through `styles/index.css` tokens (day +
-   `html.dark` blocks); do NOT bake hex/rgba accent literals into components.
-   - **Cool** (`--cool` / `--cool-bright`) = MuleSoft azure `#00a2df` + cloud-blue `#0176d3` — the
-     "API / integration" accent.
-   - **Warm** (`--warm` / `--warm-bright`) = MuleSoft gold `#fcc003` + deep amber `#b26b00` — the
-     "AI / model" accent.
-   - The day `--warm-bright` (#b26b00) is illegible on dark photos, so a rule lights
-     `.hero .grad-warm` / `.part-opener .grad-warm` as bright gold `--warm` + text-shadow (and
-     `.grad-cool` likewise) for accent words over hero images. If you need an accent tint, use gold
-     `rgba(252,192,3,…)` / blue `rgba(1,118,211,…)`.
+7. **"INFERENCE" design system — the prediction spectrum** (replaced the MuleSoft brand palette
+   2026-06-23, user: "improve it globally … fresh, coherent, beautiful"; chosen via the
+   `frontend-design` skill). The deck is rendered in the model's own grammar: a cool→hot token-
+   probability spectrum. Drive ALL colour through `styles/index.css` tokens (day `:root` + `html.dark`
+   blocks); do NOT bake hex/rgba accent literals into components.
+   - **PALETTE — a heat ramp.** **Cool = pine-teal** (`--cool` `#0e8a86` / `--cool-bright` `#0b5e57`;
+     night `#2dd4bf`/`#5eead4`) = the structured side: our systems / grid / committed. **Warm = coral**
+     (`--warm` `#f26b5b` / `--warm-bright` `#c0422f`; night `#ff8473`/`#ffa99b`) = the model side: the
+     predicted/live token. **Gold = the ramp MIDDLE** (`--gold` `#e0a32e` / `--gold-bright` `#9a6a06`;
+     night `#f5c451`/`#ffd97a`) — SCOPED to the spine/part-openers (the LLMs part), NOT a general
+     accent. Teal+coral are a true complementary pair so the cool/warm semantic split (our-systems vs
+     the-model) still reads at a glance across Grounding / ToolRoundtrip / the context-window pair.
+     `--good`/`--bad` stay green/red, kept distinct from coral.
+   - **CANVAS.** Day = **warm ivory** `--bg #f7f5f0` (bright, paper-like — NOT the greige `#e7e9e4`
+     it briefly was 2026-06-23, user: "depressing … beige"; and NOT cream). Night = **ink** `#0e1413`
+     (faint teal-green undertone) — teal+coral glow like a heat-map, the dim-room mode.
+   - **TYPE.** `--serif` = **Spectral** (display, literary; echoes "prediction spectrum") · `--sans` =
+     **Hanken Grotesk** (body) · `--mono` = **IBM Plex Mono** (token chips / code / data / kickers).
+     Replaced Fraunces+Inter+JetBrains. `AttentionFlip.vue`'s SVG `charW()` glyph-advance metrics were
+     re-tuned for Spectral (narrower than Fraunces).
+   - **SIGNATURE — the spine as a TOKEN STREAM + the caret as the deck's cursor.** `PartOpener.vue`
+     renders AI›LLMs›Agents as mono token-CHIPS on the heat ramp: each part owns ONE hue everywhere
+     (AI=teal, LLMs=gold, Agents=coral); the CURRENT part is lit (filled tint + glow + a BLINKING
+     caret = "you are here, generating"), the others sit dim as outlined chips in their own hue (user:
+     "either 3 different colours or one" → 3, encoding the spectrum). A `pos NN / 03` mono read-out
+     leads the spine. The agenda (`01-intro.md`) matches via `.grad-cool/gold/warm` words + a heat-ramp
+     `.rm-rail` per card (`margin-top:auto` pins all three rails to the card BOTTOM so they align even
+     when text wraps). `PartOpener`'s `accent` prop was REMOVED (hue is derived from `active`).
+   - **BLINKING CARET is RESERVED** for live "generating" moments only — the spine's active chip and
+     the predictor's caret (Rule 6's one allowed loop). The global `.kicker` is mono + a NON-blinking
+     bold `›` prefix (user: "the > should be bolder … everywhere"); do NOT add a blinking caret to it.
+   - **Token TINTS use RGB-triple tokens:** `--cool-rgb`/`--warm-rgb`/`--gold-rgb` (synced day+night).
+     Components write `rgba(var(--cool-rgb), 0.1)` etc. — NEVER bake the brand hex into an rgba. A
+     palette swap then propagates to every tint/glow (this is what makes "try another palette" cheap).
+   - The day `-bright` text shades are too dark on dark photos, so a rule lights `.hero .grad-warm /
+     .grad-gold / .grad-cool` (and the `.part-opener` ones) as the BRIGHT `--warm`/`--gold`/`--cool`
+     + text-shadow for accent words over hero images.
+   - The PHONE (`public/battle.html`) is self-contained (its own `:root`, not Slidev tokens) — its
+     palette mirrors the deck's NIGHT tokens (ink + teal + coral) and is kept in sync BY HAND. The
+     MuleSoft/Informatica logo lockup on the phone is PRODUCT branding (Hackathon · SE French Team),
+     separate from the deck theme — leave it.
 8. **No blank first click — slides land with their first beat showing.** The title-row carries NO
    `v-click` (always visible). The first revealable element starts at `v-click="1"`, and `clicks:` =
    number of reveals AFTER the first beat (title + 3 cards → `clicks: 3`). For `$clicks` components, the

@@ -84,7 +84,7 @@ const count = computed(() => players.value.length);
 .bl-grid { display: flex; flex-wrap: wrap; gap: 8px; align-content: flex-start; overflow: hidden;
   max-height: 64vh; }
 .bl-chip { background: var(--cool); color: #001722; font-weight: 700; font-size: .9rem;
-  padding: 6px 12px; border-radius: 999px; box-shadow: 0 4px 12px rgba(0,162,223,.22);
+  padding: 6px 12px; border-radius: 999px; box-shadow: 0 4px 12px rgba(var(--cool-rgb),.22);
   max-width: 11rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .bl-empty { color: var(--ink-faint); font-style: italic; }
 

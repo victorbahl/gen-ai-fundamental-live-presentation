@@ -21,7 +21,6 @@ layout: default
 <PartOpener
   bg="part-3.jpg"
   :active="3"
-  accent="warm"
   num="03"
   headline="From answers to actions"
   sub="what an agent is · tools · MCP · skills · the loop" />

@@ -43,7 +43,7 @@ const steps = [
     n: '3',
     method: 'tools/call',
     purpose: 'run one, read the result',
-    res: '{ "status": "shipped", "eta": "2026-06-18" }',
+    res: '{ "status": "shipped", "eta": "2026-06-25" }',
   },
 ]
 const isOn = (i) => c.value >= i
@@ -101,15 +101,15 @@ const isOn = (i) => c.value >= i
   box-shadow: var(--elev); padding: 0 1rem;
   opacity: 0.4; transition: opacity 0.45s ease, border-color 0.45s ease, box-shadow 0.45s ease;
 }
-.row.on { opacity: 1; border-color: var(--warm); box-shadow: 0 0 22px rgba(252,192,3,0.22); }
+.row.on { opacity: 1; border-color: var(--warm); box-shadow: 0 0 22px rgba(var(--warm-rgb),0.22); }
 .row.past { opacity: 0.78; border-color: var(--hair); box-shadow: var(--elev); }
 
 .num {
   width: 38px; height: 38px; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
   font-family: var(--serif); font-weight: 700; font-size: 1.1rem;
-  color: var(--warm-bright); background: rgba(252,192,3,0.14);
-  border: 1px solid rgba(252,192,3,0.4);
+  color: var(--warm-bright); background: rgba(var(--warm-rgb),0.14);
+  border: 1px solid rgba(var(--warm-rgb),0.4);
 }
 
 .req { min-width: 0; }
@@ -120,7 +120,7 @@ const isOn = (i) => c.value >= i
 .verb { color: var(--cool-bright); font-weight: 700; }
 .auth-tag {
   font-size: 0.6rem; color: var(--cool-bright);
-  background: rgba(1,118,211,0.10); border: 1px solid rgba(1,118,211,0.28);
+  background: rgba(var(--cool-rgb),0.10); border: 1px solid rgba(var(--cool-rgb),0.28);
   border-radius: 999px; padding: 0.05rem 0.45rem;
 }
 .method {

@@ -195,9 +195,9 @@ const roleColor = (r) =>
   animation: recvFlash 0.9s ease 2s both;
 }
 @keyframes recvFlash {
-  0%   { border-color: transparent; box-shadow: 0 0 0 0 rgba(252,192,3,0); }
-  40%  { border-color: var(--warm); box-shadow: inset 0 0 26px rgba(252,192,3,0.28); }
-  100% { border-color: transparent; box-shadow: 0 0 0 0 rgba(252,192,3,0); }
+  0%   { border-color: transparent; box-shadow: 0 0 0 0 rgba(var(--warm-rgb),0); }
+  40%  { border-color: var(--warm); box-shadow: inset 0 0 26px rgba(var(--warm-rgb),0.28); }
+  100% { border-color: transparent; box-shadow: 0 0 0 0 rgba(var(--warm-rgb),0); }
 }
 .bubble {
   position: relative; z-index: 2;
@@ -221,14 +221,14 @@ const roleColor = (r) =>
 .send {
   font-family: var(--mono); font-size: 0.66rem; font-weight: 700; letter-spacing: 0.06em;
   color: var(--warm-bright); padding: 0.3rem 0.55rem; border-radius: 8px;
-  border: 1px solid var(--warm); background: rgba(252,192,3,0.10);
+  border: 1px solid var(--warm); background: rgba(var(--warm-rgb),0.10);
   transition: opacity 0.4s ease;
   animation: pulse 0.7s cubic-bezier(0.22,1,0.36,1) 0.25s both;
 }
 @keyframes pulse {
-  0%   { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(252,192,3,0); }
-  40%  { transform: scale(1.08); box-shadow: 0 0 22px 2px rgba(252,192,3,0.45); }
-  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(252,192,3,0); }
+  0%   { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(var(--warm-rgb),0); }
+  40%  { transform: scale(1.08); box-shadow: 0 0 22px 2px rgba(var(--warm-rgb),0.45); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(var(--warm-rgb),0); }
 }
 .wire-line { width: 2px; height: 40px; background: linear-gradient(var(--warm), transparent); transition: opacity 0.4s ease; }
 .back {
@@ -252,7 +252,7 @@ const roleColor = (r) =>
 .sweep { position: absolute; inset: 0; pointer-events: none; z-index: 3; }
 .sweep::after {
   content: ''; position: absolute; left: 0; right: 0; height: 36%; top: -38%;
-  background: linear-gradient(180deg, transparent, rgba(252,192,3,0.24), transparent);
+  background: linear-gradient(180deg, transparent, rgba(var(--warm-rgb),0.24), transparent);
   animation: sweepDown 0.75s cubic-bezier(0.22,1,0.36,1) 0.25s both;
 }
 @keyframes sweepDown { 0% { top: -38%; } 100% { top: 102%; } }
@@ -267,7 +267,7 @@ const roleColor = (r) =>
 .card.replay .text { color: var(--ink-faint); }     /* dimmed = already sent before */
 .card.system { border-style: dashed; }
 .card.fresh {                                        /* the single new line this call */
-  background: rgba(1,118,211,0.08); border-color: rgba(1,118,211,0.45);
+  background: rgba(var(--cool-rgb),0.08); border-color: rgba(var(--cool-rgb),0.45);
 }
 .card.fresh .text { color: var(--ink); font-weight: 500; }
 .role {
@@ -314,7 +314,7 @@ const roleColor = (r) =>
 }
 @keyframes llmGlow {
   0%   { border-color: var(--hair); box-shadow: none; }
-  45%  { border-color: var(--warm); box-shadow: 0 0 24px rgba(252,192,3,0.30); }
+  45%  { border-color: var(--warm); box-shadow: 0 0 24px rgba(var(--warm-rgb),0.30); }
   100% { border-color: var(--hair); box-shadow: none; }
 }
 .llm-head {

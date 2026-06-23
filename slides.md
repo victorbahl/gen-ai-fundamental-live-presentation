@@ -1,6 +1,6 @@
 ---
 theme: default
-title: 'GenAI, from first principles'
+title: 'GenAI Fundamentals — AI → LLMs → Agents'
 info: |
   AI → LLMs → Agents — a visual, interactive intro to Generative AI
   for integration-minded engineers.
@@ -25,8 +25,7 @@ fonts:
 <Hero bg="cover.jpg" kicker="Hackathon AI · SE French Team" :logos="['mulesoft.svg', 'informatica.svg']" presenter="Victor BAHL" presenter-title="Solution Engineer" presenter-photo="victor-bahl.jpg">
   The GenAI refresher<br>you <span class="grad-warm">didn't ask for</span>
   <template #subtitle>
-    ...but might enjoy anyway 😊
-    
+    ...but might enjoy anyway 😊<br>
     From the history of AI... to autonomous agents.
   </template>
 </Hero>

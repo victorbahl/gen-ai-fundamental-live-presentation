@@ -105,15 +105,15 @@ const op = (from) => (c.value >= from ? 1 : 0)
   transition: opacity 0.45s ease, border-top-color 0.45s ease, box-shadow 0.45s ease;
 }
 .card.tool.lit { border-top-color: var(--cool); }
-.card.skill.lit { border-top-color: var(--warm); box-shadow: 0 0 26px rgba(252,192,3,0.14); }
+.card.skill.lit { border-top-color: var(--warm); box-shadow: 0 0 26px rgba(var(--warm-rgb),0.14); }
 
 .head { display: flex; align-items: center; gap: 0.7rem; }
 .ic {
   display: flex; align-items: center; justify-content: center;
   width: 46px; height: 46px; border-radius: 12px; font-size: 1.45rem; flex: none;
 }
-.card.tool .ic { background: rgba(1,118,211,0.08); border: 1px solid rgba(1,118,211,0.22); }
-.card.skill .ic { background: rgba(252,192,3,0.12); border: 1px solid rgba(252,192,3,0.28); }
+.card.tool .ic { background: rgba(var(--cool-rgb),0.08); border: 1px solid rgba(var(--cool-rgb),0.22); }
+.card.skill .ic { background: rgba(var(--warm-rgb),0.12); border: 1px solid rgba(var(--warm-rgb),0.28); }
 .t { font-family: var(--serif); font-weight: 700; font-size: 1.3rem; color: var(--ink); line-height: 1.1; }
 .tag { font-family: var(--mono); font-size: 0.64rem; font-weight: 600; letter-spacing: 0.02em; margin-top: 0.1rem; }
 .tag.cool { color: var(--cool-bright); }

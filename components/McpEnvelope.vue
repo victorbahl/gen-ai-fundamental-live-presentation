@@ -35,7 +35,7 @@ const c = computed(() => $clicks.value)
       <div class="card cool">
         <div class="chip">REST API</div>
         <div class="hdr">
-          <div class="ln"><span class="k">GET</span> /orders/4471/status</div>
+          <div class="ln"><span class="k">GET</span> /orders/7788/status</div>
           <div class="ln" :class="{ pair: c >= 2 }"><span class="dim">Host:</span> api.acme.com</div>
           <div class="ln auth" :class="{ same: c >= 2 }"><span class="dim">Authorization:</span> Bearer •••</div>
           <div class="ln" :class="{ pair: c >= 2 }"><span class="dim">Accept:</span> application/json</div>
@@ -45,7 +45,7 @@ const c = computed(() => $clicks.value)
 
 <span class="cmt"># 200 OK</span>
 { <span class="s">"status"</span>: <span class="s">"shipped"</span>,
-  <span class="s">"eta"</span>: <span class="s">"2026-06-18"</span> }</pre></div>
+  <span class="s">"eta"</span>: <span class="s">"2026-06-25"</span> }</pre></div>
       </div>
 
       <!-- MIDDLE: alignment badges -->
@@ -78,7 +78,7 @@ const c = computed(() => $clicks.value)
         <div class="body" :class="{ differ: c >= 2 }"><pre>{ <span class="k">"jsonrpc"</span>: <span class="s">"2.0"</span>, <span class="k">"id"</span>: 7,
   <span class="k">"method"</span>: <span class="s">"tools/call"</span>,
   <span class="k">"params"</span>: { <span class="dim">"name"</span>: <span class="s">"get_order_status"</span>,
-    <span class="dim">"arguments"</span>: { <span class="s">"id"</span>: <span class="s">"4471"</span> } } }</pre></div>
+    <span class="dim">"arguments"</span>: { <span class="s">"id"</span>: <span class="s">"7788"</span> } } }</pre></div>
       </div>
     </div>
 
@@ -127,8 +127,8 @@ const c = computed(() => $clicks.value)
   padding: 0 0.9rem; font-size: 0.74rem; font-weight: 700;
   letter-spacing: 0.04em; border-bottom: 1px solid var(--hair);
 }
-.card.cool .chip { color: var(--cool-bright); background: rgba(1,118,211,0.07); }
-.card.warm .chip { color: var(--warm-bright); background: rgba(252,192,3,0.12); }
+.card.cool .chip { color: var(--cool-bright); background: rgba(var(--cool-rgb),0.07); }
+.card.warm .chip { color: var(--warm-bright); background: rgba(var(--warm-rgb),0.12); }
 
 .hdr { padding: var(--hdr-pad) 0.9rem; }
 .ln {
@@ -137,9 +137,9 @@ const c = computed(() => $clicks.value)
   border-radius: 6px; padding: 0 0.35rem; margin: 0 -0.35rem;
   transition: background 0.4s ease, box-shadow 0.4s ease;
 }
-.ln.pair.pair { background: rgba(1,118,211,0.06); }
+.ln.pair.pair { background: rgba(var(--cool-rgb),0.06); }
 .ln.auth.same {
-  background: rgba(1,118,211,0.12);
+  background: rgba(var(--cool-rgb),0.12);
   box-shadow: inset 0 0 0 1px var(--cool);
   color: var(--ink);
 }
@@ -149,7 +149,7 @@ const c = computed(() => $clicks.value)
   flex: 1; padding: 0.4rem 0.9rem; border-radius: 8px;
   margin: 0 0.4rem 0.4rem; transition: background 0.4s ease;
 }
-.body.differ { background: rgba(252,192,3,0.07); }
+.body.differ { background: rgba(var(--warm-rgb),0.07); }
 .body pre {
   margin: 0; font-family: var(--mono); font-size: 0.70rem; line-height: 1.5;
   color: var(--ink-soft); white-space: pre-wrap;
@@ -169,8 +169,8 @@ const c = computed(() => $clicks.value)
   text-align: center; font-size: 0.66rem; font-weight: 600; line-height: 1.2;
   padding: 0.45rem 0.6rem; border-radius: 10px; transition: opacity 0.45s ease;
 }
-.badge.cool { color: var(--cool-bright); background: rgba(1,118,211,0.08); border: 1px solid rgba(1,118,211,0.25); }
-.badge.warm { color: var(--warm-bright); background: rgba(252,192,3,0.10); border: 1px solid rgba(252,192,3,0.30); }
+.badge.cool { color: var(--cool-bright); background: rgba(var(--cool-rgb),0.08); border: 1px solid rgba(var(--cool-rgb),0.25); }
+.badge.warm { color: var(--warm-bright); background: rgba(var(--warm-rgb),0.10); border: 1px solid rgba(var(--warm-rgb),0.30); }
 .b-eq { font-size: 1rem; font-weight: 700; }
 .b-sub { font-family: var(--mono); font-size: 0.56rem; font-weight: 500; color: var(--ink-faint); letter-spacing: 0.01em; }
 
@@ -185,8 +185,8 @@ const c = computed(() => $clicks.value)
 .pills { display: flex; gap: 0.5rem; flex-wrap: wrap; }
 .pill {
   font-family: var(--mono); font-size: 0.68rem; font-weight: 600;
-  color: var(--cool-bright); background: rgba(1,118,211,0.10);
-  border: 1px solid rgba(1,118,211,0.30); border-radius: 999px;
+  color: var(--cool-bright); background: rgba(var(--cool-rgb),0.10);
+  border: 1px solid rgba(var(--cool-rgb),0.30); border-radius: 999px;
   padding: 0.22rem 0.7rem;
 }
 </style>
