@@ -7,7 +7,15 @@ info: |
 class: text-left
 drawings:
   persist: false
-transition: fade
+# COVER's OWN forward transition: a native "slide-left" push into the deck —
+# a distinctive "let's begin" motion. (A forward transition is owned by the
+# slide you LEAVE, and slide 1's frontmatter doubles as the global headmatter,
+# so this top-level value sets BOTH the cover's transition and the global
+# fallback.) Every OTHER slide inherits the native `fade` via `defaults` below.
+transition: slide-left
+defaults:
+  # deck-wide transition for all NON-cover slides: the native crossfade.
+  transition: fade
 mdc: true
 fonts:
   provider: none
