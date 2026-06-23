@@ -10,13 +10,14 @@
  * TIES (ex-aequo) — the podium is organised by SCORE TIER, not by array slot:
  * EVERY player sharing the top score sits TOGETHER in the middle column
  * (position 1), the next distinct score fills the left column (position 2), the
- * third fills the right (position 3). So 4 players tied for 1st all stand in the
+ * third fills the right (position 3). So players tied for 1st all stand in the
  * centre — never split into stair-stepped columns. Positions are dense (1,2,3,…
  * by distinct score), so the runners-up continue 4,5,6… with no gaps.
  *
- * OVERFLOW: the podium caps names per column (rest → "+N more"), and the
- * runners-up are a compact wrapping grid capped to fit the slide (tail → a
- * "+N more" chip) — nothing runs off the bottom edge.
+ * ALL WINNERS SHOWN: a podium column lists EVERY tied name (no "+N more" on the
+ * podium). When a tier has many names they WRAP into multiple sub-columns above
+ * the bar (CSS flex column-wrap), so they all fit without growing into the title.
+ * Only the runners-up grid (rank 4+) is capped to fit the slide (tail → "+N more").
  *
  * Slide usage:  <BattleLeaderboard /> with `clicks: 3`
  */
@@ -47,7 +48,6 @@ const tiers = computed(() => {
   return order.map((score, i) => ({ pos: i + 1, score, players: byScore.get(score)! }));
 });
 
-const MAX_PODIUM_NAMES = 3;  // names shown per podium column; rest → "+N more"
 const MAX_REST = 21;         // runners-up chips shown; tail → a "+N more" chip
 
 const first = computed(() => tiers.value[0]);   // middle column
@@ -72,8 +72,6 @@ const topScore = computed(() => (board.value.length ? board.value[0].score : 0))
 function isWinner(tier: any) { return !!tier && topScore.value > 0 && tier.score === topScore.value; }
 
 const MEDALS: Record<number, string> = { 1: "🥇", 2: "🥈", 3: "🥉" };
-function names(tier: any) { return tier ? tier.players.slice(0, MAX_PODIUM_NAMES) : []; }
-function nameMore(tier: any) { return tier ? Math.max(0, tier.players.length - MAX_PODIUM_NAMES) : 0; }
 
 // Reveal order is by physical slot (3rd first), independent of who's there.
 function shown(key: "first" | "second" | "third") {
@@ -96,9 +94,8 @@ function shown(key: "first" | "second" | "third") {
           <div class="crown" v-if="isWinner(s.tier)">👑</div>
           <div class="who">
             <span class="medal">{{ MEDALS[s.pos] }}</span>
-            <div class="names">
-              <span v-for="p in names(s.tier)" :key="p.sessionId" class="nm">{{ p.name }}</span>
-              <span v-if="nameMore(s.tier)" class="more">+{{ nameMore(s.tier) }} more</span>
+            <div class="names" :class="{ multi: s.tier.players.length > 4 }">
+              <span v-for="p in s.tier.players" :key="p.sessionId" class="nm">{{ p.name }}</span>
             </div>
             <span class="sc">{{ s.tier.score }} pts</span>
           </div>
@@ -133,23 +130,30 @@ function shown(key: "first" | "second" | "third") {
 .col { display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
   flex: 1; opacity: 0; transform: translateY(20px); transition: all .5s cubic-bezier(0.22, 1, 0.36, 1); }
 .col.in { opacity: 1; transform: none; }
-.col .crown { font-size: 1.5rem; line-height: 1; margin-bottom: 2px; }
-.col .who { display: flex; flex-direction: column; align-items: center; margin-bottom: 8px; max-width: 100%; }
-.col .medal { font-size: 1.45rem; line-height: 1; }
-.col .names { display: flex; flex-direction: column; align-items: center; gap: 0; margin: 2px 0; max-width: 100%; }
-.col .nm { font-weight: 800; font-size: .95rem; line-height: 1.2; max-width: 100%;
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.col .more { font-size: .72rem; color: var(--ink-soft); font-weight: 700; }
-.col .sc { color: var(--warm-bright); font-weight: 800; font-size: .85rem; }
+.col .crown { font-size: 1.3rem; line-height: 1; margin-bottom: 1px; }
+.col .who { display: flex; flex-direction: column; align-items: center; margin-bottom: 6px; max-width: 100%; }
+.col .medal { font-size: 1.3rem; line-height: 1; }
+/* Names stack vertically; with many tied players they WRAP into extra sub-columns
+   (column-wrap + a capped height) so EVERY winner shows without growing upward.
+   Name width + sub-column gap are kept tight so two sub-columns can't bleed into
+   the neighbouring podium column. max-height is tuned so even an 8-way tie's
+   column (names + bar + medal + crown) stays inside the reserved podium box and
+   never grows into the title. */
+.col .names { display: flex; flex-direction: column; flex-wrap: wrap; align-items: center;
+  align-content: center; justify-content: flex-end; gap: 0 10px; margin: 2px 0; max-width: 100%;
+  max-height: 76px; }
+.col .nm { font-weight: 800; font-size: .85rem; line-height: 1.25; max-width: 96px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: center; }
+.col .sc { color: var(--warm-bright); font-weight: 800; font-size: .8rem; margin-top: 2px; }
 .col .bar { width: 100%; border-radius: 10px 10px 0 0; display: grid; place-items: start center;
   padding-top: 8px; }
 .col .rk { font-size: 1.4rem; font-weight: 900; color: rgba(255,255,255,.55); }
 /* Heights/colours by POSITION, not slot — tied players in a column are equal. */
-.rank-1 .bar { height: 116px; background: linear-gradient(180deg, var(--warm), rgba(252,192,3,.35)); }
+.rank-1 .bar { height: 100px; background: linear-gradient(180deg, var(--warm), rgba(252,192,3,.35)); }
 .rank-1 .rk { color: #5a4500; }
-.rank-2 .bar { height: 88px; background: linear-gradient(180deg, #cfd6e6, rgba(207,214,230,.3)); }
+.rank-2 .bar { height: 76px; background: linear-gradient(180deg, #cfd6e6, rgba(207,214,230,.3)); }
 .rank-2 .rk { color: #3a4256; }
-.rank-3 .bar { height: 64px; background: linear-gradient(180deg, #d99a5b, rgba(217,154,91,.3)); }
+.rank-3 .bar { height: 56px; background: linear-gradient(180deg, #d99a5b, rgba(217,154,91,.3)); }
 .rank-3 .rk { color: #5a3a18; }
 
 /* Runners-up: a compact wrapping grid that fits the slide; never a clipped list. */

@@ -50,10 +50,6 @@ fonts:
 
 
 ---
-src: ./slides/_preview-leaderboard.md
----
-
----
 src: ./slides/01-intro.md
 ---
 

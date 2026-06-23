@@ -81,13 +81,23 @@ Every rule the user gives is recorded here and must be respected on every slide.
   now just shows "N/total answered"; the reveal beat shows a COUNT of correct players "N players got
   it ✓", NOT names — user: "just the number of people who scored"; reuses the addon's `SlideQuizQR.vue`),
   `BattleLeaderboard.vue` (clicks:3 — podium
-  reveals 3rd-slot→2nd-slot→1st-slot; the 👑 CROWN sits on EVERY top-score player via `isWinner()`,
+  reveals 3rd-col→2nd-col→1st-col; the 👑 CROWN sits on EVERY top-score player via `isWinner()`,
   not just column 1, and is guarded so it never floats over an empty/all-zero podium. EX-AEQUO is
-  handled (user-flagged): a `ranked` computed assigns COMPETITION RANK (equal scores share a rank
-  1,1,3…), and medals/bar-heights/rank-numbers/the runners-up list are driven off that rank (CSS
-  `.rank-1/2/3`), NOT array order — so tied players render as true equals (same medal + same height).
-  Bar heights were also REDUCED (180/135/100, podium box 320px) so the winner's column + crown can't
-  grow UP into the title (user: "the crown is overlapping the title"). SPOILER GUARD (user: "on mobile
+  handled by SCORE TIERS, NOT array slots (reworked 2026-06-23, user: "when I have multiple people in
+  pos 1 I want them all in the middle, not 2 pos-1 stairs"). A `tiers` computed groups players by
+  DISTINCT score (dense positions 1,2,3…); ALL players sharing a score sit TOGETHER in ONE podium
+  column — top tier = middle (gold), 2nd = left (silver), 3rd = right (bronze) — so co-winners stand
+  together, never stair-stepped into adjacent columns. Tied names STACK vertically inside their column
+  and, when many, WRAP into multiple sub-columns (`.names` flex column + `flex-wrap` + capped
+  `max-height`) — so EVERY winner is shown: NO "+N more" on the podium (user: "we can't have a +n more
+  in the top 3; make multiple columns if needed"). Bar heights REDUCED to 100/76/56 (podium box 250px,
+  names max-height 76px) so even an 8-way tie's column + crown can't grow UP into the title (user: "the
+  crown is overlapping the title"). The RUNNERS-UP (positions 4+) are the only capped part: a compact
+  WRAPPING grid of `pos·name·score` chips (`MAX_REST=21`) with a "+N more" chip for the tail — replaced
+  the old fixed 5-row list that got CLIPPED off the slide bottom (user: "the list underneath is
+  completely cut"). VERIFIED via a throwaway `BattleLeaderboardPreview.vue` + `_preview-leaderboard.md`
+  (static data: 5-player top tie, 30 distinct, 30 w/ 4-way #1 tie, 8-way #1 tie) — both deleted after
+  sign-off; recreate the same way to re-test layout edge cases. SPOILER GUARD (user: "on mobile
   I see I'm the winner before the slide — not okay"): the slide calls `b.final(c>=3)`, so the engine
   only sets `finalRevealed` (and only then sends the leaderboard + ranks to phones) once the host has
   revealed 1st place on screen; before that phones get a roster with NO ranks + a "🥁 results coming
