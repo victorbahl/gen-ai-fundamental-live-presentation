@@ -126,25 +126,27 @@ export const BATTLE_QUESTIONS: BattleQuestion[] = [
   },
   {
     quizId: "b5",
-    question: "A chat assistant appears to “remember” earlier messages because…",
+    question:
+      "A chat assistant appears to “remember” earlier messages because…",
     options: [
-      { label: "A", text: "the server keeps your session open between messages" },
-      { label: "B", text: "the whole prior conversation is resent with each request" },
-      { label: "C", text: "the model writes the chat to its own long-term memory" },
-      { label: "D", text: "it was fine-tuned on the conversation as it unfolded" },
+      { label: "A", text: "the app resends the full conversation history with every new request" },
+      { label: "B", text: "the model stores your conversation in an internal session buffer" },
+      { label: "C", text: "the model writes each exchange into its own long-term memory" },
+      { label: "D", text: "an open connection streams state from the model between turns" },
     ],
-    correct: "B",
+    correct: "A",
   },
   {
     quizId: "b6",
-    question: "The underlying reason an LLM “hallucinates” is that…",
+    question:
+      "The fundamental reason an LLM can “hallucinate” — even on a short, simple prompt — is that…",
     options: [
-      { label: "A", text: "its training data held errors it memorised and repeats" },
-      { label: "B", text: "it ran past its context window, so earlier facts were dropped" },
-      { label: "C", text: "it generates plausible text but can't check the facts" },
-      { label: "D", text: "it was asked about a language it never learned" },
+      { label: "A", text: "its training data contained factual errors it memorised" },
+      { label: "B", text: "it predicts likely text but has no way to verify it" },
+      { label: "C", text: "it forgets the start of the conversation as the output grows" },
+      { label: "D", text: "its temperature setting was left too high" },
     ],
-    correct: "C",
+    correct: "B",
   },
   {
     quizId: "b7",

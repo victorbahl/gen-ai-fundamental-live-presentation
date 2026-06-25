@@ -220,7 +220,8 @@
         app.innerHTML = meHeader +
           `<div class="big"><div class="emoji">🟢</div>
            <div class="line">You're in!</div>
-           <div class="sub">${(s.playerCount ?? 0)} players ready · waiting for the first question</div></div>`;
+           <div class="sub">${(s.playerCount ?? 0)} players ready · waiting for the first question</div>
+           <div class="sub" style="margin-top:12px;font-size:.78rem;opacity:.7">No speed bonus · Answer is final</div></div>`;
         return;
       }
 

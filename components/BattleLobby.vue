@@ -7,9 +7,9 @@
  */
 import { computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { onSlideEnter } from "@slidev/client";
+import { useNav, onSlideEnter } from "@slidev/client";
 import SlideQuizQR from "../node_modules/slidev-addon-slide-quiz/components/SlideQuizQR.vue";
-import { battle, BATTLE_WS_URL, battleGroupId } from "./battle/battleConfig";
+import { battle, BATTLE_WS_URL, BATTLE_QUESTIONS, battleGroupId } from "./battle/battleConfig";
 
 const b = battle();
 const route = useRoute();
@@ -40,6 +40,12 @@ const joinUrl = computed(() => {
 
 const players = computed(() => b.state.players ? [...b.players()] : []);
 const count = computed(() => players.value.length);
+
+const { currentSlideNo, go } = useNav();
+// The battle occupies: lobby (1) + questions (BATTLE_QUESTIONS.length) + mid-leaderboard (1) + final leaderboard (1).
+// Skip target = current slide + all battle slides.
+const totalBattleSlides = 1 + BATTLE_QUESTIONS.length + 1 + 1;
+function skipBattle() { go(currentSlideNo.value + totalBattleSlides); }
 </script>
 
 <template>
@@ -50,6 +56,7 @@ const count = computed(() => players.value.length);
       <div class="bl-qr">
         <SlideQuizQR :url="joinUrl" :size="230" />
         <div class="bl-qrcap">scan to join</div>
+        <div class="bl-rules">No speed bonus · Answer is final</div>
       </div>
     </div>
 
@@ -62,6 +69,9 @@ const count = computed(() => players.value.length);
         <div v-if="count === 0" class="bl-empty">Waiting for the first challenger…</div>
       </div>
     </div>
+
+    <div class="bl-room">room: {{ battleGroupId() }}</div>
+    <button class="bl-skip" @click="skipBattle">Skip battle ›</button>
   </div>
 </template>
 
@@ -87,6 +97,16 @@ const count = computed(() => players.value.length);
   padding: 6px 12px; border-radius: 999px; box-shadow: 0 4px 12px rgba(var(--cool-rgb),.22);
   max-width: 11rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .bl-empty { color: var(--ink-faint); font-style: italic; }
+
+.bl-rules { font-size: .75rem; color: var(--ink-faint); margin-top: 4px; }
+
+.bl-room { position: absolute; bottom: 24px; left: 32px; font-family: var(--mono);
+  font-size: .7rem; color: var(--ink-faint); opacity: .5; }
+
+.bl-skip { position: absolute; bottom: 24px; right: 32px; background: none; border: 1px solid var(--hair);
+  color: var(--ink-soft); font-size: .78rem; font-weight: 600; padding: 6px 14px; border-radius: 8px;
+  cursor: pointer; opacity: .6; transition: opacity .2s; }
+.bl-skip:hover { opacity: 1; }
 
 .pop-enter-active { transition: all .35s cubic-bezier(0.22, 1, 0.36, 1); }
 .pop-enter-from { opacity: 0; transform: scale(.6) translateY(8px); }

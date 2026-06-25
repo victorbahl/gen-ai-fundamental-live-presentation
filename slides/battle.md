@@ -8,14 +8,16 @@ AI BATTLE — live, named, scored Kahoot-style competition.
 Custom-built on the AnyCable + Netlify infra (components/battle/ + netlify/functions/battle-*).
 NOT the poll addon: this one has names, hides the distribution, scores by speed, crowns a top 3.
 
-Flow: this lobby → 11 question slides (1 click each: open → reveal) → podium (3 clicks).
+Flow: lobby → Q1–Q6 → HALFTIME leaderboard → Q7–Q11 → final podium (3 clicks).
 Questions + answer key live in components/battle/battleConfig.ts (host-only, never sent to phones).
 Q1 is a light Game-of-Thrones icebreaker; Q2–Q11 cover the deck concepts.
 
 PRESENTER:
 - Land here → players scan the QR and type a name; watch the chips fill in.
+- Use the "Skip battle" button (bottom-right) to jump past the battle entirely if time is short.
 - Advance to Q1. Each question: arrive = answers open → click = REVEAL (which also closes scoring).
-- After the last question, the podium reveals 3rd → 2nd → 1st by click. Phones show each player their final rank.
+- After Q6, the halftime leaderboard shows automatically (no clicks) — let the room react, then advance.
+- After Q11, the final podium reveals 3rd → 2nd → 1st by click. Phones show each player their final rank.
 - Use a FRESH groupId (battleConfig.ts) per real run so scores start clean.
 -->
 
@@ -115,10 +117,23 @@ clicks: 1
 
 <!--
 Q6 — the stateless truth. Bridges to the StatelessReplay slides.
-- ✅ **B — the whole prior conversation is resent with each request.** The model has no memory. The "memory" of a chat is an illusion: the app stores the history and resends all of it on every turn. No history in the prompt = no memory.
-- A — wrong: "keeping the session open" is not how it remembers; even a fresh connection works as long as we resend the transcript.
-- C — wrong: the model never writes to any long-term memory of its own; weights are frozen at inference.
-- D — wrong: it is not fine-tuned mid-chat; that would be absurdly slow and costly.
+- ✅ **A — the app resends the full conversation history with every new request.** The model has no memory. The "memory" of a chat is an illusion: the app stores the history and resends all of it on every turn. No history in the prompt = no memory.
+- B — wrong: there is no "session buffer" inside the model; weights are frozen, inference is stateless.
+- C — wrong: the model never writes to any long-term memory of its own.
+- D — wrong: there is no persistent connection streaming state between turns; each call is independent.
+-->
+
+
+---
+layout: default
+class: battle-slide
+---
+
+<BattleMidLeaderboard />
+
+<!--
+HALFTIME — intermediate standings after 6 rounds.
+Let the room react, tease the second half. No clicks needed.
 -->
 
 
@@ -132,10 +147,10 @@ clicks: 1
 
 <!--
 Q7 — hallucination. Bridges to the Hallucination slide ("guesses — never checks").
-- ✅ **C — it generates plausible text but can't check the facts.** This is the ROOT cause. The model only predicts the next likely token; it has no step where it verifies anything against the real world. So it can produce something that sounds perfect and is simply wrong — confidently.
-- B is the subtle trap, and it's a fair question to raise: a context overflow drops earlier facts, which CAN push the model to fill the gap by guessing — so it can TRIGGER fabrication. But it is not the underlying REASON hallucination exists. Proof: a model hallucinates even on a tiny prompt with the window almost empty. And overflow drops INPUT — it doesn't "corrupt" the output; the text still reads fluently. So context loss is a trigger, not the cause; the cause is "predicts, never checks."
-- A — sometimes true (bad training data repeats), but that's a specific case, not the general reason. It hallucinates even on things that were never in its data.
-- D — wrong and oddly specific; unknown languages aren't why it invents facts.
+- ✅ **B — it predicts likely text but has no way to verify it.** This is the ROOT cause. The model only predicts the next likely token; it has no step where it verifies anything against the real world. So it can produce something that sounds perfect and is simply wrong — confidently. The question says "even on a short, simple prompt" — that rules out context-overflow explanations.
+- A — sometimes true (bad training data repeats), but that's a specific case, not the fundamental reason. It hallucinates even on things that were never in its data.
+- C — wrong: forgetting the start of the conversation (context overflow) is a separate issue, and the question explicitly says "even on a short, simple prompt".
+- D — wrong: temperature affects variety, not factual accuracy; hallucination happens at any temperature.
 - THE BRIDGE: because it can't check, we don't fix the model — we give it a way to check: grounding (RAG) and tools.
 -->
 
