@@ -54,10 +54,10 @@ function skipBattle() { go(currentSlideNo.value + totalBattleSlides); }
       <div class="bl-kicker">⚔️ AI Battle</div>
       <h2 class="bl-title">Scan. Name yourself. <span class="grad-warm">Play.</span></h2>
       <div class="bl-qr">
-        <SlideQuizQR :url="joinUrl" :size="230" />
+        <SlideQuizQR :url="joinUrl" :size="180" />
         <div class="bl-qrcap">scan to join</div>
-        <div class="bl-rules">No speed bonus · Answer is final</div>
       </div>
+      <div class="bl-rules">No speed bonus · Answer is final</div>
     </div>
 
     <div class="bl-right">
